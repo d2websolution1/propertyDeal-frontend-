@@ -22,14 +22,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-[#1e293b]">
           {/* Brand Col */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#ffb300] flex items-center justify-center text-[#0f172a] font-black text-sm">
-                PD
-              </div>
-              <span className="text-xl font-extrabold text-white tracking-tight">
-                Property<span className="text-[#3b82f6]">Deal</span>
-              </span>
-            </div>
+            <PropertyDealLogo size={36} textColor="text-white" />
             <p className="text-xs text-[#94a3b8] leading-relaxed">
               India's trusted real estate marketplace. Buy, sell, or rent flats, builder floors, plots, and commercial properties directly from owners and verified agents.
             </p>

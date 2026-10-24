@@ -2,26 +2,21 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import ClientAuthModal from "./ClientAuthModal";
+import propertyDealIcon from "../../assets/icon-propertydeal.png";
 
-export const PropertyDealLogo = ({ size = 32 }) => (
-  <div className="flex items-center gap-2 flex-shrink-0">
-    <div
+export const PropertyDealLogo = ({ size = 34, showText = true, textColor = "text-[#0f172a]" }) => (
+  <div className="flex items-center gap-2.5 flex-shrink-0">
+    <img
+      src={propertyDealIcon}
+      alt="PropertyDeal Logo"
       style={{ width: size, height: size }}
-      className="rounded-lg bg-[#ffb300] flex items-center justify-center flex-shrink-0 shadow-sm"
-    >
-      <svg
-        width={size * 0.62}
-        height={size * 0.62}
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className="text-[#1e1b4b]"
-      >
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-      </svg>
-    </div>
-    <span className="font-extrabold text-xl md:text-2xl tracking-tight text-[#0f172a] whitespace-nowrap">
-      Property<span className="text-[#3b82f6]">Deal</span>
-    </span>
+      className="object-contain flex-shrink-0 rounded-lg drop-shadow-xs"
+    />
+    {showText && (
+      <span className={`font-extrabold text-xl md:text-2xl tracking-tight ${textColor} whitespace-nowrap`}>
+        Property<span className="text-[#3b82f6]">Deal</span>
+      </span>
+    )}
   </div>
 );
 
