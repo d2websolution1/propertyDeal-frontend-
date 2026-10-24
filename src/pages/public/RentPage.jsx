@@ -1,24 +1,34 @@
-import React from 'react'
-import RentHero from '../../components/Rentpage/RentHero'
-import NewlyAddedProperties from '../../components/Homepage/NewlyAddedProperties'
-import ResearchAndInsights from '../../components/Homepage/ResearchAndInsights'
-import RecommendedSellers from '../../components/Homepage/RecommendedSellers'
-import SellPropertyBanner from '../../components/Homepage/SellPropertyBanner'
-import NewsAndArticles from '../../components/Homepage/NewsAndArticles'
-import ManagedPageSections from '../../components/shared/ManagedPageSections'
+// frontend/src/pages/public/RentPage.jsx
+import React from 'react';
+import PropertiesSection from '../../components/Homepage/PropertiesSection';
+import LivePropertiesShowcase from '../../components/Homepage/LivePropertiesShowcase';
+import RecommendedSellers from '../../components/Homepage/RecommendedSellers';
+import HomeLoanEmiCalculator from '../../components/Homepage/HomeLoanEmiCalculator';
+import HomesWaleFaq from '../../components/Homepage/HomesWaleFaq';
+import ManagedPageSections from '../../components/shared/ManagedPageSections';
 
 function RentPage() {
   return (
-    <div>
-      <RentHero />
-      <NewlyAddedProperties sectionKey="rent_newly_added_properties" />
-      <ResearchAndInsights />
+    <div className="min-h-screen bg-[#f8fafc]">
+      {/* Unified Hero Banner & Navbar Search Widget for Rent */}
+      <PropertiesSection category="rent" city="Mumbai" />
+
+      {/* Live Verified Rental Properties from Database */}
+      <LivePropertiesShowcase initialFilter="rent" title="Verified Flats & Houses for Rent" />
+
+      {/* Recommended Sellers / Owners */}
       <RecommendedSellers sectionKey="rent_recommended_sellers" />
-      <SellPropertyBanner />
-      <NewsAndArticles sectionKey="rent_news_articles" />
+
+      {/* Financial Tools */}
+      <HomeLoanEmiCalculator />
+
+      {/* FAQs */}
+      <HomesWaleFaq />
+
+      {/* Admin-Managed Rent Content Sections */}
       <ManagedPageSections page="rent" />
     </div>
-  )
+  );
 }
 
-export default RentPage
+export default RentPage;

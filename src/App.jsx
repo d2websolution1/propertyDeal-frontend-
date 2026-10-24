@@ -45,7 +45,7 @@ import ManageSecuritySettings from './pages/admin/ManageSecuritySettings';
 import ManageSessions from './pages/admin/ManageSessions';
 
 // Routes jinke apne khud ke header/footer hain (common Header/Footer yahan nahi dikhana)
-const ROUTES_WITH_CUSTOM_HEADER = ['/commercial', '/admin'];
+const ROUTES_WITH_CUSTOM_HEADER = ['/admin'];
 
 function AppContent() {
   const location = useLocation();

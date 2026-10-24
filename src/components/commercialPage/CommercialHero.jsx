@@ -50,13 +50,8 @@ const CommercialHero = ({ city = "Mumbai" }) => {
         <line x1="0" y1="330" x2="380" y2="330" stroke="#fff" strokeWidth="2" />
       </svg>
 
-      {/* Header sits transparent on top of the gradient */}
-      <div className="relative z-20">
-        <CommercialHeader city={city} />
-      </div>
-
       {/* CONTENT */}
-      <div className="relative z-10 px-4 md:px-8 pb-14 pt-4 md:pt-8">
+      <div className="relative z-10 px-4 md:px-8 pb-14 pt-8 md:pt-12">
         <div className="max-w-[1300px] ml-40 mx-auto grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-center">
           {/* Left: text + search */}
           <div>

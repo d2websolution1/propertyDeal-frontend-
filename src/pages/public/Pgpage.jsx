@@ -1,34 +1,32 @@
-import React from 'react'
-import PGCoLivingHero from '../../components/pgpage/PGCoLivingHero'
-import HomeAtFirstSight from '../../components/pgpage/HomeAtFirstSight'
-import PGBenefitsSection from '../../components/pgpage/PGBenefitsSection'
-import HandpickedCollections from '../../components/pgpage/HandpickedCollections'
-import PopularCities from '../../components/pgpage/PopularCities'
-import PropertiesInIndia from '../../components/pgpage/PropertiesInIndia'
-import BuyPropertiesInStates from '../../components/pgpage/BuyPropertiesInStates'
-import HomeLoansSection from '../../components/pgpage/HomeLoansSection'
-import NewsAndArticles from '../../components/Homepage/NewsAndArticles'
-import MembersTestimonial from '../../components/pgpage/MembersTestimonial'
-import FeaturedIn from '../../components/pgpage/FeaturedIn'
-import ManagedPageSections from '../../components/shared/ManagedPageSections'
+// frontend/src/pages/public/Pgpage.jsx
+import React from 'react';
+import PropertiesSection from '../../components/Homepage/PropertiesSection';
+import LivePropertiesShowcase from '../../components/Homepage/LivePropertiesShowcase';
+import HomeAtFirstSight from '../../components/pgpage/HomeAtFirstSight';
+import PGBenefitsSection from '../../components/pgpage/PGBenefitsSection';
+import HandpickedCollections from '../../components/pgpage/HandpickedCollections';
+import HomesWaleFaq from '../../components/Homepage/HomesWaleFaq';
+import ManagedPageSections from '../../components/shared/ManagedPageSections';
 
-function Pgpage() {
+function Pgpage({ city = 'Mumbai' }) {
   return (
-    <div>
-      <PGCoLivingHero/>
-      <HomeAtFirstSight/>
-      <PGBenefitsSection/>
-<HandpickedCollections />
-<PopularCities/>
-<PropertiesInIndia />
-<BuyPropertiesInStates />
-<HomeLoansSection/>
-<MembersTestimonial />
-<FeaturedIn />
-<NewsAndArticles/>
-<ManagedPageSections />
+    <div className="min-h-screen bg-[#f8fafc]">
+      {/* Unified Hero Banner & Navbar Search Widget for PG / Co-Living */}
+      <PropertiesSection category="pg" city={city} />
+
+      {/* Live Verified PG Accommodations from Database */}
+      <LivePropertiesShowcase initialFilter="rent" title="Verified PG Accommodations & Co-Living Spaces" />
+
+      {/* Collections & Amenities */}
+      <HomeAtFirstSight />
+      <PGBenefitsSection />
+      <HandpickedCollections />
+      <HomesWaleFaq />
+
+      {/* Admin-Managed PG Content Sections */}
+      <ManagedPageSections page="pg" />
     </div>
-  )
+  );
 }
 
-export default Pgpage
+export default Pgpage;

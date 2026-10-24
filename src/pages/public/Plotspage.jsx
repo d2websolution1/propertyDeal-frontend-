@@ -1,26 +1,32 @@
-import React from 'react'
-import PlotsHero from '../../components/plotspage/PlotsHero'
-import LatestProjects from '../../components/plotspage/LatestProjects'
-import PropertiesInIndia from '../../components/pgpage/PropertiesInIndia'
-import BuyPropertiesInStates from '../../components/pgpage/BuyPropertiesInStates'
-import HomeLoansSection from '../../components/pgpage/HomeLoansSection'
-import NewsAndArticles from '../../components/Homepage/NewsAndArticles'
-import GreatnessBanner from '../../components/commercialPage/GreatnessBanner'
-import ManagedPageSections from '../../components/shared/ManagedPageSections'
+// frontend/src/pages/public/Plotspage.jsx
+import React from 'react';
+import PropertiesSection from '../../components/Homepage/PropertiesSection';
+import LivePropertiesShowcase from '../../components/Homepage/LivePropertiesShowcase';
+import LatestProjects from '../../components/plotspage/LatestProjects';
+import PropertiesInIndia from '../../components/pgpage/PropertiesInIndia';
+import HomeLoanEmiCalculator from '../../components/Homepage/HomeLoanEmiCalculator';
+import HomesWaleFaq from '../../components/Homepage/HomesWaleFaq';
+import ManagedPageSections from '../../components/shared/ManagedPageSections';
 
-function Plotspage() {
+function Plotspage({ city = 'Mumbai' }) {
   return (
-    <div>
-      <PlotsHero/>
-      <LatestProjects/>
-      <PropertiesInIndia/>
-      <BuyPropertiesInStates />
-      <HomeLoansSection/>
-      <NewsAndArticles/>
-      <GreatnessBanner/>
+    <div className="min-h-screen bg-[#f8fafc]">
+      {/* Unified Hero Banner & Navbar Search Widget for Plots */}
+      <PropertiesSection category="plots" city={city} />
+
+      {/* Live Verified Plots from Database */}
+      <LivePropertiesShowcase initialFilter="plots" title="Residential & Commercial Plots / Land" />
+
+      {/* Projects & Tools */}
+      <LatestProjects />
+      <PropertiesInIndia />
+      <HomeLoanEmiCalculator />
+      <HomesWaleFaq />
+
+      {/* Admin-Managed Plots Content Sections */}
       <ManagedPageSections page="plots" />
     </div>
-  )
+  );
 }
 
-export default Plotspage
+export default Plotspage;

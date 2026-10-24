@@ -1,37 +1,34 @@
-import React from 'react'
-
-import PropertiesSection from '../../components/Homepage/PropertiesSection'
-import HousingTopPicks from '../../components/Homepage/HousingTopPicks'
-import ProminentProjects from '../../components/Homepage/ProminentProjects'
-import TopHighlightedProjects from '../../components/Homepage/TopHighlightedProjects'
-import FeaturedDevelopers from '../../components/Homepage/FeaturedDevelopers'
-import TrustedDeveloperProjects from '../../components/Homepage/TrustedDeveloperProjects'
-import ResearchAndInsights from '../../components/Homepage/ResearchAndInsights'
-import RecommendedSellers from '../../components/Homepage/RecommendedSellers'
-import NewlyAddedProperties from '../../components/Homepage/NewlyAddedProperties'
-import PropertyResearchTools from '../../components/Homepage/PropertyResearchTools'
-import SellPropertyBanner from '../../components/Homepage/SellPropertyBanner'
-import NewsAndArticles from '../../components/Homepage/NewsAndArticles'
-import ManagedPageSections from '../../components/shared/ManagedPageSections'
+// frontend/src/pages/public/HomePage.jsx
+import React from 'react';
+import PropertiesSection from '../../components/Homepage/PropertiesSection';
+import LivePropertiesShowcase from '../../components/Homepage/LivePropertiesShowcase';
+import ProminentProjects from '../../components/Homepage/ProminentProjects';
+import HomeLoanEmiCalculator from '../../components/Homepage/HomeLoanEmiCalculator';
+import HomesWaleFaq from '../../components/Homepage/HomesWaleFaq';
+import ManagedPageSections from '../../components/shared/ManagedPageSections';
 
 function HomePage() {
   return (
-    <>
-     <PropertiesSection />
-     <HousingTopPicks/>
-     <ProminentProjects/>
-     <TopHighlightedProjects/>
-     <FeaturedDevelopers/>
-     <TrustedDeveloperProjects/>
-     <ResearchAndInsights/>
-     <RecommendedSellers/>
-     <NewlyAddedProperties/>
-     <PropertyResearchTools/>
-     <SellPropertyBanner/>
-     <NewsAndArticles/>
-     <ManagedPageSections page="homepage" />
-    </>
-  )
+    <div className="min-h-screen bg-[#fbfaf7]">
+      {/* 1. Hero Banner Carousel & Interactive Search Widget */}
+      <PropertiesSection />
+
+      {/* 2. Live Verified Properties from Backend Database */}
+      <LivePropertiesShowcase />
+
+      {/* 3. Luxury & Featured Projects */}
+      <ProminentProjects />
+
+      {/* 4. Interactive Home Loan EMI Calculator */}
+      <HomeLoanEmiCalculator />
+
+      {/* 5. HomesWale Trust Pillars & FAQs */}
+      <HomesWaleFaq />
+
+      {/* 6. Admin Managed Dynamic Sections */}
+      <ManagedPageSections page="homepage" />
+    </div>
+  );
 }
 
-export default HomePage
+export default HomePage;

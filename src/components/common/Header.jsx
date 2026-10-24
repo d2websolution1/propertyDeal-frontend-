@@ -1,524 +1,762 @@
-import React, { useState } from 'react';
-import {
-  AppBar, Toolbar, Typography, Button, Box, IconButton,
-  Paper, Grow, ClickAwayListener, Avatar, InputBase
-} from '@mui/material';
-import {
-  KeyboardArrowDown, Menu as MenuIcon, AccountCircle,
-  Home, Search, ApartmentOutlined, HouseOutlined,
-  BusinessOutlined, GroupsOutlined, VillaOutlined, StorefrontOutlined
-} from '@mui/icons-material';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import LoginModal from './LoginModal';
-import SideDrawer from './SideDrawer';
+// frontend/src/components/common/Header.jsx
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+
+export const PropertyDealLogo = ({ size = 32 }) => (
+  <div className="flex items-center gap-2 flex-shrink-0">
+    <div
+      style={{ width: size, height: size }}
+      className="rounded-lg bg-[#ffb300] flex items-center justify-center flex-shrink-0 shadow-sm"
+    >
+      <svg
+        width={size * 0.62}
+        height={size * 0.62}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="text-[#1e1b4b]"
+      >
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+      </svg>
+    </div>
+    <span className="font-extrabold text-xl md:text-2xl tracking-tight text-[#0f172a] whitespace-nowrap">
+      Property<span className="text-[#3b82f6]">Deal</span>
+    </span>
+  </div>
+);
+
+const CITIES = [
+  "Mumbai",
+  "Delhi NCR",
+  "Noida",
+  "Greater Noida",
+  "Gurgaon",
+  "Bengaluru",
+  "Pune",
+  "Hyderabad",
+  "Chennai",
+  "Kolkata",
+  "Ahmedabad",
+  "Thane",
+];
 
 const Header = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [openMenu, setOpenMenu] = useState(null);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [sideDrawerOpen, setSideDrawerOpen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("All India");
+  const [citySearch, setCitySearch] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleEnter = (key) => setOpenMenu(key);
-  const handleLeave = () => setOpenMenu(null);
+  const navRef = useRef(null);
+  const timeoutRef = useRef(null);
 
-  const cities = [
-    'Mumbai', 'Bengaluru', 'Pune', 'Chennai', 'Kolkata', 'Ahmedabad',
-    'Delhi', 'Noida', 'Gurgaon', 'Hyderabad', 'Thane', 'Navi Mumbai',
-  ];
+  const handleMouseEnter = (menuKey) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setOpenMenu(menuKey);
+  };
 
-  // ── For Buyers dropdown data ──
+  const handleMouseLeave = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setOpenMenu(null);
+    }, 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close mobile drawer on route navigation
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setOpenMenu(null);
+  }, [location.pathname]);
+
+  const handleCitySelect = (city) => {
+    setSelectedCity(city);
+    setOpenMenu(null);
+  };
+
+  // ── Dropdown Data matching Images 2 & 3 ──
   const propertyTypesBuy = [
-    { label: 'Flats', icon: <ApartmentOutlined fontSize="small" /> },
-    { label: 'Houses', icon: <HouseOutlined fontSize="small" /> },
-    { label: 'Builder floors', icon: <BusinessOutlined fontSize="small" /> },
-    { label: 'Plots', icon: <VillaOutlined fontSize="small" /> },
-    { label: 'Villas', icon: <VillaOutlined fontSize="small" /> },
-    { label: 'Commercial properties', icon: <StorefrontOutlined fontSize="small" /> },
+    { label: "Flats", path: "/?type=apartment", icon: "🏢" },
+    { label: "Houses", path: "/?type=house", icon: "🏠" },
+    { label: "Builder floors", path: "/?type=builder_floor", icon: "🏬" },
+    { label: "Plots", path: "/plots", icon: "🏞️" },
+    { label: "Villas", path: "/?type=villa", icon: "🏡" },
+    { label: "Commercial properties", path: "/commercial", icon: "🏪" },
   ];
 
   const popularAreasBuy = [
-    'Thane West', 'Borivali West', 'Mira Road East',
-    'Kurla West', 'Kurla East', 'Santacruz East',
+    "Thane West",
+    "Borivali West",
+    "Mira Road East",
+    "Kurla West",
+    "Kurla East",
+    "Santacruz East",
   ];
 
   const searchByBHKBuy = [
-    '1 RK for Sale in Mumbai', '1 BHK for Sale in Mumbai',
-    '2 BHK for Sale in Mumbai', '3 BHK for Sale in Mumbai',
-    '1 BHK Houses', '2 BHK Houses',
+    "1 RK for Sale in Mumbai",
+    "1 BHK for Sale in Mumbai",
+    "2 BHK for Sale in Mumbai",
+    "3 BHK for Sale in Mumbai",
+    "1 BHK Houses",
+    "2 BHK Houses",
   ];
 
   const popularSearchesBuy = [
-    'Flats without brokerage', 'Under construction flats',
-    'Affordable projects for sale', 'Ready to move-in projects',
-    'New residential projects', 'Resale properties',
+    "Flats without brokerage",
+    "Under construction flats",
+    "Affordable projects for sale",
+    "Ready to move-in projects",
+    "New residential projects",
+    "Resale properties",
   ];
 
-  // ── For Tenants dropdown data ──
   const propertyTypesRent = [
-    { label: 'Flats', icon: <ApartmentOutlined fontSize="small" /> },
-    { label: 'Houses', icon: <HouseOutlined fontSize="small" /> },
-    { label: 'PG / Co-living', icon: <GroupsOutlined fontSize="small" /> },
-    { label: 'Builder floors', icon: <BusinessOutlined fontSize="small" /> },
-    { label: 'Villas', icon: <VillaOutlined fontSize="small" /> },
-    { label: 'Commercial properties', icon: <StorefrontOutlined fontSize="small" /> },
+    { label: "Flats", path: "/rent?type=apartment", icon: "🏢" },
+    { label: "Houses", path: "/rent?type=house", icon: "🏠" },
+    { label: "PG / Co-living", path: "/pg-co-living", icon: "👥" },
+    { label: "Builder floors", path: "/rent?type=builder_floor", icon: "🏬" },
+    { label: "Villas", path: "/rent?type=villa", icon: "🏡" },
+    { label: "Commercial properties", path: "/commercial", icon: "🏪" },
   ];
 
   const popularAreasRent = [
-    'Thane West', 'Borivali West', 'Mira Road East',
-    'Kurla West', 'Kurla East', 'Santacruz East',
+    "Thane West",
+    "Borivali West",
+    "Mira Road East",
+    "Kurla West",
+    "Kurla East",
+    "Santacruz East",
   ];
 
   const searchByBHKRent = [
-    '1 RK for Rent in Mumbai', '1 BHK for Rent in Mumbai',
-    '2 BHK for Rent in Mumbai', '3 BHK for Rent in Mumbai',
-    '1 BHK Houses for Rent', '2 BHK Houses for Rent',
+    "1 RK for Rent in Mumbai",
+    "1 BHK for Rent in Mumbai",
+    "2 BHK for Rent in Mumbai",
+    "3 BHK for Rent in Mumbai",
+    "1 BHK Houses for Rent",
+    "2 BHK Houses for Rent",
   ];
 
   const popularSearchesRent = [
-    'Flats without brokerage', 'Fully furnished flats',
-    'Bachelor friendly flats', 'Family friendly flats',
-    'Pet friendly flats', 'Flats near metro',
+    "Flats without brokerage",
+    "Fully furnished flats",
+    "Bachelor friendly flats",
+    "Family friendly flats",
+    "Pet friendly flats",
+    "Flats near metro",
   ];
 
   const sellersMenu = [
-    { title: 'Developers', desc: 'Launch or sell homes' },
-    { title: 'Brokers', desc: 'List and grow business' },
-    { title: 'Owners', desc: 'Sell or rent easily' },
+    { title: "Developers", desc: "Launch or sell homes with high visibility", link: "/post-property" },
+    { title: "Brokers", desc: "List and grow your local property deals", link: "/post-property" },
+    { title: "Owners", desc: "Sell or rent easily with 0% brokerage", link: "/post-property" },
   ];
 
   const servicesMenu = {
-    'Housing Edge': ['Home Loan', 'Housing Premium'],
-    'Tools': ['EMI calculator', 'Property value calculator', 'Rent receipt generator'],
+    "Housing Edge": [
+      { name: "Home Loan Assistance", path: "/#emi-calculator" },
+      { name: "Property Legal Verification", path: "/contact" },
+      { name: "Housing Premium Partner", path: "/post-property" },
+    ],
+    Tools: [
+      { name: "Home Loan EMI Calculator", path: "/#emi-calculator" },
+      { name: "Property Value Calculator", path: "/contact" },
+      { name: "Rent Receipt Generator", path: "/rent" },
+    ],
   };
 
   const newsMenu = [
-    { title: 'Real Estate News', desc: 'Latest market updates' },
-    { title: 'Buying Guide', desc: 'Expert homebuying tips' },
-    { title: 'Housing Research', desc: 'Data-driven insights' },
+    { title: "Real Estate News", desc: "Latest property price trends & policy updates", link: "/blogs" },
+    { title: "Buying Guide", desc: "Expert homebuyer checklist & document guides", link: "/blogs" },
+    { title: "Housing Research", desc: "Data-driven quarterly real estate market reports", link: "/blogs" },
   ];
 
-  const navLinkSx = {
-    color: 'white',
-    fontWeight: 500,
-    textTransform: 'none',
-    fontSize: '0.9rem',
-    whiteSpace: 'nowrap',
-    minWidth: 'fit-content',
-    flexShrink: 0,
-  };
-
-  const ArrowIcon = ({ menuKey, color = 'white' }) => (
-    <KeyboardArrowDown
-      sx={{
-        color,
-        fontSize: 20,
-        transition: 'transform 0.2s ease',
-        transform: openMenu === menuKey ? 'rotate(180deg)' : 'rotate(0deg)',
-      }}
-    />
-  );
-
-  const Caret = () => (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: -6,
-        left: 24,
-        width: 12,
-        height: 12,
-        bgcolor: 'white',
-        transform: 'rotate(45deg)',
-        boxShadow: '-2px -2px 4px rgba(0,0,0,0.04)',
-      }}
-    />
+  const filteredCities = CITIES.filter((c) =>
+    c.toLowerCase().includes(citySearch.toLowerCase())
   );
 
   return (
-    <ClickAwayListener onClickAway={handleLeave}>
-      <AppBar
-        position="sticky"
-        elevation={0}
-        sx={{ background: 'linear-gradient(90deg, #3b2f6e 0%, #5a4a9e 100%)', overflow: 'visible' }}
-      >
-        <Toolbar
-          sx={{
-            gap: 2,
-            px: { xs: 2, md: 4 },
-            py: 1,
-            flexWrap: 'nowrap',
-            minHeight: 64,
-            overflowX: { xs: 'auto', md: 'visible' },
-          }}
-        >
-          {/* Logo + All India grouped together with tight gap */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-            <Box
-              component={Link}
-              to="/"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                textDecoration: 'none',
-                flexShrink: 0,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <Box sx={{ width: 30, height: 30, borderRadius: '6px', bgcolor: '#ffb300', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Home sx={{ color: '#3b2f6e', fontSize: 18 }} />
-              </Box>
-              <Typography variant="h6" sx={{ color: 'white', fontWeight: 800, fontSize: '1.1rem', whiteSpace: 'nowrap' }}>
-                PropertyDeal<Typography component="span" sx={{ fontWeight: 400, fontSize: 'inherit' }}></Typography>
-              </Typography>
-            </Box>
+    <header
+      ref={navRef}
+      className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e2e8f0] shadow-xs"
+    >
+      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between gap-2 md:gap-4">
+        {/* Left: Brand Logo & All India Selector */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+          <Link to="/" className="focus:outline-none flex items-center">
+            <PropertyDealLogo size={32} />
+          </Link>
 
-            {/* All India / city selector */}
-            <Box
-              onMouseEnter={() => handleEnter('city')}
-              onMouseLeave={handleLeave}
-              sx={{ position: 'relative', flexShrink: 0 }}
-            >
-              <Button endIcon={<ArrowIcon menuKey="city" />} sx={navLinkSx}>
-                All India
-              </Button>
-              <Grow in={openMenu === 'city'}>
-                <Paper
-                  sx={{
-                    display: openMenu === 'city' ? 'block' : 'none',
-                    position: 'absolute', top: '100%', left: 0, mt: 1.5,
-                    width: 430, p: 3, zIndex: 20, borderRadius: 2,
-                  }}
-                >
-                  <Caret />
-                  <InputBase
-                    placeholder="Search for city"
-                    startAdornment={<Search sx={{ color: 'text.secondary', mr: 1 }} />}
-                    fullWidth
-                    sx={{ border: '1px solid #ddd', borderRadius: 2, px: 2, py: 1, mb: 2, fontSize: '0.9rem' }}
-                  />
-                  <Typography variant="subtitle2" fontWeight="700" sx={{ mb: 1.5 }}>
-                    Popular cities
-                  </Typography>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
-                    {cities.map((city) => (
-                      <Button
-                        key={city}
-                        onClick={() => { navigate(`/properties?city=${city}`); handleLeave(); }}
-                        sx={{
-                          justifyContent: 'flex-start', textTransform: 'none', color: 'text.primary',
-                          border: '1px solid #eee', borderRadius: 2, fontSize: '0.82rem', fontWeight: 500,
-                        }}
-                      >
-                        {city}
-                      </Button>
-                    ))}
-                  </Box>
-                </Paper>
-              </Grow>
-            </Box>
-          </Box>
-
-          {/* Desktop nav */}
-          <Box
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              gap: 0.5,
-              flexGrow: 1,
-              flexWrap: 'nowrap',
-              whiteSpace: 'nowrap',
-              ml: 2,
-            }}
+          {/* City / All India Selector Dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("city")}
+            onMouseLeave={handleMouseLeave}
           >
-            {/* For Buyers */}
-            <Box onMouseEnter={() => handleEnter('buyers')} onMouseLeave={handleLeave} sx={{ position: 'relative', flexShrink: 0 }}>
-              <Button endIcon={<ArrowIcon menuKey="buyers" />} sx={navLinkSx}>For Buyers</Button>
-              <Grow in={openMenu === 'buyers'}>
-                <Paper
-                  sx={{
-                    display: openMenu === 'buyers' ? 'flex' : 'none',
-                    position: 'absolute', top: '100%', left: 0, mt: 1.5, zIndex: 20,
-                    p: 3, borderRadius: 2, gap: 5, minWidth: 850,
-                  }}
-                >
-                  <Caret />
-                  <Box sx={{ minWidth: 180 }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Property type
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.6 }}>
-                      {propertyTypesBuy.map((item) => (
-                        <Box
-                          key={item.label}
-                          sx={{ display: 'flex', alignItems: 'center', gap: 1.2, cursor: 'pointer', color: 'text.primary', '&:hover': { color: 'primary.main' } }}
-                        >
-                          <Box sx={{ color: 'text.secondary', display: 'flex' }}>{item.icon}</Box>
-                          <Typography variant="body2">{item.label}</Typography>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Popular areas
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                      {popularAreasBuy.map((l) => (
-                        <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                          {l}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Search by BHK
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                      {searchByBHKBuy.map((l) => (
-                        <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                          {l}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Popular searches
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                      {popularSearchesBuy.map((l) => (
-                        <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                          {l}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grow>
-            </Box>
-
-            {/* For Tenants */}
-            <Box onMouseEnter={() => handleEnter('tenants')} onMouseLeave={handleLeave} sx={{ position: 'relative', flexShrink: 0 }}>
-              <Button endIcon={<ArrowIcon menuKey="tenants" />} sx={navLinkSx}>For Tenants</Button>
-              <Grow in={openMenu === 'tenants'}>
-                <Paper
-                  sx={{
-                    display: openMenu === 'tenants' ? 'flex' : 'none',
-                    position: 'absolute', top: '100%', left: 0, mt: 1.5, zIndex: 20,
-                    p: 3, borderRadius: 2, gap: 5, minWidth: 850,
-                  }}
-                >
-                  <Caret />
-                  <Box sx={{ minWidth: 180 }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Property type
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.6 }}>
-                      {propertyTypesRent.map((item) => (
-                        <Box
-                          key={item.label}
-                          sx={{ display: 'flex', alignItems: 'center', gap: 1.2, cursor: 'pointer', color: 'text.primary', '&:hover': { color: 'primary.main' } }}
-                        >
-                          <Box sx={{ color: 'text.secondary', display: 'flex' }}>{item.icon}</Box>
-                          <Typography variant="body2">{item.label}</Typography>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Popular areas
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                      {popularAreasRent.map((l) => (
-                        <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                          {l}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Search by BHK
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                      {searchByBHKRent.map((l) => (
-                        <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                          {l}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                      Popular searches
-                    </Typography>
-                    <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                      {popularSearchesRent.map((l) => (
-                        <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                          {l}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grow>
-            </Box>
-
-            {/* For Sellers */}
-            <Box onMouseEnter={() => handleEnter('sellers')} onMouseLeave={handleLeave} sx={{ position: 'relative', flexShrink: 0 }}>
-              <Button endIcon={<ArrowIcon menuKey="sellers" />} sx={navLinkSx}>For Sellers</Button>
-              <Grow in={openMenu === 'sellers'}>
-                <Paper
-                  sx={{
-                    display: openMenu === 'sellers' ? 'block' : 'none',
-                    position: 'absolute', top: '100%', left: 0, mt: 1.5, zIndex: 20,
-                    p: 3, borderRadius: 2, minWidth: 260,
-                  }}
-                >
-                  <Caret />
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                    Packages for
-                  </Typography>
-                  <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {sellersMenu.map((item) => (
-                      <Box key={item.title} sx={{ cursor: 'pointer' }}>
-                        <Typography variant="body2" fontWeight="600">{item.title}</Typography>
-                        <Typography variant="caption" color="text.secondary">{item.desc}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Paper>
-              </Grow>
-            </Box>
-
-            {/* Services */}
-            <Box onMouseEnter={() => handleEnter('services')} onMouseLeave={handleLeave} sx={{ position: 'relative', flexShrink: 0 }}>
-              <Button endIcon={<ArrowIcon menuKey="services" />} sx={navLinkSx}>Services</Button>
-              <Grow in={openMenu === 'services'}>
-                <Paper
-                  sx={{
-                    display: openMenu === 'services' ? 'flex' : 'none',
-                    position: 'absolute', top: '100%', left: 0, mt: 1.5, zIndex: 20,
-                    p: 3, borderRadius: 2, gap: 5, minWidth: 420,
-                  }}
-                >
-                  <Caret />
-                  {Object.entries(servicesMenu).map(([col, links]) => (
-                    <Box key={col}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                        {col}
-                      </Typography>
-                      <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
-                        {links.map((l) => (
-                          <Typography key={l} variant="body2" sx={{ cursor: 'pointer', whiteSpace: 'nowrap', '&:hover': { color: 'primary.main' } }}>
-                            {l}
-                          </Typography>
-                        ))}
-                      </Box>
-                    </Box>
-                  ))}
-                </Paper>
-              </Grow>
-            </Box>
-
-            {/* News & Guide */}
-            <Box onMouseEnter={() => handleEnter('news')} onMouseLeave={handleLeave} sx={{ position: 'relative', flexShrink: 0 }}>
-              <Button endIcon={<ArrowIcon menuKey="news" />} sx={navLinkSx}>News & Guide</Button>
-              <Grow in={openMenu === 'news'}>
-                <Paper
-                  sx={{
-                    display: openMenu === 'news' ? 'block' : 'none',
-                    position: 'absolute', top: '100%', left: 0, mt: 1.5, zIndex: 20,
-                    p: 3, borderRadius: 2, minWidth: 280,
-                  }}
-                >
-                  <Caret />
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                    Property market guide
-                  </Typography>
-                  <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {newsMenu.map((item) => (
-                      <Box
-                        key={item.title}
-                        sx={{ cursor: 'pointer' }}
-                        onClick={() => { navigate('/blogs'); handleLeave(); }}
-                      >
-                        <Typography variant="body2" fontWeight="600">{item.title}</Typography>
-                        <Typography variant="caption" color="text.secondary">{item.desc}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Paper>
-              </Grow>
-            </Box>
-          </Box>
-
-          {/* Right side */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0, whiteSpace: 'nowrap' }}>
-            <Button sx={{ display: { xs: 'none', md: 'inline-flex' }, color: 'white', textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
-              Download App
-            </Button>
-
-            <Button
-              onClick={() => isAuthenticated ? navigate('/vendor/properties/add') : setLoginModalOpen(true)}
-              sx={{ display: { xs: 'none', md: 'inline-flex' }, color: 'white', textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', gap: 0.8, whiteSpace: 'nowrap' }}
+            <button
+              type="button"
+              onClick={() => setOpenMenu(openMenu === "city" ? null : "city")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border ${
+                openMenu === "city"
+                  ? "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]"
+                  : "bg-[#f8fafc] text-[#334155] border-[#e2e8f0] hover:bg-[#f1f5f9]"
+              }`}
             >
-              Post Property
-              <Box component="span" sx={{ bgcolor: '#e53935', color: 'white', fontSize: 9, fontWeight: 700, px: 0.7, py: 0.2, borderRadius: 0.5 }}>
-                FREE
-              </Box>
-            </Button>
-
-            {isAuthenticated ? (
-              <Box
-                sx={{ display: 'flex', alignItems: 'center', bgcolor: 'white', borderRadius: 10, px: 0.5, py: 0.5, gap: 0.5, flexShrink: 0 }}
+              <span>{selectedCity}</span>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className={`transition-transform duration-200 ${
+                  openMenu === "city" ? "rotate-180" : ""
+                }`}
               >
-                <IconButton
-                  size="small"
-                  onClick={(e) => { e.stopPropagation(); setSideDrawerOpen(true); }}
-                >
-                  <MenuIcon sx={{ color: '#3b2f6e', fontSize: 20 }} />
-                </IconButton>
-                <Avatar
-                  sx={{ width: 26, height: 26, bgcolor: '#3b2f6e', fontSize: 13, cursor: 'pointer' }}
-                  onClick={() => navigate(`/${user?.role}/dashboard`)}
-                >
-                  {user?.name?.charAt(0)?.toUpperCase() || <AccountCircle />}
-                </Avatar>
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'white', borderRadius: 10, pl: 2, pr: 0.5, py: 0.4, gap: 1, flexShrink: 0 }}>
-                <Button
-                  onClick={() => setLoginModalOpen(true)}
-                  sx={{ color: '#3b2f6e', textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', minWidth: 0, p: 0, whiteSpace: 'nowrap' }}
-                >
-                  Login
-                </Button>
-                <IconButton size="small" onClick={() => setSideDrawerOpen(true)}>
-                  <MenuIcon sx={{ color: '#3b2f6e', fontSize: 20 }} />
-                </IconButton>
-              </Box>
-            )}
-          </Box>
-        </Toolbar>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
 
-        <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
-        <SideDrawer
-          open={sideDrawerOpen}
-          onClose={() => setSideDrawerOpen(false)}
-          onLoginClick={() => setLoginModalOpen(true)}
-        />
-      </AppBar>
-    </ClickAwayListener>
+            {openMenu === "city" && (
+              <div className="absolute left-0 mt-2 w-72 sm:w-80 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-4 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="relative mb-3">
+                  <input
+                    type="text"
+                    placeholder="Search for city..."
+                    value={citySearch}
+                    onChange={(e) => setCitySearch(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 text-xs border border-[#e2e8f0] rounded-xl outline-none focus:border-[#2563eb] bg-[#f8fafc]"
+                  />
+                  <svg
+                    className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </div>
+                <div className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider mb-2">
+                  Popular Cities
+                </div>
+                <div className="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto">
+                  <button
+                    onClick={() => handleCitySelect("All India")}
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                      selectedCity === "All India"
+                        ? "bg-[#2563eb] text-white"
+                        : "hover:bg-[#f8fafc] text-[#0f172a]"
+                    }`}
+                  >
+                    🇮🇳 All India
+                  </button>
+                  {filteredCities.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => handleCitySelect(c)}
+                      className={`text-left px-3 py-2 rounded-lg text-xs font-medium truncate ${
+                        selectedCity === c
+                          ? "bg-[#2563eb] text-white font-semibold"
+                          : "hover:bg-[#f8fafc] text-[#0f172a]"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Center: Desktop Navigation Dropdowns */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          {/* 1. FOR BUYERS (Image 2) */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("buyers")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              onClick={() => setOpenMenu(openMenu === "buyers" ? null : "buyers")}
+              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
+                openMenu === "buyers"
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#1e293b] hover:text-[#2563eb]"
+              }`}
+            >
+              <span>For Buyers</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            {openMenu === "buyers" && (
+              <div className="absolute left-0 mt-2 w-[780px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-6 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="grid grid-cols-4 gap-6 text-xs">
+                  {/* Col 1: Property type */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Property type
+                    </h4>
+                    <ul className="space-y-2.5">
+                      {propertyTypesBuy.map((item) => (
+                        <li key={item.label}>
+                          <Link
+                            to={item.path}
+                            onClick={() => setOpenMenu(null)}
+                            className="flex items-center gap-2 text-[#0f172a] hover:text-[#2563eb] transition-colors py-0.5"
+                          >
+                            <span className="text-base">{item.icon}</span>
+                            <span>{item.label}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Col 2: Popular areas */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Popular areas
+                    </h4>
+                    <ul className="space-y-2">
+                      {popularAreasBuy.map((area) => (
+                        <li key={area}>
+                          <Link
+                            to={`/?q=${encodeURIComponent(area)}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
+                          >
+                            {area}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Col 3: Search by BHK */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Search by BHK
+                    </h4>
+                    <ul className="space-y-2">
+                      {searchByBHKBuy.map((bhk) => (
+                        <li key={bhk}>
+                          <Link
+                            to={`/?q=${encodeURIComponent(bhk)}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
+                          >
+                            {bhk}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Col 4: Popular searches */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Popular searches
+                    </h4>
+                    <ul className="space-y-2">
+                      {popularSearchesBuy.map((item) => (
+                        <li key={item}>
+                          <Link
+                            to={`/?q=${encodeURIComponent(item)}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
+                          >
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. FOR TENANTS (Image 3) */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("tenants")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              onClick={() => setOpenMenu(openMenu === "tenants" ? null : "tenants")}
+              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
+                openMenu === "tenants"
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#1e293b] hover:text-[#2563eb]"
+              }`}
+            >
+              <span>For Tenants</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            {openMenu === "tenants" && (
+              <div className="absolute left-0 mt-2 w-[780px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-6 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="grid grid-cols-4 gap-6 text-xs">
+                  {/* Col 1: Property type */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Property type
+                    </h4>
+                    <ul className="space-y-2.5">
+                      {propertyTypesRent.map((item) => (
+                        <li key={item.label}>
+                          <Link
+                            to={item.path}
+                            onClick={() => setOpenMenu(null)}
+                            className="flex items-center gap-2 text-[#0f172a] hover:text-[#2563eb] transition-colors py-0.5"
+                          >
+                            <span className="text-base">{item.icon}</span>
+                            <span>{item.label}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Col 2: Popular areas */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Popular areas
+                    </h4>
+                    <ul className="space-y-2">
+                      {popularAreasRent.map((area) => (
+                        <li key={area}>
+                          <Link
+                            to={`/rent?q=${encodeURIComponent(area)}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
+                          >
+                            {area}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Col 3: Search by BHK */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Search by BHK
+                    </h4>
+                    <ul className="space-y-2">
+                      {searchByBHKRent.map((bhk) => (
+                        <li key={bhk}>
+                          <Link
+                            to={`/rent?q=${encodeURIComponent(bhk)}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
+                          >
+                            {bhk}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Col 4: Popular searches */}
+                  <div>
+                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
+                      Popular searches
+                    </h4>
+                    <ul className="space-y-2">
+                      {popularSearchesRent.map((item) => (
+                        <li key={item}>
+                          <Link
+                            to={`/rent?q=${encodeURIComponent(item)}`}
+                            onClick={() => setOpenMenu(null)}
+                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
+                          >
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 3. FOR SELLERS */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("sellers")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              onClick={() => setOpenMenu(openMenu === "sellers" ? null : "sellers")}
+              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
+                openMenu === "sellers"
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#1e293b] hover:text-[#2563eb]"
+              }`}
+            >
+              <span>For Sellers</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            {openMenu === "sellers" && (
+              <div className="absolute left-0 mt-2 w-72 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-4 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-2.5">
+                  Packages for
+                </h4>
+                <div className="space-y-2">
+                  {sellersMenu.map((item) => (
+                    <Link
+                      key={item.title}
+                      to={item.link}
+                      onClick={() => setOpenMenu(null)}
+                      className="block p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors"
+                    >
+                      <strong className="block text-xs font-bold text-[#0f172a]">{item.title}</strong>
+                      <span className="text-[11px] text-[#64748b] leading-tight block">{item.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. SERVICES */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("services")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              onClick={() => setOpenMenu(openMenu === "services" ? null : "services")}
+              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
+                openMenu === "services"
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#1e293b] hover:text-[#2563eb]"
+              }`}
+            >
+              <span>Services</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            {openMenu === "services" && (
+              <div className="absolute left-0 mt-2 w-[420px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-5 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="grid grid-cols-2 gap-5 text-xs">
+                  {Object.entries(servicesMenu).map(([group, links]) => (
+                    <div key={group}>
+                      <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-2.5">
+                        {group}
+                      </h4>
+                      <ul className="space-y-2">
+                        {links.map((link) => (
+                          <li key={link.name}>
+                            <Link
+                              to={link.path}
+                              onClick={() => setOpenMenu(null)}
+                              className="text-[#334155] hover:text-[#2563eb] block py-0.5"
+                            >
+                              {link.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 5. NEWS & GUIDE */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("news")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button
+              onClick={() => setOpenMenu(openMenu === "news" ? null : "news")}
+              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
+                openMenu === "news"
+                  ? "bg-[#eff6ff] text-[#2563eb]"
+                  : "text-[#1e293b] hover:text-[#2563eb]"
+              }`}
+            >
+              <span>News & Guide</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            {openMenu === "news" && (
+              <div className="absolute left-0 mt-2 w-72 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-4 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-2.5">
+                  Property Market Guide
+                </h4>
+                <div className="space-y-2">
+                  {newsMenu.map((item) => (
+                    <Link
+                      key={item.title}
+                      to={item.link}
+                      onClick={() => setOpenMenu(null)}
+                      className="block p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors"
+                    >
+                      <strong className="block text-xs font-bold text-[#0f172a]">{item.title}</strong>
+                      <span className="text-[11px] text-[#64748b] leading-tight block">{item.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          {/* User Auth state */}
+          {isAuthenticated ? (
+            <div className="relative group">
+              <button className="flex items-center gap-2 px-2.5 py-1.5 rounded-full border border-[#e2e8f0] bg-white hover:border-[#2563eb] transition-all">
+                <div className="w-7 h-7 rounded-full bg-[#2563eb] text-white font-bold text-xs flex items-center justify-center">
+                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                </div>
+                <span className="hidden sm:inline text-xs font-semibold text-[#0f172a] max-w-[80px] truncate">
+                  {user?.name || "Account"}
+                </span>
+              </button>
+              <div className="absolute right-0 mt-1 w-44 bg-white border border-[#e2e8f0] rounded-xl shadow-xl p-2 hidden group-hover:block z-50">
+                <div className="px-3 py-2 border-b border-[#f1f5f9]">
+                  <p className="text-xs font-bold text-[#0f172a] truncate">{user?.name}</p>
+                  <p className="text-[10px] text-[#64748b] truncate">{user?.email}</p>
+                </div>
+                {user?.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="block px-3 py-2 text-xs font-semibold text-[#2563eb] hover:bg-[#eff6ff] rounded-lg mt-1"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
+                <button
+                  onClick={logout}
+                  className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              to="/admin/login"
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#2563eb] hover:bg-[#1d4ed8] shadow-sm transition-colors"
+            >
+              Login
+            </Link>
+          )}
+
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-lg border border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              {mobileMenuOpen ? (
+                <path d="M18 6L6 18M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white border-b border-[#e2e8f0] px-4 py-4 space-y-3 animate-hw-fade">
+          <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9]">
+            <span className="text-xs font-bold text-[#64748b]">Location: {selectedCity}</span>
+            <button
+              onClick={() => setOpenMenu(openMenu === "city" ? null : "city")}
+              className="text-xs font-bold text-[#2563eb] underline"
+            >
+              Change City
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+            <Link to="/" className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex justify-between items-center">
+              <span>🏠 Buy Flats</span>
+              <span>→</span>
+            </Link>
+            <Link to="/rent" className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex justify-between items-center">
+              <span>🔑 Rent Homes</span>
+              <span>→</span>
+            </Link>
+            <Link to="/commercial" className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex justify-between items-center">
+              <span>🏢 Commercial</span>
+              <span>→</span>
+            </Link>
+            <Link to="/plots" className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex justify-between items-center">
+              <span>🧭 Plots & Land</span>
+              <span>→</span>
+            </Link>
+            <Link to="/pg-co-living" className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex justify-between items-center">
+              <span>👥 PG / Co-Living</span>
+              <span>→</span>
+            </Link>
+            <Link to="/admin/login" className="p-3 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] flex justify-between items-center">
+              <span>🛡️ Admin Portal</span>
+              <span>🔑</span>
+            </Link>
+          </div>
+
+          <div className="pt-2">
+            <Link
+              to="/post-property"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2563eb] text-white font-bold text-sm shadow-md"
+            >
+              <span>Post Property</span>
+              <span className="bg-[#ef4444] text-white text-[10px] px-1.5 py-0.5 rounded font-black">
+                FREE
+              </span>
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
   );
 };
 

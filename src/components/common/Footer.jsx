@@ -1,413 +1,126 @@
-// Footer.jsx
-import React, { useState } from "react";
-
-const TABS = ["FOR BUYERS", "FOR TENANTS", "PROJECTS", "POPULAR SEARCHES"];
-
-const LINK_SETS = {
-  "FOR BUYERS": {
-    heading: "Find flats for sale",
-    columns: [
-      [
-        "Flats for sale in Greater Noida",
-        "Flats for sale in Ghaziabad",
-        "Flats for sale in Lucknow",
-        "Flats for sale in Indore",
-        "Flats for sale in Faridabad",
-      ],
-      [
-        "Flats for sale in Mohali",
-        "Flats for sale in Coimbatore",
-        "Flats for sale in Nagpur",
-        "Flats for sale in Surat",
-        "Flats for sale in Vadodara",
-      ],
-      [
-        "Flats for sale in Dehradun",
-        "Flats for sale in Raipur",
-        "Flats for sale in Visakhapatnam",
-        "Flats for sale in Secunderabad",
-        "Flats for sale in Bhubaneswar",
-      ],
-      [
-        "Flats for sale in Zirakpur",
-        "Flats for sale in Bhopal",
-        "Flats for sale in Mira Bhayandar",
-        "Flats for sale in Patna",
-        "Flats for sale in Nashik",
-      ],
-    ],
-  },
-  "FOR TENANTS": {
-    heading: "Find flats for rent",
-    columns: [
-      [
-        "Flats for rent in Greater Noida",
-        "Flats for rent in Ghaziabad",
-        "Flats for rent in Lucknow",
-        "Flats for rent in Indore",
-        "Flats for rent in Faridabad",
-      ],
-      [
-        "Flats for rent in Mohali",
-        "Flats for rent in Coimbatore",
-        "Flats for rent in Nagpur",
-        "Flats for rent in Surat",
-        "Flats for rent in Vadodara",
-      ],
-      [
-        "Flats for rent in Dehradun",
-        "Flats for rent in Raipur",
-        "Flats for rent in Visakhapatnam",
-        "Flats for rent in Secunderabad",
-        "Flats for rent in Bhubaneswar",
-      ],
-      [
-        "Flats for rent in Zirakpur",
-        "Flats for rent in Bhopal",
-        "Flats for rent in Mira Bhayandar",
-        "Flats for rent in Patna",
-        "Flats for rent in Nashik",
-      ],
-    ],
-  },
-  PROJECTS: {
-    heading: "Find new projects",
-    columns: [
-      [
-        "Projects in Greater Noida",
-        "Projects in Ghaziabad",
-        "Projects in Lucknow",
-        "Projects in Indore",
-        "Projects in Faridabad",
-      ],
-      [
-        "Projects in Mohali",
-        "Projects in Coimbatore",
-        "Projects in Nagpur",
-        "Projects in Surat",
-        "Projects in Vadodara",
-      ],
-      [
-        "Projects in Dehradun",
-        "Projects in Raipur",
-        "Projects in Visakhapatnam",
-        "Projects in Secunderabad",
-        "Projects in Bhubaneswar",
-      ],
-      [
-        "Projects in Zirakpur",
-        "Projects in Bhopal",
-        "Projects in Mira Bhayandar",
-        "Projects in Patna",
-        "Projects in Nashik",
-      ],
-    ],
-  },
-  "POPULAR SEARCHES": {
-    heading: "Popular searches",
-    columns: [
-      [
-        "2 BHK flats in Greater Noida",
-        "3 BHK flats in Ghaziabad",
-        "Villas in Lucknow",
-        "Plots in Indore",
-        "Studio apartments in Faridabad",
-      ],
-      [
-        "2 BHK flats in Mohali",
-        "3 BHK flats in Coimbatore",
-        "Villas in Nagpur",
-        "Plots in Surat",
-        "Studio apartments in Vadodara",
-      ],
-      [
-        "2 BHK flats in Dehradun",
-        "3 BHK flats in Raipur",
-        "Villas in Visakhapatnam",
-        "Plots in Secunderabad",
-        "Studio apartments in Bhubaneswar",
-      ],
-      [
-        "2 BHK flats in Zirakpur",
-        "3 BHK flats in Bhopal",
-        "Villas in Mira Bhayandar",
-        "Plots in Patna",
-        "Studio apartments in Nashik",
-      ],
-    ],
-  },
-};
-
-const COMPANY_LINKS = [
-  "Careers",
-  "About Us",
-  "For Partners",
-  "Terms",
-  "Annual Return",
-  "Privacy Policy",
-  "Contact Us",
-  "Unsubscribe",
-  "Merger Hearing Advertisement",
-];
-
-const PARTNER_LINKS = [
-  "realestate.com.au",
-  "realtor.com",
-  "99.co",
-  "collinsdictionary.com",
-];
-
-const EXPLORE_LINKS = ["News", "Home Loans", "Sitemap", "International"];
-
-const SOCIAL_ICONS = [
-  { icon: "fa-facebook-f", label: "Facebook" },
-  { icon: "fa-instagram", label: "Instagram" },
-  { icon: "fa-twitter", label: "Twitter" },
-  { icon: "fa-linkedin-in", label: "LinkedIn" },
-  { icon: "fa-youtube", label: "YouTube" },
-];
+// frontend/src/components/common/Footer.jsx
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { PropertyDealLogo } from './Header';
 
 const Footer = () => {
-  const [activeTab, setActiveTab] = useState("FOR BUYERS");
-  const activeContent = LINK_SETS[activeTab];
+  const topCities = [
+    'Flats in Mumbai',
+    'Flats in Delhi NCR',
+    'Properties in Noida',
+    'Flats in Greater Noida West',
+    'Properties in Gurgaon',
+    'Apartments in Bengaluru',
+    'Homes in Pune',
+    'Plots on Yamuna Expressway',
+  ];
 
   return (
-    <footer className="bg-[#0d0d0d] text-white">
-      {/* Tabs */}
-      <div className="border-b border-white/10">
-        <div className="max-w-[1300px] mx-auto px-6 flex items-center gap-10 overflow-x-auto">
-          {TABS.map((t) => {
-            const active = t === activeTab;
-            return (
-              <button
-                key={t}
-                onClick={() => setActiveTab(t)}
-                className={`relative py-5 text-sm font-semibold tracking-wide whitespace-nowrap transition-colors ${
-                  active ? "text-white" : "text-white/50 hover:text-white/80"
-                }`}
-              >
-                {t}
-                {active && (
-                  <span className="absolute left-0 right-0 -bottom-[1px] h-[2px] bg-white" />
-                )}
-              </button>
-            );
-          })}
+    <footer className="bg-[#0f172a] text-[#94a3b8] pt-14 pb-8 border-t border-[#1e293b] relative">
+      <div className="max-w-[1300px] mx-auto px-4 sm:px-6">
+        {/* Top Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-[#1e293b]">
+          {/* Brand Col */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#ffb300] flex items-center justify-center text-[#0f172a] font-black text-sm">
+                PD
+              </div>
+              <span className="text-xl font-extrabold text-white tracking-tight">
+                Property<span className="text-[#3b82f6]">Deal</span>
+              </span>
+            </div>
+            <p className="text-xs text-[#94a3b8] leading-relaxed">
+              India's trusted real estate marketplace. Buy, sell, or rent flats, builder floors, plots, and commercial properties directly from owners and verified agents.
+            </p>
+            <div className="text-xs text-[#cbd5e1] font-semibold">
+              Over 71,000+ verified listings across major Indian cities.
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
+              Explore PropertyDeal
+            </h4>
+            <ul className="space-y-2.5 text-xs">
+              <li><Link to="/" className="hover:text-white transition-colors">Residential Properties for Sale</Link></li>
+              <li><Link to="/rent" className="hover:text-white transition-colors">Flats & Houses for Rent</Link></li>
+              <li><Link to="/commercial" className="hover:text-white transition-colors">Commercial Shops & Office Spaces</Link></li>
+              <li><Link to="/plots" className="hover:text-white transition-colors">Residential Plots & Land</Link></li>
+              <li><Link to="/pg-co-living" className="hover:text-white transition-colors">PG & Co-Living Spaces</Link></li>
+              <li><Link to="/post-property" className="text-[#f59e0b] hover:underline font-bold">Post Property for FREE →</Link></li>
+            </ul>
+          </div>
+
+          {/* Popular Cities */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
+              Popular Searches
+            </h4>
+            <ul className="space-y-2.5 text-xs">
+              {topCities.map((city, idx) => (
+                <li key={idx}>
+                  <Link to={`/?q=${encodeURIComponent(city)}`} className="hover:text-white transition-colors">
+                    {city}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Admin & Support */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
+              Admin & Portals
+            </h4>
+            <ul className="space-y-2.5 text-xs">
+              <li>
+                <Link
+                  to="/admin/login"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2563eb] text-white font-bold hover:bg-[#1d4ed8] transition-colors shadow-xs"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span>PropertyDeal Admin Login</span>
+                </Link>
+              </li>
+              <li className="pt-2 text-[11px] text-[#94a3b8]">
+                Admin Credentials: <br />
+                <span className="text-[#f59e0b] font-mono">admin@propertydeal.com</span> / <span className="text-[#f59e0b] font-mono">admin123</span>
+              </li>
+              <li className="pt-2"><a href="tel:+919876543210" className="hover:text-white">Customer Support: +91 98765 43210</a></li>
+              <li><a href="mailto:support@propertydeal.com" className="hover:text-white">Email: support@propertydeal.com</a></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748b]">
+          <p>© {new Date().getFullYear()} PropertyDeal Technologies Pvt. Ltd. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-white">Terms of Use</Link>
+            <Link to="/sitemap" className="hover:text-white">Sitemap</Link>
+          </div>
         </div>
       </div>
 
-      {/* Link grid */}
-      <div className="max-w-[1300px] mx-auto px-6 py-8">
-        <h3 className="text-white font-bold text-lg mb-5">
-          {activeContent.heading}
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-3">
-          {activeContent.columns.map((col, i) => (
-            <div key={i} className="flex flex-col gap-3">
-              {col.map((link, j) => (
-                <a
-                  key={j}
-                  href="#"
-                  className="text-white/60 text-sm hover:text-white transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom section */}
-      <div className="border-t border-white/10">
-        <div className="max-w-[1300px] mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-[310px_1fr_1fr_1fr_260px] gap-8">
-          {/* Come home to Greatness banner */}
-          <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-[#7c3aed] to-[#a855f7] p-5 flex items-center min-h-[190px]">
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(135deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 10px)",
-              }}
-            />
-            <div className="relative flex items-center gap-3 w-full">
-              <p className="text-white font-extrabold text-xl leading-tight flex-1">
-                Come home
-                <br />
-                to G<span className="text-[#ffd966]">r</span>eatness
-              </p>
-              <div className="w-px h-16 bg-white/30 flex-shrink-0"></div>
-              <div className="flex-shrink-0 text-center">
-                <p className="text-white font-extrabold text-2xl leading-none">
-                  RANKED
-                  <br />
-                  <span className="text-3xl">5</span>
-                  <sup className="text-xs">th</sup>
-                </p>
-                <p className="text-white/90 text-[9px] mt-1 leading-tight w-[90px]">
-                  Best Companies to Work For 2024 by Great Place to Work®
-                </p>
-              </div>
-              <div className="flex flex-col gap-1.5 flex-shrink-0">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-center">
-                  <span className="text-[6px] font-bold text-[#e11d48] leading-tight">
-                    Great
-                    <br />
-                    Place
-                    <br />
-                    To Work
-                  </span>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-center">
-                  <span className="text-[5px] font-bold text-[#1d4ed8] leading-tight">
-                    Best
-                    <br />
-                    Workplaces
-                    <br />
-                    Asia
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-white/50 text-xs font-bold tracking-wider mb-4">
-              COMPANY
-            </h4>
-            <div className="flex flex-col gap-3">
-              {COMPANY_LINKS.map((link, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="text-white/70 text-sm hover:text-white transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Partner sites */}
-          <div>
-            <h4 className="text-white/50 text-xs font-bold tracking-wider mb-4">
-              PARTNER SITES
-            </h4>
-            <div className="flex flex-col gap-3">
-              {PARTNER_LINKS.map((link, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="text-white/70 text-sm hover:text-white transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Explore */}
-          <div>
-            <h4 className="text-white/50 text-xs font-bold tracking-wider mb-4">
-              EXPLORE
-            </h4>
-            <div className="flex flex-col gap-3">
-              {EXPLORE_LINKS.map((link, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="text-white/70 text-sm hover:text-white transition-colors"
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile app */}
-          <div>
-            <h4 className="text-white/50 text-xs font-bold tracking-wider mb-4">
-              EXPERIENCE HOUSING APP ON MOBILE
-            </h4>
-            <div className="flex items-center gap-2 mb-4">
-              <a
-                href="#"
-                className="flex items-center gap-1.5 bg-black border border-white/30 rounded-md px-2.5 py-1.5"
-              >
-                <i className="fab fa-apple text-lg"></i>
-                <span className="text-[9px] leading-tight text-left">
-                  Download on the
-                  <br />
-                  <span className="text-xs font-semibold">App Store</span>
-                </span>
-              </a>
-              <a
-                href="#"
-                className="flex items-center gap-1.5 bg-black border border-white/30 rounded-md px-2.5 py-1.5"
-              >
-                <i className="fab fa-google-play text-lg"></i>
-                <span className="text-[9px] leading-tight text-left">
-                  GET IT ON
-                  <br />
-                  <span className="text-xs font-semibold">Google Play</span>
-                </span>
-              </a>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 bg-white p-1 rounded flex-shrink-0">
-                <svg viewBox="0 0 100 100" className="w-full h-full">
-                  <rect width="100" height="100" fill="#fff" />
-                  {[...Array(10)].map((_, r) =>
-                    [...Array(10)].map((_, c) =>
-                      (r + c) % 3 === 0 || (r * c) % 7 === 0 ? (
-                        <rect
-                          key={`${r}-${c}`}
-                          x={c * 10}
-                          y={r * 10}
-                          width="10"
-                          height="10"
-                          fill="#000"
-                        />
-                      ) : null
-                    )
-                  )}
-                </svg>
-              </div>
-              <p className="text-white/60 text-[11px] leading-snug">
-                Open camera &amp; scan the QR code to Download the App
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Follow + copyright */}
-        <div className="max-w-[1300px] mx-auto px-6 pb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h4 className="text-white/50 text-xs font-bold tracking-wider mb-3">
-                FOLLOW
-              </h4>
-              <div className="flex items-center gap-3">
-                {SOCIAL_ICONS.map((s, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    aria-label={s.label}
-                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors"
-                  >
-                    <i className={`fab ${s.icon} text-xs`}></i>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-          <p className="text-white/40 text-xs mt-6">
-            ©2012-26 Locon Solutions Pvt. Ltd.
-          </p>
-        </div>
-      </div>
+      {/* Floating WhatsApp Action */}
+      <a
+        href="https://wa.me/919876543210?text=Hi%20PropertyDeal,%20I%20am%20interested%20in%20properties"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+        className="fixed right-5 bottom-6 z-50 w-13 h-13 rounded-full bg-[#25d366] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-transform animate-hw-pulse-glow"
+        title="Chat on WhatsApp"
+      >
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.2 1.054.94 1.62 1.026 1.83 1.116.21.09.332.072.455-.069.123-.141.52-.607.66-.815.14-.208.28-.173.473-.101.193.072 1.226.578 1.438.684.212.106.353.159.405.249.052.09.052.52-.092.925z" />
+        </svg>
+      </a>
     </footer>
   );
 };

@@ -68,13 +68,16 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
   const sidebarContent = (
     <div className="h-full flex flex-col bg-[#0f172a] text-white">
       {/* Logo */}
-      <div className="h-16 flex items-center gap-2 px-4 border-b border-white/10 flex-shrink-0">
-        <div className="w-8 h-8 rounded-md bg-[#ffb300] flex items-center justify-center flex-shrink-0">
-          <i className="fas fa-home text-[#0f172a] text-sm"></i>
+      <div className="h-16 flex items-center gap-2.5 px-4 border-b border-white/10 flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-[#ffb300] flex items-center justify-center flex-shrink-0 shadow-sm">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-[#0f172a]">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+          </svg>
         </div>
         {!collapsed && (
-          <span className="font-extrabold text-base tracking-tight whitespace-nowrap">
-            PropertyDeal<span className="font-normal">.ADMIN</span>
+          <span className="font-extrabold text-base tracking-tight whitespace-nowrap text-white">
+            Property<span className="text-[#3b82f6]">Deal</span>
+            <span className="text-[10px] font-normal uppercase tracking-wider text-slate-400 ml-1.5 bg-white/10 px-1.5 py-0.5 rounded">ADMIN</span>
           </span>
         )}
       </div>
@@ -106,9 +109,9 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
                     end={item.path === "/admin"}
                     onClick={onCloseMobile}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                      `flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm transition-colors ${
                         isActive
-                          ? "bg-[#6C3EE6] text-white font-semibold"
+                          ? "bg-[#2563eb] text-white font-bold shadow-xs"
                           : "text-white/70 hover:bg-white/5 hover:text-white"
                       } ${collapsed ? "justify-center" : ""}`
                     }
