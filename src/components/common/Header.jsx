@@ -1,7 +1,7 @@
-// frontend/src/components/common/Header.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import ClientAuthModal from "./ClientAuthModal";
 
 export const PropertyDealLogo = ({ size = 32 }) => (
   <div className="flex items-center gap-2 flex-shrink-0">
@@ -49,6 +49,8 @@ const Header = () => {
   const [selectedCity, setSelectedCity] = useState("All India");
   const [citySearch, setCitySearch] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [clientAuthModalOpen, setClientAuthModalOpen] = useState(false);
+  const [authInitialMode, setAuthInitialMode] = useState("login");
 
   const navRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -671,26 +673,32 @@ const Header = () => {
                 )}
                 <button
                   onClick={logout}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
                 >
                   Logout
                 </button>
               </div>
             </div>
           ) : (
-            <Link
-              to="/admin/login"
-              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#2563eb] hover:bg-[#1d4ed8] shadow-sm transition-colors"
-            >
-              Login
-            </Link>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setClientAuthModalOpen(true);
+                  setAuthInitialMode("login");
+                }}
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#2563eb] hover:bg-[#1d4ed8] shadow-sm transition-colors cursor-pointer"
+              >
+                Login
+              </button>
+            </div>
           )}
 
           {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg border border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]"
+            className="lg:hidden p-2 rounded-lg border border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               {mobileMenuOpen ? (
@@ -715,6 +723,46 @@ const Header = () => {
               Change City
             </button>
           </div>
+
+          {/* Client Authentication in Mobile Drawer */}
+          {!isAuthenticated ? (
+            <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-extrabold text-[#0f172a]">Client Sign In / Sign Up</p>
+                <p className="text-[11px] text-[#64748b]">Save favorites & contact owners</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setClientAuthModalOpen(true);
+                  setAuthInitialMode("login");
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-[#2563eb] text-white font-bold text-xs shadow-sm cursor-pointer whitespace-nowrap"
+              >
+                Sign In
+              </button>
+            </div>
+          ) : (
+            <div className="p-3 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#2563eb] text-white font-bold text-xs flex items-center justify-center">
+                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-[#0f172a]">{user?.name}</p>
+                  <p className="text-[10px] text-[#64748b]">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={logout}
+                className="text-xs font-bold text-rose-600 hover:underline cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-2 text-xs font-bold">
             <Link to="/" className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex justify-between items-center">
@@ -756,6 +804,13 @@ const Header = () => {
           </div>
         </div>
       )}
+
+      {/* Client Sign In & Sign Up Modal (Gmail OTP & Password) */}
+      <ClientAuthModal
+        isOpen={clientAuthModalOpen}
+        onClose={() => setClientAuthModalOpen(false)}
+        initialMode={authInitialMode}
+      />
     </header>
   );
 };

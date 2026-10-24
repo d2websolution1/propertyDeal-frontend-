@@ -58,6 +58,31 @@ export const AuthProvider = ({ children }) => {
     return newUser;
   }, []);
 
+  const sendOtp = useCallback(async (payload) => {
+    const res = await api.post("/auth/send-otp", payload);
+    return res.data;
+  }, []);
+
+  const verifyOtp = useCallback(async (payload) => {
+    const res = await api.post("/auth/verify-otp", payload);
+    const { token, user: verifiedUser } = res.data;
+    if (token) {
+      localStorage.setItem("token", token);
+      setUser(verifiedUser);
+    }
+    return verifiedUser;
+  }, []);
+
+  const googleAuth = useCallback(async (payload) => {
+    const res = await api.post("/auth/google-auth", payload);
+    const { token, user: authedUser } = res.data;
+    if (token) {
+      localStorage.setItem("token", token);
+      setUser(authedUser);
+    }
+    return authedUser;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     setUser(null);
@@ -69,6 +94,9 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    sendOtp,
+    verifyOtp,
+    googleAuth,
     logout,
   };
 
