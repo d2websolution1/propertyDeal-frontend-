@@ -1,5 +1,6 @@
 // frontend/src/components/common/ClientAuthModal.jsx
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PropertyDealLogo } from './Header';
 import { Link } from 'react-router-dom';
@@ -29,14 +30,29 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Reset form on open & handle Escape key + body scroll lock
   useEffect(() => {
-    if (isOpen) {
-      setMode(initialMode);
-      setError('');
-      setSuccessMsg('');
-      setOtpStep(1);
-    }
-  }, [isOpen, initialMode]);
+    if (!isOpen) return;
+    setMode(initialMode);
+    setError('');
+    setSuccessMsg('');
+    setOtpStep(1);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen, initialMode, onClose]);
 
   useEffect(() => {
     let interval = null;
@@ -166,23 +182,43 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-hw-fade">
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-[#e2e8f0] overflow-hidden">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/65 backdrop-blur-sm overflow-y-auto animate-hw-fade"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      {/* Outer Floating Dismiss Button (Visible on all screens) */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="fixed top-4 right-4 z-[100000] w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center text-lg font-bold transition-all shadow-lg hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md"
+        aria-label="Close modal"
+        title="Close (Esc)"
+      >
+        ✕
+      </button>
+
+      <div
+        className="relative w-full max-w-md my-auto bg-white rounded-3xl shadow-2xl border border-[#e2e8f0] overflow-hidden flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] p-6 text-white text-center relative">
+        <div className="bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] p-5 sm:p-6 text-white text-center relative flex-shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center font-bold text-lg transition-colors cursor-pointer"
+            className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 text-white flex items-center justify-center font-bold text-base transition-transform hover:scale-110 active:scale-90 cursor-pointer shadow-sm"
             aria-label="Close"
+            title="Close"
           >
             ✕
           </button>
 
           <div className="flex justify-center mb-2">
-            <div className="bg-white px-3 py-1.5 rounded-xl shadow-md">
-              <PropertyDealLogo size={28} />
+            <div className="bg-white px-3.5 py-1.5 rounded-xl shadow-md">
+              <PropertyDealLogo height={38} className="h-9 w-auto" />
             </div>
           </div>
           <h3 className="text-xl font-black tracking-tight">
@@ -215,8 +251,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6">
+        {/* Modal Body (Scrollable for compact screens) */}
+        <div className="p-5 sm:p-6 overflow-y-auto">
           {/* Error & Success Alerts */}
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
@@ -503,8 +539,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             )}
           </div>
 
-          {/* Subtle Admin Portal Link */}
-          <div className="mt-4 pt-3 border-t border-[#f1f5f9] text-center">
+          {/* Subtle Admin Portal Link & Cancel Action */}
+          <div className="mt-4 pt-3 border-t border-[#f1f5f9] flex flex-col items-center gap-2 text-center">
             <Link
               to="/admin/login"
               onClick={onClose}
@@ -513,11 +549,22 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
               <span>🛡️ Are you an Administrator? Access Admin Portal</span>
               <span>→</span>
             </Link>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs font-semibold text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9] px-4 py-1.5 rounded-lg transition-colors cursor-pointer"
+            >
+              ✕ Close Window
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalContent, document.body)
+    : null;
 };
 
 export default ClientAuthModal;

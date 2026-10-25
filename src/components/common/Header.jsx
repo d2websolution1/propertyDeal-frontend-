@@ -4,21 +4,24 @@ import { useAuth } from "../../hooks/useAuth";
 import ClientAuthModal from "./ClientAuthModal";
 import propertyDealIcon from "../../assets/icon-propertydeal.png";
 
-export const PropertyDealLogo = ({ size = 34, showText = true, textColor = "text-[#0f172a]" }) => (
-  <div className="flex items-center gap-2.5 flex-shrink-0">
-    <img
-      src={propertyDealIcon}
-      alt="PropertyDeal Logo"
-      style={{ width: size, height: size }}
-      className="object-contain flex-shrink-0 rounded-lg drop-shadow-xs"
-    />
-    {showText && (
-      <span className={`font-extrabold text-xl md:text-2xl tracking-tight ${textColor} whitespace-nowrap`}>
-        Property<span className="text-[#3b82f6]">Deal</span>
-      </span>
-    )}
-  </div>
-);
+export const PropertyDealLogo = ({
+  size,
+  height = 50,
+  className = "",
+  alt = "PropertyDeal",
+}) => {
+  const logoHeight = size || height;
+  return (
+    <div className="flex items-center flex-shrink-0">
+      <img
+        src={propertyDealIcon}
+        alt={alt}
+        style={{ height: `${logoHeight}px`, width: "auto" }}
+        className={`object-contain flex-shrink-0 max-h-[60px] select-none ${className}`}
+      />
+    </div>
+  );
+};
 
 const CITIES = [
   "Mumbai",
@@ -197,11 +200,11 @@ const Header = () => {
       ref={navRef}
       className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e2e8f0] shadow-xs"
     >
-      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between gap-2 md:gap-4">
-        {/* Left: Brand Logo & All India Selector */}
-        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-          <Link to="/" className="focus:outline-none flex items-center">
-            <PropertyDealLogo size={32} />
+      <div className="max-w-[1340px] mx-auto px-4 sm:px-6 h-[72px] sm:h-[76px] flex items-center justify-between gap-3 md:gap-4">
+        {/* Left: Brand Logo & All India Selector with generous spacing */}
+        <div className="flex items-center gap-5 sm:gap-7 md:gap-8 flex-shrink-0">
+          <Link to="/" className="focus:outline-none flex items-center py-1 mr-2 sm:mr-4 transition-transform hover:scale-102">
+            <PropertyDealLogo height={52} className="h-11 sm:h-12 md:h-[52px] w-auto" />
           </Link>
 
           {/* City / All India Selector Dropdown */}

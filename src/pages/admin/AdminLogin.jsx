@@ -65,8 +65,8 @@ const AdminLogin = () => {
       <div className="relative z-10 w-full max-w-[440px] bg-white rounded-3xl shadow-xl border border-[#e2e8f0] p-8 sm:p-10 animate-hw-fade">
         {/* Logo */}
         <div className="flex flex-col items-center justify-center mb-6">
-          <PropertyDealLogo size={40} />
-          <span className="mt-2 text-[10.5px] font-black uppercase tracking-widest text-[#2563eb] bg-[#eff6ff] px-2.5 py-0.5 rounded-full border border-[#bfdbfe]">
+          <PropertyDealLogo height={48} className="h-12 w-auto" />
+          <span className="mt-2.5 text-[10.5px] font-black uppercase tracking-widest text-[#2563eb] bg-[#eff6ff] px-2.5 py-0.5 rounded-full border border-[#bfdbfe]">
             ADMINISTRATOR PORTAL
           </span>
         </div>

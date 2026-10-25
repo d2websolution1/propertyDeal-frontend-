@@ -161,8 +161,8 @@ function ClientAuthPage({ initialMode = 'login' }) {
         {/* Header */}
         <div className="bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] p-6 text-white text-center">
           <div className="flex justify-center mb-2">
-            <div className="bg-white px-3 py-1.5 rounded-xl shadow-md">
-              <PropertyDealLogo size={28} />
+            <div className="bg-white px-3.5 py-1.5 rounded-xl shadow-md">
+              <PropertyDealLogo height={38} className="h-9 w-auto" />
             </div>
           </div>
           <h2 className="text-2xl font-black tracking-tight">
