@@ -499,15 +499,15 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/90 via-[#0f172a]/60 to-transparent"></div>
 
                 {/* Slide text */}
-                <div className="absolute inset-0 p-6 sm:p-10 md:p-12 flex flex-col justify-between max-w-2xl text-white">
+                <div className="absolute inset-0 p-4 sm:p-8 md:p-12 flex flex-col justify-between max-w-2xl text-white">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f59e0b] text-[#0f172a] text-[11px] font-black tracking-wider uppercase mb-2">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#f59e0b] text-[#0f172a] text-[10px] sm:text-[11px] font-black tracking-wider uppercase mb-1.5 sm:mb-2">
                       <span>{slide.tag}</span>
                     </div>
                     <span className="block text-xs sm:text-sm font-medium text-blue-200 tracking-wide mb-1">
                       {slide.location}
                     </span>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-2 leading-tight">
+                    <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-1.5 sm:mb-2 leading-tight">
                       {slide.title}
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-200 line-clamp-2 max-w-lg mb-2">
@@ -515,9 +515,9 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20">
-                      <span className="text-[10px] text-gray-300 block uppercase font-bold">Price</span>
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
+                      <span className="text-[9.5px] sm:text-[10px] text-gray-300 block uppercase font-bold">Price</span>
                       <strong className="text-sm sm:text-lg font-extrabold text-[#fde047]">
                         {slide.price}
                       </strong>
@@ -525,7 +525,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
                     <Link
                       to={slide.link}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
                     >
                       <span>Explore Now</span>
                       <span>→</span>
@@ -573,7 +573,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
         {/* ── 2. Floating Navbar & Search Widget (Identical on ALL pages!) ── */}
         <div className="relative -mt-6 sm:-mt-8 z-30 max-w-[1080px] mx-auto bg-white rounded-2xl shadow-xl border border-[#e2e8f0] p-3 sm:p-4">
           {/* Category Tabs linking to each page */}
-          <div className="flex items-center gap-1 sm:gap-2 pb-3 border-b border-[#f1f5f9] overflow-x-auto">
+          <div className="flex items-center gap-1 sm:gap-2 pb-3 border-b border-[#f1f5f9] overflow-x-auto no-scrollbar">
             {SEARCH_TABS.map((tab) => {
               const isActive =
                 (tab.path === '/' && location.pathname === '/') ||
