@@ -89,6 +89,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       setSuccessMsg(res.message || `Verification OTP sent to ${email}`);
       if (res.previewOtp) {
         setPreviewOtp(res.previewOtp);
+        setOtp(String(res.previewOtp));
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
