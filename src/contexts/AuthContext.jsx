@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const AuthContext = createContext(null);
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
 // Axios instance with token attached automatically
 const api = axios.create({ baseURL: API_BASE_URL });
