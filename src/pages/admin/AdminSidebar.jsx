@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import propertyDealIcon from "../../assets/icon-propertydeal.png";
 
 const NAV_GROUPS = [
@@ -14,8 +15,6 @@ const NAV_GROUPS = [
       { label: "Advertisements", icon: "fa-ad", path: "/admin/advertisements" },
       { label: "CMS Pages", icon: "fa-file-alt", path: "/admin/cms" },
       { label: "Blog Management", icon: "fa-blog", path: "/admin/blogs" },
-      { label: "SEO Settings", icon: "fa-search", path: "/admin/seo" },
-      { label: "Email Templates", icon: "fa-envelope-open-text", path: "/admin/email-templates" },
       { label: "Pop-up Banners", icon: "fa-window-restore", path: "/admin/banners" },
       { label: "Bulk WhatsApp / SMS / Email", icon: "fa-paper-plane", path: "/admin/bulk-messaging" },
     ],
@@ -52,12 +51,15 @@ const NAV_GROUPS = [
       { label: "General Settings", icon: "fa-cog", path: "/admin/settings" },
       { label: "Multi-language", icon: "fa-language", path: "/admin/settings/language" },
       { label: "Security & SSL", icon: "fa-lock", path: "/admin/settings/security" },
-      { label: "Log Out All Devices", icon: "fa-sign-out-alt", path: "/admin/settings/sessions" },
+      { label: "Active Sessions", icon: "fa-laptop", path: "/admin/settings/sessions" },
     ],
   },
 ];
 
 const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [openGroups, setOpenGroups] = useState(
     NAV_GROUPS.reduce((acc, g) => ({ ...acc, [g.label]: true }), {})
   );
@@ -65,9 +67,16 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
   const toggleGroup = (label) =>
     setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }));
 
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("token");
+    if (onCloseMobile) onCloseMobile();
+    navigate("/admin/login", { replace: true });
+  };
+
   const sidebarContent = (
-    <div className="h-full flex flex-col bg-[#0f172a] text-white">
-      {/* Logo */}
+    <div className="h-full flex flex-col bg-[#0f172a] text-white select-none">
+      {/* Logo Header */}
       <div className="h-16 flex items-center gap-2.5 px-4 border-b border-white/10 flex-shrink-0">
         <img
           src={propertyDealIcon}
@@ -82,12 +91,13 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
         )}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2">
+      {/* Nav groups */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2 custom-scrollbar">
         {NAV_GROUPS.map((group) => (
           <div key={group.label} className="mb-2">
             {!collapsed && (
               <button
+                type="button"
                 onClick={() => toggleGroup(group.label)}
                 className="w-full flex items-center justify-between px-2 py-2 text-[11px] font-bold tracking-wider text-white/40 uppercase hover:text-white/60 transition-colors"
               >
@@ -126,6 +136,27 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
           </div>
         ))}
       </nav>
+
+      {/* User Info & Direct Logout Button */}
+      <div className="p-3 border-t border-white/10 flex-shrink-0 bg-[#0b1120]">
+        {!collapsed && user && (
+          <div className="mb-2 px-1">
+            <p className="text-xs font-bold text-white truncate">{user.name || "Administrator"}</p>
+            <p className="text-[10px] text-white/40 truncate">{user.email || "admin@propertydeal.com"}</p>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-red-300 hover:text-white bg-red-500/10 hover:bg-red-600 transition-all cursor-pointer ${
+            collapsed ? "justify-center" : ""
+          }`}
+          title="Logout Admin"
+        >
+          <i className="fas fa-sign-out-alt text-sm flex-shrink-0"></i>
+          {!collapsed && <span>Logout Admin</span>}
+        </button>
+      </div>
     </div>
   );
 

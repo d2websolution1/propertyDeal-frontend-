@@ -11,7 +11,8 @@ const AdminTopbar = ({ onToggleSidebar, onOpenMobileSidebar }) => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    localStorage.removeItem("token");
+    navigate("/admin/login", { replace: true });
   };
 
   return (

@@ -22,7 +22,7 @@ const AdminLogin = () => {
       const loggedInUser = await login(email, password);
 
       if (loggedInUser?.role !== 'admin') {
-        setError('This account does not have admin privileges.');
+        setError('Access denied. This account does not have administrator privileges.');
         setLoading(false);
         return;
       }
@@ -32,20 +32,14 @@ const AdminLogin = () => {
       console.error('Login error:', err);
       setError(
         err.response?.data?.message ||
-          'Invalid email or password. Please verify your admin credentials.'
+          'Invalid credentials. Please verify your administrator email and password.'
       );
       setLoading(false);
     }
   };
 
-  const fillCredentials = (adminEmail = 'admin@propertydeal.com', adminPass = 'admin123') => {
-    setEmail(adminEmail);
-    setPassword(adminPass);
-    setError('');
-  };
-
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden select-none">
       {/* Decorative ambient subtle background accents */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-100/50 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-amber-100/40 rounded-full blur-3xl pointer-events-none"></div>
@@ -62,49 +56,22 @@ const AdminLogin = () => {
       </div>
 
       {/* Card Container */}
-      <div className="relative z-10 w-full max-w-[440px] bg-white rounded-3xl shadow-xl border border-[#e2e8f0] p-8 sm:p-10 animate-hw-fade">
+      <div className="relative z-10 w-full max-w-[420px] bg-white rounded-3xl shadow-xl border border-[#e2e8f0] p-8 sm:p-10 animate-hw-fade">
         {/* Logo */}
         <div className="flex flex-col items-center justify-center mb-6">
           <PropertyDealLogo height={48} className="h-12 w-auto" />
           <span className="mt-2.5 text-[10.5px] font-black uppercase tracking-widest text-[#2563eb] bg-[#eff6ff] px-2.5 py-0.5 rounded-full border border-[#bfdbfe]">
-            ADMINISTRATOR PORTAL
+            SECURE ADMIN PORTAL
           </span>
         </div>
 
         <div className="text-center mb-6">
           <h1 className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">
-            Sign In to Admin Panel
+            Administrator Sign In
           </h1>
           <p className="text-xs text-[#64748b] mt-1">
-            Manage listings, users, approvals, content & SEO settings.
+            Enter your credentials to access the administrative control dashboard.
           </p>
-        </div>
-
-        {/* Credentials helper box */}
-        <div className="mb-6 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-1">
-              <span>🔑</span>
-              <span>Admin Credentials:</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => fillCredentials('admin@propertydeal.com', 'admin123')}
-              className="text-[11px] font-black text-white bg-[#2563eb] hover:bg-[#1d4ed8] px-2.5 py-1 rounded-lg transition-colors shadow-xs"
-            >
-              1-Click Auto Fill
-            </button>
-          </div>
-          <div className="text-xs space-y-1 font-mono text-[#0f172a]">
-            <div>
-              <span className="text-[#64748b]">Email:</span>{' '}
-              <strong className="text-[#2563eb]">admin@propertydeal.com</strong>
-            </div>
-            <div>
-              <span className="text-[#64748b]">Password:</span>{' '}
-              <strong className="text-[#2563eb]">admin123</strong>
-            </div>
-          </div>
         </div>
 
         {error && (
@@ -125,7 +92,8 @@ const AdminLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="admin@propertydeal.com"
+              autoComplete="username"
+              placeholder="name@domain.com"
               className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-xs sm:text-sm outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 transition-all bg-[#f8fafc]"
             />
           </div>
@@ -139,6 +107,7 @@ const AdminLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
               placeholder="••••••••"
               className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-xs sm:text-sm outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 transition-all bg-[#f8fafc]"
             />
@@ -147,7 +116,7 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold py-3.5 rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 mt-2 disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold py-3.5 rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 mt-2 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <>
@@ -155,7 +124,7 @@ const AdminLogin = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
-                <span>Signing In...</span>
+                <span>Authenticating...</span>
               </>
             ) : (
               <span>Sign In to Admin Panel →</span>
@@ -165,10 +134,7 @@ const AdminLogin = () => {
 
         <div className="mt-6 pt-5 border-t border-[#f1f5f9] text-center">
           <p className="text-[11px] text-[#64748b]">
-            Need help? Contact support at{' '}
-            <a href="tel:+919876543210" className="text-[#2563eb] font-bold hover:underline">
-              +91 98765 43210
-            </a>
+            Protected by PropertyDeal Authentication & SSL Encryption
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
-// AdminDashboard.jsx
-import React, { useEffect, useState } from "react";
+// frontend/src/pages/admin/AdminDashboard.jsx
+import React, { useEffect, useState, useCallback } from "react";
+import axios from "axios";
 import {
   LineChart,
   Line,
@@ -12,85 +13,193 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// TODO: replace with real API calls, e.g. GET /api/admin/dashboard-stats
-const MOCK_STATS = [
-  { id: 1, label: "Total Users", value: "12,480", change: "+8.2%", up: true, icon: "fa-users", color: "#6C3EE6" },
-  { id: 2, label: "Total Properties", value: "3,214", change: "+4.1%", up: true, icon: "fa-building", color: "#2fb47c" },
-  { id: 3, label: "Pending Approvals", value: "37", change: "-2 today", up: false, icon: "fa-hourglass-half", color: "#e0569a" },
-  { id: 4, label: "Active Subscriptions", value: "842", change: "+12", up: true, icon: "fa-layer-group", color: "#4f6bd8" },
-  { id: 5, label: "New Listings Today", value: "56", change: "+15%", up: true, icon: "fa-file-invoice", color: "#d9975a" },
-  { id: 6, label: "Revenue (This Month)", value: "₹8.4L", change: "+6.4%", up: true, icon: "fa-indian-rupee-sign", color: "#0f766e" },
-];
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
-const MOCK_LISTINGS_TREND = [
-  { month: "Feb", listings: 210 },
-  { month: "Mar", listings: 280 },
-  { month: "Apr", listings: 240 },
-  { month: "May", listings: 310 },
-  { month: "Jun", listings: 350 },
-  { month: "Jul", listings: 420 },
-];
-
-const MOCK_USER_SIGNUPS = [
-  { month: "Feb", buyers: 120, vendors: 40 },
-  { month: "Mar", buyers: 150, vendors: 55 },
-  { month: "Apr", buyers: 130, vendors: 48 },
-  { month: "May", buyers: 180, vendors: 62 },
-  { month: "Jun", buyers: 210, vendors: 70 },
-  { month: "Jul", buyers: 260, vendors: 85 },
-];
-
-const MOCK_RECENT_ACTIVITY = [
-  { id: 1, type: "New Listing", detail: "3 BHK Apartment — Andheri West, Mumbai", user: "Rohit Sharma", time: "5 min ago" },
-  { id: 2, type: "New Vendor", detail: "Registered as a Broker", user: "Priya Constructions", time: "22 min ago" },
-  { id: 3, type: "Listing Approved", detail: "2 BHK Flat — Kandivali East", user: "Admin", time: "1 hr ago" },
-  { id: 4, type: "Enquiry", detail: "Interested in Lodha Upper Thane", user: "Aakash Verma", time: "2 hr ago" },
-  { id: 5, type: "Payment", detail: "Subscription renewed — Premium Plan", user: "Mehta Properties", time: "3 hr ago" },
-];
+const api = axios.create({ baseURL: API_BASE_URL });
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(MOCK_STATS);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [statsData, setStatsData] = useState({
+    counts: {
+      totalUsers: 0,
+      totalClients: 0,
+      totalVendors: 0,
+      totalProperties: 0,
+      pendingApprovals: 0,
+      approvedProperties: 0,
+      featuredProperties: 0,
+      verifiedProperties: 0,
+      saleProperties: 0,
+      rentProperties: 0,
+      newListingsToday: 0,
+    },
+    listingsTrend: [],
+    userSignups: [],
+    recentActivity: [],
+  });
 
-  useEffect(() => {
-    // TODO: fetch real stats
-    // setLoading(true);
-    // api.get('/admin/dashboard-stats').then(res => setStats(res.data)).finally(() => setLoading(false));
+  const fetchStats = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    setRefreshing(true);
+    setError("");
+
+    try {
+      const res = await api.get("/admin/dashboard/stats");
+      if (res.data && res.data.counts) {
+        setStatsData(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to load real dashboard stats:", err);
+      setError("Unable to load real-time stats from database. Check server connection.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const { counts, listingsTrend, userSignups, recentActivity } = statsData;
+
+  const statCards = [
+    {
+      id: "users",
+      label: "Total Registered Users",
+      value: counts.totalUsers,
+      sublabel: `${counts.totalClients} Clients • ${counts.totalVendors} Vendors`,
+      icon: "fa-users",
+      color: "#6C3EE6",
+      badge: "Real DB Users",
+    },
+    {
+      id: "properties",
+      label: "Total Properties",
+      value: counts.totalProperties,
+      sublabel: `${counts.saleProperties} Sale • ${counts.rentProperties} Rent`,
+      icon: "fa-building",
+      color: "#2fb47c",
+      badge: "In Database",
+    },
+    {
+      id: "approvals",
+      label: "Pending Approvals",
+      value: counts.pendingApprovals,
+      sublabel: counts.pendingApprovals > 0 ? "Requires review" : "All reviewed",
+      icon: "fa-hourglass-half",
+      color: counts.pendingApprovals > 0 ? "#e0569a" : "#10b981",
+      badge: counts.pendingApprovals > 0 ? "Action Needed" : "Clear",
+    },
+    {
+      id: "approved",
+      label: "Approved & Live Listings",
+      value: counts.approvedProperties,
+      sublabel: `${counts.verifiedProperties} Verified Listings`,
+      icon: "fa-check-circle",
+      color: "#2563eb",
+      badge: "Live on Site",
+    },
+    {
+      id: "featured",
+      label: "Featured Properties",
+      value: counts.featuredProperties,
+      sublabel: "Promoted on Homepage",
+      icon: "fa-star",
+      color: "#d9975a",
+      badge: "Homepage Boost",
+    },
+    {
+      id: "today",
+      label: "New Listings Today",
+      value: counts.newListingsToday,
+      sublabel: "Added in last 24 hrs",
+      icon: "fa-bolt",
+      color: "#0f766e",
+      badge: "Real-time",
+    },
+  ];
+
   return (
-    <div className="max-w-[1400px] mx-auto">
+    <div className="max-w-[1400px] mx-auto pb-8">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-0.5">
-          Overview of platform activity and performance
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Real-Time Dashboard</h1>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+              ● Live MongoDB Atlas
+            </span>
+          </div>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+            Real-time platform activity, user accounts & property listings from your database
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => fetchStats(true)}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-xs rounded-xl border border-gray-200 shadow-xs transition-colors self-start sm:self-auto cursor-pointer disabled:opacity-60"
+        >
+          <i className={`fas fa-sync-alt text-xs text-[#2563eb] ${refreshing ? "fa-spin" : ""}`}></i>
+          <span>{refreshing ? "Syncing..." : "Refresh Live Data"}</span>
+        </button>
       </div>
+
+      {error && (
+        <div className="mb-6 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => fetchStats()}
+            className="text-xs font-bold underline hover:text-rose-900"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <div
             key={stat.id}
-            className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm"
+            className="bg-white rounded-2xl border border-gray-100 p-4 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden"
           >
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
-              style={{ backgroundColor: `${stat.color}1a` }}
-            >
-              <i className={`fas ${stat.icon} text-sm`} style={{ color: stat.color }}></i>
+            <div className="flex items-center justify-between mb-3">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: `${stat.color}15` }}
+              >
+                <i className={`fas ${stat.icon} text-sm`} style={{ color: stat.color }}></i>
+              </div>
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-gray-50 text-gray-500 border border-gray-100">
+                {stat.badge}
+              </span>
             </div>
-            <p className="text-gray-500 text-xs">{stat.label}</p>
-            <p className="text-xl font-bold text-gray-800 mt-0.5">{stat.value}</p>
-            <p
-              className={`text-xs mt-1 flex items-center gap-1 ${
-                stat.up ? "text-green-600" : "text-gray-400"
-              }`}
-            >
-              {stat.up && <i className="fas fa-arrow-up text-[9px]"></i>}
-              {stat.change}
+
+            <p className="text-gray-500 text-xs font-medium truncate">{stat.label}</p>
+            <p className="text-2xl font-black text-gray-800 mt-1">
+              {loading ? (
+                <span className="inline-block w-8 h-6 bg-gray-100 animate-pulse rounded"></span>
+              ) : (
+                stat.value
+              )}
             </p>
+            <p className="text-[11px] text-gray-400 mt-1 truncate">{stat.sublabel}</p>
           </div>
         ))}
       </div>
@@ -98,72 +207,121 @@ const AdminDashboard = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Listings trend */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="font-bold text-gray-800 text-sm mb-4">
-            New Listings — Last 6 Months
-          </h3>
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm">
+                Property Listings Added (Last 6 Months)
+              </h3>
+              <p className="text-[11px] text-gray-400 mt-0.5">Calculated from actual database timestamp</p>
+            </div>
+            <span className="text-xs font-bold text-[#2563eb] bg-blue-50 px-2 py-0.5 rounded-md">
+              Total: {counts.totalProperties}
+            </span>
+          </div>
+
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={MOCK_LISTINGS_TREND}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-              <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
-              <Tooltip />
+            <LineChart data={listingsTrend.length > 0 ? listingsTrend : [{ month: "Current", listings: counts.totalProperties }]}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#94a3b8" />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="#94a3b8" />
+              <Tooltip
+                contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "12px" }}
+              />
               <Line
                 type="monotone"
                 dataKey="listings"
-                stroke="#6C3EE6"
-                strokeWidth={2.5}
-                dot={{ r: 3 }}
+                name="Listings"
+                stroke="#2563eb"
+                strokeWidth={3}
+                dot={{ r: 4, fill: "#2563eb" }}
+                activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         {/* User signups */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="font-bold text-gray-800 text-sm mb-4">
-            New User &amp; Vendor Signups
-          </h3>
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm">
+                User Signups (Last 6 Months)
+              </h3>
+              <p className="text-[11px] text-gray-400 mt-0.5">Real users & vendors registered in MongoDB Atlas</p>
+            </div>
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+              Total: {counts.totalUsers}
+            </span>
+          </div>
+
           <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={MOCK_USER_SIGNUPS}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-              <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
-              <Tooltip />
-              <Bar dataKey="buyers" fill="#6C3EE6" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="vendors" fill="#2fb47c" radius={[4, 4, 0, 0]} />
+            <BarChart data={userSignups.length > 0 ? userSignups : [{ month: "Current", buyers: counts.totalClients, vendors: counts.totalVendors }]}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#94a3b8" />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="#94a3b8" />
+              <Tooltip
+                contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: "12px" }}
+              />
+              <Bar dataKey="buyers" name="Clients" fill="#6C3EE6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="vendors" name="Vendors" fill="#2fb47c" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Recent activity */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-bold text-gray-800 text-sm">Recent Activity</h3>
-          <button className="text-[#6C3EE6] text-xs font-semibold hover:underline">
-            View all
-          </button>
+          <div>
+            <h3 className="font-bold text-gray-800 text-sm">Live Recent Activity</h3>
+            <p className="text-[11px] text-gray-400">Directly from latest database transactions</p>
+          </div>
+          <span className="text-xs font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
+            {recentActivity.length} Events Logged
+          </span>
         </div>
-        <div className="divide-y divide-gray-100">
-          {MOCK_RECENT_ACTIVITY.map((activity) => (
-            <div
-              key={activity.id}
-              className="px-5 py-3 flex items-center justify-between gap-4"
-            >
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-800">
-                  {activity.type}
-                </p>
-                <p className="text-xs text-gray-500 truncate">{activity.detail}</p>
+
+        {loading ? (
+          <div className="p-8 text-center text-gray-400 text-xs">
+            <i className="fas fa-spinner fa-spin mr-2"></i>Loading live database activity...
+          </div>
+        ) : recentActivity.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-xs">
+            No activity logged yet.
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {recentActivity.map((activity) => (
+              <div
+                key={activity.id}
+                className="px-5 py-3.5 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors"
+              >
+                <div className="min-w-0 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563eb] flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    {activity.type.includes("User") || activity.type.includes("Client") ? (
+                      <i className="fas fa-user"></i>
+                    ) : (
+                      <i className="fas fa-building"></i>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-gray-800 truncate">
+                      {activity.type}
+                    </p>
+                    <p className="text-[11px] text-gray-500 truncate max-w-md">{activity.detail}</p>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <span className="text-[11px] font-semibold text-gray-700 block">
+                    {activity.user}
+                  </span>
+                  <span className="text-[10px] text-gray-400">{activity.time}</span>
+                </div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <p className="text-xs text-gray-600">{activity.user}</p>
-                <p className="text-[11px] text-gray-400">{activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
