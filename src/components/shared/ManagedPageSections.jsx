@@ -51,7 +51,10 @@ const ManagedPageSections = ({ page }) => {
 
   if (loading) return null;
 
-  const visibleSections = sections.filter((section) => getItems(section).length > 0);
+  const excludedKeys = ['hero_buy_tiles', 'prominent_projects', 'hero_rent_tiles'];
+  const visibleSections = sections.filter(
+    (section) => !excludedKeys.includes(section.sectionKey) && getItems(section).length > 0
+  );
   if (visibleSections.length === 0) return null;
 
   return (

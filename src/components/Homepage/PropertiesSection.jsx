@@ -1,6 +1,9 @@
 // frontend/src/components/Homepage/PropertiesSection.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
 const CATEGORY_DATA = {
   buy: {
@@ -417,6 +420,37 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
   const [propertyType, setPropertyType] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Dynamic content from MongoDB Atlas
+  const [dbTiles, setDbTiles] = useState(null);
+  const [dbHeadline, setDbHeadline] = useState(null);
+  const [dbSlogan, setDbSlogan] = useState(null);
+
+  useEffect(() => {
+    const keyMap = {
+      buy: 'hero_buy_tiles',
+      rent: 'hero_rent_tiles',
+    };
+    const key = keyMap[resolvedCategory];
+    if (key) {
+      axios
+        .get(`${API_BASE_URL}/home-sections/${key}`)
+        .then((res) => {
+          if (res.data) {
+            if (res.data.title) setDbHeadline(res.data.title);
+            if (res.data.subtitle) setDbSlogan(res.data.subtitle);
+            if (Array.isArray(res.data.items) && res.data.items.length > 0) {
+              setDbTiles(res.data.items);
+            }
+          }
+        })
+        .catch(() => {});
+    } else {
+      setDbTiles(null);
+      setDbHeadline(null);
+      setDbSlogan(null);
+    }
+  }, [resolvedCategory]);
+
   // Sync inputs with URL query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -668,10 +702,16 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
         {/* ── 3. Page Context Headline ── */}
         <div className="mt-7 text-center max-w-2xl mx-auto">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0f172a] tracking-tight">
-            {data.headline} in {city} & Across India
+            {dbHeadline ? (
+              dbHeadline.toLowerCase().includes(city.toLowerCase())
+                ? dbHeadline
+                : `${dbHeadline} in ${city} & Across India`
+            ) : (
+              `${data.headline} in ${city} & Across India`
+            )}
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-[#64748b]">
-            {data.slogan}{' '}
+            {dbSlogan || data.slogan}{' '}
             <Link to="/post-property" className="text-[#2563eb] font-bold hover:underline">
               Post your property free →
             </Link>
@@ -680,24 +720,26 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
         {/* ── 4. Category-Specific Quick Tiles Grid ── */}
         <div className="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
-          {data.tiles.map((tile, i) => (
+          {(dbTiles || data.tiles).map((tile, i) => (
             <Link
-              key={i}
-              to={tile.link}
+              key={tile.id || i}
+              to={tile.link || '/'}
               className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-[#e2e8f0] h-32 sm:h-38 p-4 flex flex-col justify-end text-white transition-transform hover:-translate-y-1"
             >
               <img
-                src={tile.img}
-                alt={tile.title}
+                src={tile.image || tile.img || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80'}
+                alt={tile.title || 'Property Tile'}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/95 via-[#0f172a]/40 to-transparent"></div>
               <div className="relative z-10">
                 <span className="text-lg sm:text-xl font-black text-[#fde047] leading-none block mb-1">
-                  {tile.badge}
+                  {tile.badge || tile.tag || ''}
                 </span>
                 <strong className="text-xs sm:text-sm font-bold block text-white">{tile.title}</strong>
-                <span className="text-[10.5px] text-slate-200 block">{tile.desc}</span>
+                <span className="text-[10.5px] text-slate-200 block">
+                  {tile.desc || tile.description || tile.subtitle || ''}
+                </span>
               </div>
             </Link>
           ))}
