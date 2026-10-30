@@ -73,8 +73,80 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // Handle Photo File Upload (Convert to Base64 data URL for instant preview & persistence)
-  const handlePhotoUpload = (e) => {
+  // Helper to compress and resize an image file into an optimized base64 string
+  const compressImageFile = (file, maxWidth = 500, maxHeight = 500, quality = 0.8) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = (err) => reject(err);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onerror = (err) => reject(err);
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          let mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          let result = canvas.toDataURL(mime, quality);
+          if (mime === 'image/png' && result.length > 300000) {
+            result = canvas.toDataURL('image/jpeg', quality);
+          }
+          resolve(result);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Helper to ensure any already-loaded large base64 data URL is compressed before submit
+  const ensureCompressedDataUrl = async (dataUrl, maxWidth = 500, maxHeight = 500, quality = 0.8) => {
+    if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/') || dataUrl.length < 150000) {
+      return dataUrl;
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  };
+
+  // Handle Photo File Upload (Compressed to lightweight Base64 to prevent 413 Payload Too Large)
+  const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -83,17 +155,19 @@ export default function ProfilePage() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image file size should be less than 5MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image file size should be less than 10MB.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setAvatar(reader.result);
+    try {
+      const compressed = await compressImageFile(file, 500, 500, 0.82);
+      setAvatar(compressed);
       setError('');
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Failed to compress avatar:', err);
+      setError('Failed to process image. Please try a different photo.');
+    }
   };
 
   const handleRemovePhoto = () => {
@@ -102,7 +176,7 @@ export default function ProfilePage() {
   };
 
   // Handle Company Logo Upload
-  const handleLogoUpload = (e) => {
+  const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -111,12 +185,19 @@ export default function ProfilePage() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setCompanyLogo(reader.result);
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image file size should be less than 10MB.');
+      return;
+    }
+
+    try {
+      const compressed = await compressImageFile(file, 500, 500, 0.82);
+      setCompanyLogo(compressed);
       setError('');
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Failed to compress company logo:', err);
+      setError('Failed to process logo. Please try a different image.');
+    }
   };
 
   // Toggle Deals In options
@@ -153,6 +234,9 @@ export default function ProfilePage() {
 
     try {
       setSaving(true);
+      const safeAvatar = await ensureCompressedDataUrl(avatar, 500, 500, 0.82);
+      const safeLogo = await ensureCompressedDataUrl(companyLogo, 500, 500, 0.82);
+
       await updateProfile({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
@@ -160,8 +244,8 @@ export default function ProfilePage() {
         age: age ? Number(age) : null,
         gender,
         userType,
-        avatar,
-        companyLogo,
+        avatar: safeAvatar,
+        companyLogo: safeLogo,
         companyName: companyName.trim(),
         reraNumber: reraNumber.trim(),
         city: city.trim(),
