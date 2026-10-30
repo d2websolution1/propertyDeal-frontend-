@@ -13,6 +13,8 @@ import ManageUsers from './pages/admin/ManageUsers';
 import ManageProperties from './pages/admin/ManageProperties';
 import ManageHomeContent from './pages/admin/ManageHomeContent';
 import ClientAuthPage from './pages/public/ClientAuthPage';
+import ProfilePage from './pages/public/ProfilePage';
+import MyListingsPage from './pages/public/MyListingsPage';
 import Pgpage from './pages/public/Pgpage';
 import Plotspage from './pages/public/Plotspage';
 
@@ -66,6 +68,9 @@ function AppContent() {
         <Route path="/plots" element={<Plotspage city="Mumbai" />} />
         <Route path="/login" element={<ClientAuthPage initialMode="login" />} />
         <Route path="/signup" element={<ClientAuthPage initialMode="signup" />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/my-listings" element={<MyListingsPage />} />
+        <Route path="/post-property" element={<MyListingsPage />} />
 
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />

@@ -1,15 +1,16 @@
 // frontend/src/components/common/ClientAuthModal.jsx
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PropertyDealLogo } from './Header';
-import { Link } from 'react-router-dom';
 
-const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
-  const { login, register, sendOtp, verifyOtp, googleAuth } = useAuth();
+const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/profile?next=%2Fmy-listings' }) => {
+  const navigate = useNavigate();
+  const { login, register, sendOtp, verifyOtp, googleAuth, instantGmailAuth } = useAuth();
 
-  // 'otp' or 'password'
-  const [authMethod, setAuthMethod] = useState('otp');
+  // 'instant' | 'otp' | 'password'
+  const [authMethod, setAuthMethod] = useState('instant');
   // 'login' or 'signup'
   const [mode, setMode] = useState(initialMode);
 
@@ -21,7 +22,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [otp, setOtp] = useState('');
 
   // OTP flow state
-  const [otpStep, setOtpStep] = useState(1); // 1 = enter email, 2 = enter otp
+  const [otpStep, setOtpStep] = useState(1);
   const [previewOtp, setPreviewOtp] = useState('');
   const [timer, setTimer] = useState(0);
 
@@ -30,7 +31,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Reset form on open & handle Escape key + body scroll lock
   useEffect(() => {
     if (!isOpen) return;
     setMode(initialMode);
@@ -64,7 +64,37 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
 
   if (!isOpen) return null;
 
-  // Handle Send OTP
+  // 1. Instant Gmail Auth without OTP
+  const handleInstantGmailSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+
+    if (!email || !email.includes('@')) {
+      setError('Please enter a valid Gmail / Email address.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await instantGmailAuth({
+        email: email.trim(),
+        name: name?.trim() || undefined,
+      });
+
+      setSuccessMsg('Account verified instantly! Opening profile...');
+      setTimeout(() => {
+        onClose();
+        navigate(nextUrl);
+      }, 500);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Authentication failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. Handle Send OTP
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setError('');
@@ -120,6 +150,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       setSuccessMsg('Authentication successful!');
       setTimeout(() => {
         onClose();
+        navigate(nextUrl);
       }, 400);
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid or expired OTP code.');
@@ -128,7 +159,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     }
   };
 
-  // Handle Email + Password Login / Register
+  // 3. Handle Email + Password Login / Register
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -154,6 +185,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
       setSuccessMsg(`${mode === 'signup' ? 'Account created' : 'Logged in'} successfully!`);
       setTimeout(() => {
         onClose();
+        navigate(nextUrl);
       }, 400);
     } catch (err) {
       setError(err.response?.data?.message || 'Authentication failed. Please check your credentials.');
@@ -162,19 +194,21 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     }
   };
 
-  // Quick Google Client Simulation
+  // 4. Quick Google Client Authentication
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
       setError('');
+      const targetEmail = email || 'princerajput5868@gmail.com';
       await googleAuth({
-        email: email || 'client.user@gmail.com',
+        email: targetEmail,
         name: name || 'Google Verified Client',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
       });
       setSuccessMsg('Logged in via Google successfully!');
       setTimeout(() => {
         onClose();
+        navigate(nextUrl);
       }, 400);
     } catch (err) {
       setError(err.response?.data?.message || 'Google login failed');
@@ -185,12 +219,11 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/65 backdrop-blur-sm overflow-y-auto animate-hw-fade"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/65 backdrop-blur-sm overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      {/* Outer Floating Dismiss Button (Visible on all screens) */}
       <button
         type="button"
         onClick={onClose}
@@ -206,13 +239,12 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] p-5 sm:p-6 text-white text-center relative flex-shrink-0">
+        <div className="bg-gradient-to-br from-[#005744] to-[#043d30] p-5 sm:p-6 text-white text-center relative flex-shrink-0">
           <button
             type="button"
             onClick={onClose}
             className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 text-white flex items-center justify-center font-bold text-base transition-transform hover:scale-110 active:scale-90 cursor-pointer shadow-sm"
             aria-label="Close"
-            title="Close"
           >
             ✕
           </button>
@@ -223,28 +255,37 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             </div>
           </div>
           <h3 className="text-xl font-black tracking-tight">
-            {mode === 'signup' ? 'Create Client Account' : 'Welcome to PropertyDeal'}
+            {mode === 'signup' ? 'Create Account' : 'Welcome to HomesWale'}
           </h3>
-          <p className="text-xs text-blue-100 mt-1">
-            Sign in to explore verified flats, connect with owners & save favorite homes.
+          <p className="text-xs text-[#a7f3d0] mt-1">
+            Access verified properties, contact owners directly & track inquiries.
           </p>
 
           {/* Auth Method Pills */}
           <div className="mt-4 flex items-center justify-center gap-1.5 bg-white/15 p-1 rounded-xl backdrop-blur-xs max-w-xs mx-auto">
             <button
               type="button"
-              onClick={() => { setAuthMethod('otp'); setOtpStep(1); setError(''); }}
+              onClick={() => { setAuthMethod('instant'); setError(''); }}
               className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                authMethod === 'otp' ? 'bg-white text-[#2563eb] shadow-sm' : 'text-white hover:bg-white/10'
+                authMethod === 'instant' ? 'bg-white text-[#005744] shadow-sm' : 'text-white hover:bg-white/10'
               }`}
             >
-              ✉️ Gmail OTP
+              ⚡ Instant Gmail
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAuthMethod('otp'); setOtpStep(1); setError(''); }}
+              className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                authMethod === 'otp' ? 'bg-white text-[#005744] shadow-sm' : 'text-white hover:bg-white/10'
+              }`}
+            >
+              ✉️ OTP
             </button>
             <button
               type="button"
               onClick={() => { setAuthMethod('password'); setError(''); }}
               className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                authMethod === 'password' ? 'bg-white text-[#2563eb] shadow-sm' : 'text-white hover:bg-white/10'
+                authMethod === 'password' ? 'bg-white text-[#005744] shadow-sm' : 'text-white hover:bg-white/10'
               }`}
             >
               🔑 Password
@@ -252,9 +293,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           </div>
         </div>
 
-        {/* Modal Body (Scrollable for compact screens) */}
+        {/* Modal Body */}
         <div className="p-5 sm:p-6 overflow-y-auto">
-          {/* Error & Success Alerts */}
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
               <span>⚠️</span>
@@ -268,7 +308,58 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             </div>
           )}
 
-          {/* ── METHOD 1: GMAIL OTP AUTH ── */}
+          {/* ── METHOD 1: INSTANT GMAIL AUTH (NO OTP) ── */}
+          {authMethod === 'instant' && (
+            <form onSubmit={handleInstantGmailSubmit} className="space-y-4">
+              <div className="p-3 bg-[#ecfdf5] rounded-xl border border-[#a7f3d0] text-center">
+                <span className="text-xs font-bold text-[#005744] flex items-center justify-center gap-1.5">
+                  <span>⚡</span> Instant Login & Sign Up (No OTP)
+                </span>
+                <p className="text-[11px] text-[#065f46] mt-0.5">
+                  Enter your Gmail to create or access your profile immediately.
+                </p>
+              </div>
+
+              {mode === 'signup' && (
+                <div>
+                  <label className="block text-xs font-bold text-[#0f172a] mb-1">
+                    Your Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Prince Kumar"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none transition-all"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] mb-1">
+                  Gmail / Email Address <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. princerajput5868@gmail.com"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none transition-all"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 rounded-xl bg-[#005744] hover:bg-[#004737] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                {loading ? <span>Authenticating...</span> : <span>Continue with Gmail (No OTP) →</span>}
+              </button>
+            </form>
+          )}
+
+          {/* ── METHOD 2: GMAIL OTP AUTH ── */}
           {authMethod === 'otp' && (
             <div>
               {otpStep === 1 ? (
@@ -283,8 +374,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Rahul Sharma"
-                        className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20 outline-none transition-all"
+                        placeholder="e.g. Prince Kumar"
+                        className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none transition-all"
                       />
                     </div>
                   )}
@@ -299,38 +390,16 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="e.g. rahul@gmail.com"
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20 outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none transition-all"
                     />
                   </div>
-
-                  {mode === 'signup' && (
-                    <div>
-                      <label className="block text-xs font-bold text-[#0f172a] mb-1">
-                        Phone Number (Optional)
-                      </label>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="e.g. 9876543210"
-                        className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20 outline-none transition-all"
-                      />
-                    </div>
-                  )}
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    className="w-full py-3 rounded-xl bg-[#005744] hover:bg-[#004737] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                   >
-                    {loading ? (
-                      <span>Sending OTP...</span>
-                    ) : (
-                      <>
-                        <span>Send OTP to Email</span>
-                        <span>→</span>
-                      </>
-                    )}
+                    {loading ? <span>Sending OTP...</span> : <span>Send OTP to Email →</span>}
                   </button>
                 </form>
               ) : (
@@ -356,14 +425,14 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                       placeholder="• • • • • •"
-                      className="w-full text-center tracking-[10px] text-xl font-black py-3 rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/20 outline-none"
+                      className="w-full text-center tracking-[10px] text-xl font-black py-3 rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={loading || otp.length !== 6}
-                    className="w-full py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    className="w-full py-3 rounded-xl bg-[#005744] hover:bg-[#004737] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                   >
                     {loading ? <span>Verifying OTP...</span> : <span>Verify & Log In</span>}
                   </button>
@@ -372,7 +441,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     <button
                       type="button"
                       onClick={() => setOtpStep(1)}
-                      className="hover:text-[#2563eb] underline cursor-pointer"
+                      className="hover:text-[#005744] underline cursor-pointer"
                     >
                       Change Email
                     </button>
@@ -382,7 +451,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                       <button
                         type="button"
                         onClick={handleSendOtp}
-                        className="text-[#2563eb] font-bold hover:underline cursor-pointer"
+                        className="text-[#005744] font-bold hover:underline cursor-pointer"
                       >
                         Resend OTP
                       </button>
@@ -393,7 +462,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             </div>
           )}
 
-          {/* ── METHOD 2: PASSWORD AUTH ── */}
+          {/* ── METHOD 3: PASSWORD AUTH ── */}
           {authMethod === 'password' && (
             <form onSubmit={handlePasswordSubmit} className="space-y-3.5">
               {mode === 'signup' && (
@@ -407,7 +476,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] outline-none"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none"
                   />
                 </div>
               )}
@@ -422,7 +491,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. client@gmail.com"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] outline-none"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none"
                 />
               </div>
 
@@ -436,29 +505,14 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] outline-none"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#005744] outline-none"
                 />
               </div>
-
-              {mode === 'signup' && (
-                <div>
-                  <label className="block text-xs font-bold text-[#0f172a] mb-1">
-                    Phone Number (Optional)
-                  </label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="e.g. 9876543210"
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[#cbd5e1] focus:border-[#2563eb] outline-none"
-                  />
-                </div>
-              )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                className="w-full py-3 rounded-xl bg-[#005744] hover:bg-[#004737] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
                 {loading ? (
                   <span>Processing...</span>
@@ -504,7 +558,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                 <button
                   type="button"
                   onClick={() => { setMode('signup'); setOtpStep(1); setError(''); }}
-                  className="font-bold text-[#2563eb] hover:underline cursor-pointer"
+                  className="font-bold text-[#005744] hover:underline cursor-pointer"
                 >
                   Sign Up Free
                 </button>
@@ -515,7 +569,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setOtpStep(1); setError(''); }}
-                  className="font-bold text-[#2563eb] hover:underline cursor-pointer"
+                  className="font-bold text-[#005744] hover:underline cursor-pointer"
                 >
                   Log In
                 </button>
@@ -528,10 +582,9 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
             <Link
               to="/admin/login"
               onClick={onClose}
-              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#94a3b8] hover:text-[#2563eb] transition-colors"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#94a3b8] hover:text-[#005744] transition-colors"
             >
-              <span>🛡️ Are you an Administrator? Access Admin Portal</span>
-              <span>→</span>
+              <span>🛡️ Are you an Administrator? Access Admin Portal →</span>
             </Link>
             <button
               type="button"

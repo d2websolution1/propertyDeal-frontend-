@@ -681,33 +681,62 @@ const Header = () => {
           {/* User Auth state */}
           {isAuthenticated ? (
             <div className="relative group">
-              <button className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-full border border-[#e2e8f0] bg-white hover:border-[#2563eb] transition-all">
-                <div className="w-7 h-7 rounded-full bg-[#2563eb] text-white font-bold text-xs flex items-center justify-center">
-                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
+              <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full border border-[#cbd5e1] bg-white hover:border-[#005744] shadow-2xs transition-all cursor-pointer">
+                <div className="w-7 h-7 rounded-full overflow-hidden bg-[#005744] text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{user?.firstName?.charAt(0) || user?.name?.charAt(0)?.toUpperCase() || "U"}</span>
+                  )}
                 </div>
-                <span className="hidden sm:inline text-xs font-semibold text-[#0f172a] max-w-[80px] truncate">
-                  {user?.name || "Account"}
+                <span className="text-xs font-semibold text-[#0f172a] max-w-[90px] truncate">
+                  {user?.firstName || user?.name?.split(" ")[0] || "Prince"}
                 </span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#64748b]">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
               </button>
-              <div className="absolute right-0 mt-1 w-44 bg-white border border-[#e2e8f0] rounded-xl shadow-xl p-2 hidden group-hover:block z-50">
+              <div className="absolute right-0 mt-1 w-52 bg-white border border-[#e2e8f0] rounded-2xl shadow-xl p-2 hidden group-hover:block z-50 animate-fade-in">
                 <div className="px-3 py-2 border-b border-[#f1f5f9]">
-                  <p className="text-xs font-bold text-[#0f172a] truncate">{user?.name}</p>
+                  <p className="text-xs font-bold text-[#0f172a] truncate">{user?.name || "Client"}</p>
                   <p className="text-[10px] text-[#64748b] truncate">{user?.email}</p>
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecfdf5] text-[#005744]">
+                    {user?.userType || "Owner"}
+                  </span>
                 </div>
-                {user?.role === "admin" && (
+                <div className="py-1 space-y-0.5">
                   <Link
-                    to="/admin"
-                    className="block px-3 py-2 text-xs font-semibold text-[#2563eb] hover:bg-[#eff6ff] rounded-lg mt-1"
+                    to="/profile"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#334155] hover:bg-[#f8fafc] hover:text-[#005744] rounded-lg transition-colors"
                   >
-                    Admin Dashboard
+                    <span>👤</span>
+                    <span>My Profile</span>
                   </Link>
-                )}
-                <button
-                  onClick={logout}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
-                >
-                  Logout
-                </button>
+                  <Link
+                    to="/my-listings"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#334155] hover:bg-[#f8fafc] hover:text-[#005744] rounded-lg transition-colors"
+                  >
+                    <span>📑</span>
+                    <span>My Listings</span>
+                  </Link>
+                  {user?.role === "admin" && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#2563eb] hover:bg-[#eff6ff] rounded-lg transition-colors"
+                    >
+                      <span>🛡️</span>
+                      <span>Admin Dashboard</span>
+                    </Link>
+                  )}
+                </div>
+                <div className="pt-1 border-t border-[#f1f5f9]">
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
+                  >
+                    🚪 Logout
+                  </button>
+                </div>
               </div>
             </div>
           ) : (

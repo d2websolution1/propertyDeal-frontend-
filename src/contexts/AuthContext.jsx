@@ -83,6 +83,26 @@ export const AuthProvider = ({ children }) => {
     return authedUser;
   }, []);
 
+  const instantGmailAuth = useCallback(async (payload) => {
+    const body = typeof payload === "string" ? { email: payload } : payload;
+    const res = await api.post("/auth/instant-gmail", body);
+    const { token, user: authedUser } = res.data;
+    if (token) {
+      localStorage.setItem("token", token);
+      setUser(authedUser);
+    }
+    return authedUser;
+  }, []);
+
+  const updateProfile = useCallback(async (payload) => {
+    const res = await api.put("/auth/profile", payload);
+    const updatedUser = res.data.user;
+    if (updatedUser) {
+      setUser(updatedUser);
+    }
+    return res.data;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     setUser(null);
@@ -97,6 +117,8 @@ export const AuthProvider = ({ children }) => {
     sendOtp,
     verifyOtp,
     googleAuth,
+    instantGmailAuth,
+    updateProfile,
     logout,
   };
 
