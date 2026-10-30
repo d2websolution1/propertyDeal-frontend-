@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { PropertyDealLogo } from './Header';
 
-const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/profile?next=%2Fmy-listings' }) => {
+const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/' }) => {
   const navigate = useNavigate();
   const { login, register, sendOtp, verifyOtp, googleAuth, instantGmailAuth } = useAuth();
 

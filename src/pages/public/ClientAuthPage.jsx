@@ -9,8 +9,8 @@ function ClientAuthPage({ initialMode = 'login' }) {
   const location = useLocation();
   const { user, isAuthenticated, login, register, sendOtp, verifyOtp, googleAuth, instantGmailAuth } = useAuth();
 
-  const searchParams = new URLSearchParams(location.search);
-  const nextParam = searchParams.get('next') || '/profile?next=%2Fmy-listings';
+  const explicitNext = searchParams.get('next');
+  const nextParam = explicitNext || (mode === 'signup' ? '/profile?next=%2Fmy-listings' : '/');
 
   const [mode, setMode] = useState(
     location.pathname === '/signup' ? 'signup' : initialMode
@@ -39,7 +39,6 @@ function ClientAuthPage({ initialMode = 'login' }) {
   useEffect(() => {
     if (isAuthenticated) {
       if (user?.role === 'admin') navigate('/admin');
-      else if (!user?.isProfileCompleted) navigate('/profile?next=%2Fmy-listings');
       else navigate(nextParam.startsWith('/') ? nextParam : '/');
     }
   }, [isAuthenticated, user, navigate, nextParam]);
@@ -65,12 +64,18 @@ function ClientAuthPage({ initialMode = 'login' }) {
 
     try {
       setLoading(true);
-      await instantGmailAuth({
+      const res = await instantGmailAuth({
         email: email.trim(),
         name: name?.trim() || undefined,
       });
 
-      setSuccessMsg('Account verified instantly! Opening profile...');
+      const isExisting = res?.isExistingUser;
+      if (mode === 'login' || isExisting) {
+        setSuccessMsg(`Welcome back, ${res?.user?.name || 'User'}! Successfully logged in.`);
+      } else {
+        setSuccessMsg('Account registered successfully! Redirecting...');
+      }
+
       setTimeout(() => {
         navigate(nextParam);
       }, 500);
@@ -203,11 +208,40 @@ function ClientAuthPage({ initialMode = 'login' }) {
               <PropertyDealLogo height={38} className="h-9 w-auto" />
             </div>
           </div>
-          <h2 className="text-2xl font-black tracking-tight">
-            {mode === 'signup' ? 'Create Account' : 'Welcome to HomesWale'}
+
+          {/* Primary Action Switch: Log In (Existing ID) vs Sign Up (New ID) */}
+          <div className="mt-2 mb-3 grid grid-cols-2 bg-black/25 p-1 rounded-xl border border-white/10 max-w-sm mx-auto">
+            <button
+              type="button"
+              onClick={() => { setMode('login'); setError(''); setSuccessMsg(''); setOtpStep(1); }}
+              className={`py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                mode === 'login'
+                  ? 'bg-white text-[#005744] shadow-md'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              🔑 Log In (Existing ID)
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode('signup'); setError(''); setSuccessMsg(''); setOtpStep(1); }}
+              className={`py-2 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                mode === 'signup'
+                  ? 'bg-white text-[#005744] shadow-md'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              ✨ Sign Up (New User)
+            </button>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+            {mode === 'signup' ? 'Create New Account' : 'Log In to Your Account'}
           </h2>
           <p className="text-xs text-[#a7f3d0] mt-1">
-            Access verified listings, connect with owners & list properties for free.
+            {mode === 'signup'
+              ? 'Register once and manage all your properties, leads and inquiries for free.'
+              : 'Enter your registered Gmail or password to access your listings directly.'}
           </p>
 
           {/* Auth Method Pills */}
