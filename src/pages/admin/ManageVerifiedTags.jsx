@@ -10,18 +10,33 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const formatIndianPrice = (price, listingType) => {
+  const num = Number(price);
+  if (!num || isNaN(num)) return "₹ Call for Price";
+  if (listingType === "rent") return `₹ ${num.toLocaleString("en-IN")}/mo`;
+  if (num >= 10000000) return `₹ ${(num / 10000000).toFixed(2).replace(/\.00$/, "")} Cr`;
+  if (num >= 100000) return `₹ ${(num / 100000).toFixed(2).replace(/\.00$/, "")} Lakh`;
+  return `₹ ${num.toLocaleString("en-IN")}`;
+};
+
 const ManageVerifiedTags = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [actionId, setActionId] = useState(null);
 
   const fetchProperties = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.get("/admin/properties/verified");
-      setProperties(res.data);
+      setProperties(Array.isArray(res.data) ? res.data : res.data.properties || []);
     } catch (err) {
-      console.error("Failed to load properties:", err);
+      try {
+        const fallbackRes = await api.get("/admin/listings/verified");
+        setProperties(Array.isArray(fallbackRes.data) ? fallbackRes.data : fallbackRes.data.properties || []);
+      } catch (e) {
+        console.error("Failed to load properties:", e);
+      }
     } finally {
       setLoading(false);
     }
@@ -32,120 +47,172 @@ const ManageVerifiedTags = () => {
   }, [fetchProperties]);
 
   const toggleVerified = async (property) => {
+    const propId = property.id || property._id;
+    setActionId(propId);
     try {
-      await api.put(`/admin/properties/${property.id}/verify`, {
-        isVerified: !property.isVerified
+      await api.put(`/admin/properties/${propId}/verify`, {
+        isVerified: !property.isVerified,
       });
-      fetchProperties();
+      setProperties((prev) =>
+        prev.map((p) =>
+          (p.id || p._id) === propId ? { ...p, isVerified: !p.isVerified } : p
+        )
+      );
     } catch (err) {
       alert(err.response?.data?.message || "Action failed");
+    } finally {
+      setActionId(null);
     }
   };
 
-  const filteredProperties = filter === "all" 
-    ? properties 
-    : properties.filter(p => filter === "verified" ? p.isVerified : !p.isVerified);
+  const filteredProperties =
+    filter === "all"
+      ? properties
+      : properties.filter((p) => (filter === "verified" ? p.isVerified : !p.isVerified));
 
   return (
-    <div className="max-w-[1200px] mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Verified Property Tags</h1>
-        <p className="text-gray-500 text-sm mt-0.5">
-          Manage verification status of property listings
-        </p>
-      </div>
+    <div className="max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <span>🛡️</span> Verified Property Tags
+          </h1>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+            Audit and grant green 'Verified by PropertyDeal' trust badges to listings
+          </p>
+        </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
-            filter === "all" ? "bg-[#6C3EE6] text-white" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          All ({properties.length})
-        </button>
-        <button
-          onClick={() => setFilter("verified")}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
-            filter === "verified" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          Verified ({properties.filter(p => p.isVerified).length})
-        </button>
-        <button
-          onClick={() => setFilter("unverified")}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
-            filter === "unverified" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          Unverified ({properties.filter(p => !p.isVerified).length})
-        </button>
+        {/* Filter Tabs */}
+        <div className="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-bold">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              filter === "all" ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            All ({properties.length})
+          </button>
+          <button
+            onClick={() => setFilter("verified")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              filter === "verified" ? "bg-white text-emerald-700 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            Verified ({properties.filter((p) => p.isVerified).length})
+          </button>
+          <button
+            onClick={() => setFilter("unverified")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              filter === "unverified" ? "bg-white text-amber-700 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            Unverified ({properties.filter((p) => !p.isVerified).length})
+          </button>
+        </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Loading...</div>
+        <div className="text-center py-20 text-gray-400 font-semibold">
+          <i className="fas fa-spinner fa-spin text-2xl mr-2 text-blue-600"></i>
+          <p className="mt-2 text-sm">Loading verification tags...</p>
+        </div>
       ) : filteredProperties.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
-          No properties found.
+        <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">
+          <div className="text-4xl mb-2">🛡️</div>
+          <h4 className="font-bold text-gray-800">No properties in this filter</h4>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
-              <tr>
-                <th className="text-left px-5 py-3">Property</th>
-                <th className="text-left px-5 py-3">Owner</th>
-                <th className="text-left px-5 py-3">Status</th>
-                <th className="text-right px-5 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProperties.map((property) => (
-                <tr key={property.id} className="border-t border-gray-100">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      {property.image && (
-                        <img 
-                          src={property.image} 
-                          alt={property.title}
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
-                      )}
-                      <div>
-                        <span className="font-medium text-gray-800">{property.title}</span>
-                        <p className="text-gray-400 text-xs">{property.location}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 text-gray-500">{property.owner?.name || 'N/A'}</td>
-                  <td className="px-5 py-3">
-                    {property.isVerified ? (
-                      <span className="bg-green-50 text-green-600 text-xs font-bold px-2.5 py-1 rounded-full">
-                        <i className="fas fa-check-circle mr-1"></i> Verified
-                      </span>
-                    ) : (
-                      <span className="bg-gray-100 text-gray-400 text-xs font-bold px-2.5 py-1 rounded-full">
-                        Unverified
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => toggleVerified(property)}
-                      className={`text-sm font-medium px-3 py-1 rounded ${
-                        property.isVerified 
-                          ? "bg-red-50 text-red-500 hover:bg-red-100"
-                          : "bg-green-50 text-green-600 hover:bg-green-100"
-                      }`}
-                    >
-                      {property.isVerified ? "Remove Tag" : "Add Tag"}
-                    </button>
-                  </td>
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs sm:text-sm text-left">
+              <thead className="bg-gray-50/80 text-gray-500 text-[11px] font-bold uppercase tracking-wider border-b border-gray-200">
+                <tr>
+                  <th className="px-5 py-3.5">Property</th>
+                  <th className="px-5 py-3.5">Location</th>
+                  <th className="px-5 py-3.5">Price</th>
+                  <th className="px-5 py-3.5">Poster / Owner</th>
+                  <th className="px-5 py-3.5">Verification Status</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredProperties.map((property) => {
+                  const propId = property.id || property._id;
+                  const imgUrl =
+                    property.images?.[0] ||
+                    property.image ||
+                    "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80";
+
+                  return (
+                    <tr key={propId} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={imgUrl}
+                            alt={property.title}
+                            className="w-12 h-12 rounded-xl object-cover border border-gray-200 flex-shrink-0"
+                          />
+                          <div>
+                            <span className="font-bold text-gray-900 line-clamp-1">
+                              {property.title}
+                            </span>
+                            <span className="text-[11px] font-mono text-gray-400">
+                              {property.uniqueCode || "HW-PROP"} • {property.propertyType}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-600">
+                        {property.locality ? `${property.locality}, ` : ""}
+                        {property.city}
+                      </td>
+                      <td className="px-5 py-3.5 font-black text-[#005744]">
+                        {formatIndianPrice(property.price, property.listingType)}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-600">
+                        <span className="font-bold text-gray-800">
+                          {property.owner?.name || property.contactName || "Owner"}
+                        </span>
+                        {property.owner?.email && (
+                          <span className="block text-[11px] text-gray-400 truncate max-w-[150px]">
+                            {property.owner.email}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        {property.isVerified ? (
+                          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-black px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                            <span>✓</span> Verified Badge Active
+                          </span>
+                        ) : (
+                          <span className="bg-gray-100 text-gray-600 text-[11px] font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                            <span>⏳</span> Not Verified
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <button
+                          onClick={() => toggleVerified(property)}
+                          disabled={actionId === propId}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+                            property.isVerified
+                              ? "border-red-200 text-red-600 hover:bg-red-50"
+                              : "border-emerald-300 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                          }`}
+                        >
+                          {actionId === propId
+                            ? "Updating..."
+                            : property.isVerified
+                            ? "Remove Badge"
+                            : "Mark Verified"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

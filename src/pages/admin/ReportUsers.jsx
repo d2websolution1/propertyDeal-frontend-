@@ -13,17 +13,17 @@ api.interceptors.request.use((config) => {
 const ReportUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState("all");
+  const [dateRange, setDateRange] = useState("week");
 
   useEffect(() => {
     fetchUsers();
-  }, [role]);
+  }, [dateRange]);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/admin/reports/users?role=${role}`);
-      setUsers(res.data);
+      const res = await api.get(`/admin/reports/users?range=${dateRange}`);
+      setUsers(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to load users:", err);
     } finally {
@@ -31,85 +31,107 @@ const ReportUsers = () => {
     }
   };
 
-  const getRoleBadge = (role) => {
-    const colors = {
-      admin: "bg-purple-50 text-purple-600",
-      vendor: "bg-blue-50 text-blue-600",
-      user: "bg-green-50 text-green-600"
-    };
-    return colors[role] || colors.user;
-  };
-
   return (
-    <div className="max-w-[1200px] mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">New User & Vendor Report</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Track new user registrations</p>
-      </div>
+    <div className="max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <span>👤</span> New User Registrations Report
+          </h1>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+            Audit new accounts created across India with poster category and contact
+          </p>
+        </div>
 
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setRole("all")}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
-            role === "all" ? "bg-[#6C3EE6] text-white" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          All ({users.length})
-        </button>
-        <button
-          onClick={() => setRole("user")}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
-            role === "user" ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          Users ({users.filter(u => u.role === 'user').length})
-        </button>
-        <button
-          onClick={() => setRole("vendor")}
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
-            role === "vendor" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          Vendors ({users.filter(u => u.role === 'vendor').length})
-        </button>
+        <div className="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-bold">
+          <button
+            onClick={() => setDateRange("week")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              dateRange === "week" ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            Last 7 Days
+          </button>
+          <button
+            onClick={() => setDateRange("month")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              dateRange === "month" ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            Last 30 Days
+          </button>
+          <button
+            onClick={() => setDateRange("year")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              dateRange === "year" ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            Past Year
+          </button>
+        </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Loading...</div>
+        <div className="text-center py-20 text-gray-400 font-semibold">
+          <i className="fas fa-spinner fa-spin text-2xl mr-2 text-blue-600"></i>
+          <p className="mt-2 text-sm">Generating user report...</p>
+        </div>
       ) : users.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
-          No users found.
+        <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">
+          <div className="text-4xl mb-2">👥</div>
+          <h4 className="font-bold text-gray-800">No new user registrations in this timeframe</h4>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
-              <tr>
-                <th className="text-left px-5 py-3">Name</th>
-                <th className="text-left px-5 py-3">Email</th>
-                <th className="text-left px-5 py-3">Role</th>
-                <th className="text-left px-5 py-3">Properties</th>
-                <th className="text-left px-5 py-3">Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-t border-gray-100">
-                  <td className="px-5 py-3 font-medium text-gray-800">{user.name}</td>
-                  <td className="px-5 py-3 text-gray-500">{user.email}</td>
-                  <td className="px-5 py-3">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getRoleBadge(user.role)}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-gray-500">{user.properties?.length || 0}</td>
-                  <td className="px-5 py-3 text-gray-400 text-xs">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs sm:text-sm text-left">
+              <thead className="bg-gray-50/80 text-gray-500 text-[11px] font-bold uppercase tracking-wider border-b border-gray-200">
+                <tr>
+                  <th className="px-5 py-3.5">User</th>
+                  <th className="px-5 py-3.5">Category</th>
+                  <th className="px-5 py-3.5">Contact Details</th>
+                  <th className="px-5 py-3.5">Company / City</th>
+                  <th className="px-5 py-3.5">Registration Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {users.map((u) => {
+                  const uid = u.id || u._id;
+                  return (
+                    <tr key={uid} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-5 py-3.5 font-bold text-gray-900">{u.name || "User"}</td>
+                      <td className="px-5 py-3.5">
+                        <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                          {u.userType || "Owner"}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-700">
+                        <span className="block truncate max-w-xs">{u.email}</span>
+                        {u.phone && <span className="text-xs text-blue-600 font-semibold">📞 +91 {u.phone}</span>}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-600">
+                        {u.companyName ? (
+                          <span className="font-bold text-gray-800 block">🏢 {u.companyName}</span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                        {u.city && <span className="text-[11px] text-gray-400 block">{u.city}</span>}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-500 text-xs whitespace-nowrap">
+                        {u.createdAt
+                          ? new Date(u.createdAt).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "Recent"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -852,7 +852,7 @@ const Header = () => {
                       }}
                       className="w-full py-2.5 rounded-xl bg-[#2563eb] text-white font-bold text-xs shadow-sm hover:bg-[#1d4ed8] transition-colors cursor-pointer text-center"
                     >
-                      Sign In with Mobile / Email →
+                      Instant Gmail Sign In →
                     </button>
                   </div>
                 )}

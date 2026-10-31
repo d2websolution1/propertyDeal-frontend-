@@ -13,15 +13,23 @@ api.interceptors.request.use((config) => {
 const ManageEnquiries = () => {
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+  const [actionId, setActionId] = useState(null);
 
   const fetchEnquiries = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.get("/admin/enquiries");
-      setEnquiries(res.data);
+      setEnquiries(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("Failed to load enquiries:", err);
+      try {
+        const fallbackRes = await api.get("/admin/listings/enquiries");
+        setEnquiries(Array.isArray(fallbackRes.data) ? fallbackRes.data : []);
+      } catch (e) {
+        console.error("Failed to load enquiries:", e);
+      }
     } finally {
       setLoading(false);
     }
@@ -32,172 +40,225 @@ const ManageEnquiries = () => {
   }, [fetchEnquiries]);
 
   const updateStatus = async (id, status) => {
+    setActionId(id);
     try {
       await api.put(`/admin/enquiries/${id}`, { status });
-      fetchEnquiries();
+      setEnquiries((prev) =>
+        prev.map((item) => ((item.id || item._id) === id ? { ...item, status } : item))
+      );
     } catch (err) {
-      alert(err.response?.data?.message || "Action failed");
+      try {
+        await api.put(`/admin/listings/enquiries/${id}`, { status });
+        setEnquiries((prev) =>
+          prev.map((item) => ((item.id || item._id) === id ? { ...item, status } : item))
+        );
+      } catch (e) {
+        alert("Failed to update status");
+      }
+    } finally {
+      setActionId(null);
     }
   };
 
   const deleteEnquiry = async (id) => {
-    if (!window.confirm("Delete this enquiry?")) return;
+    if (!window.confirm("Delete this customer enquiry?")) return;
+    setActionId(id);
     try {
       await api.delete(`/admin/enquiries/${id}`);
-      fetchEnquiries();
+      setEnquiries((prev) => prev.filter((item) => (item.id || item._id) !== id));
     } catch (err) {
-      alert(err.response?.data?.message || "Delete failed");
+      try {
+        await api.delete(`/admin/listings/enquiries/${id}`);
+        setEnquiries((prev) => prev.filter((item) => (item.id || item._id) !== id));
+      } catch (e) {
+        alert("Failed to delete enquiry");
+      }
+    } finally {
+      setActionId(null);
     }
   };
 
   const getStatusBadge = (status) => {
-    const colors = {
-      new: "bg-blue-50 text-blue-600",
-      contacted: "bg-yellow-50 text-yellow-600",
-      in_progress: "bg-purple-50 text-purple-600",
-      closed: "bg-gray-50 text-gray-500"
-    };
-    return colors[status] || colors.new;
+    switch (status) {
+      case "contacted":
+        return "bg-amber-50 text-amber-800 border-amber-200";
+      case "in_progress":
+        return "bg-blue-50 text-blue-800 border-blue-200";
+      case "closed":
+        return "bg-gray-100 text-gray-700 border-gray-200";
+      default:
+        return "bg-emerald-50 text-emerald-800 border-emerald-200";
+    }
   };
 
+  const filtered = enquiries.filter((e) => {
+    if (statusFilter !== "all" && e.status !== statusFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const name = (e.userName || e.user?.name || "").toLowerCase();
+      const email = (e.userEmail || e.user?.email || "").toLowerCase();
+      const prop = (e.propertyTitle || e.property?.title || "").toLowerCase();
+      return name.includes(q) || email.includes(q) || prop.includes(q);
+    }
+    return true;
+  });
+
   return (
-    <div className="max-w-[1200px] mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Enquiries</h1>
-        <p className="text-gray-500 text-sm mt-0.5">
-          Manage all property enquiries from users
-        </p>
+    <div className="max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <span>💬</span> Property Enquiries & Leads
+          </h1>
+          <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
+            Real-time prospective buyer & tenant enquiries from public property listings
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-bold">
+            {["all", "new", "contacted", "in_progress", "closed"].map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatusFilter(st)}
+                className={`px-3 py-1.5 rounded-lg transition-all capitalize cursor-pointer ${
+                  statusFilter === st ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+                }`}
+              >
+                {st.replace("_", " ")}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-1.5 shadow-xs">
+            <i className="fas fa-search text-gray-400 text-xs"></i>
+            <input
+              type="text"
+              placeholder="Search enquiries..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="text-xs outline-none bg-transparent text-gray-700"
+            />
+          </div>
+        </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Loading...</div>
-      ) : enquiries.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
-          No enquiries yet.
+        <div className="text-center py-20 text-gray-400 font-semibold">
+          <i className="fas fa-spinner fa-spin text-2xl mr-2 text-[#6C3EE6]"></i>
+          <p className="mt-2 text-sm">Loading property enquiries...</p>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">
+          <div className="text-4xl mb-2">📬</div>
+          <h4 className="font-bold text-gray-800">No Enquiries Found</h4>
+          <p className="text-xs text-gray-400 mt-1">
+            When users submit inquiry forms on properties, they will appear here in real time.
+          </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
-              <tr>
-                <th className="text-left px-5 py-3">Property</th>
-                <th className="text-left px-5 py-3">User</th>
-                <th className="text-left px-5 py-3">Message</th>
-                <th className="text-left px-5 py-3">Status</th>
-                <th className="text-left px-5 py-3">Date</th>
-                <th className="text-right px-5 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enquiries.map((enquiry) => (
-                <tr key={enquiry.id} className="border-t border-gray-100">
-                  <td className="px-5 py-3">
-                    <div>
-                      <span className="font-medium text-gray-800">{enquiry.propertyTitle}</span>
-                      <p className="text-gray-400 text-xs">{enquiry.propertyLocation}</p>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">
-                    <div>
-                      <span className="font-medium text-gray-800">{enquiry.userName}</span>
-                      <p className="text-gray-400 text-xs">{enquiry.userEmail}</p>
-                      <p className="text-gray-400 text-xs">{enquiry.userPhone}</p>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">
-                    <button
-                      onClick={() => setSelectedEnquiry(enquiry)}
-                      className="text-[#6C3EE6] hover:underline text-sm"
-                    >
-                      View Message
-                    </button>
-                  </td>
-                  <td className="px-5 py-3">
-                    <select
-                      value={enquiry.status}
-                      onChange={(e) => updateStatus(enquiry.id, e.target.value)}
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full border-0 ${getStatusBadge(enquiry.status)}`}
-                    >
-                      <option value="new">New</option>
-                      <option value="contacted">Contacted</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="closed">Closed</option>
-                    </select>
-                  </td>
-                  <td className="px-5 py-3 text-gray-400 text-xs">
-                    {new Date(enquiry.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => deleteEnquiry(enquiry.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <i className="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs sm:text-sm text-left">
+              <thead className="bg-gray-50/80 text-gray-500 text-[11px] font-bold uppercase tracking-wider border-b border-gray-200">
+                <tr>
+                  <th className="px-5 py-3.5">Property</th>
+                  <th className="px-5 py-3.5">Prospective Buyer</th>
+                  <th className="px-5 py-3.5">Message / Note</th>
+                  <th className="px-5 py-3.5">Status</th>
+                  <th className="px-5 py-3.5">Date</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map((enquiry) => {
+                  const enqId = enquiry.id || enquiry._id;
+                  const userName = enquiry.userName || enquiry.user?.name || "Client";
+                  const userEmail = enquiry.userEmail || enquiry.user?.email || "";
+                  const userPhone = enquiry.userPhone || enquiry.user?.phone || "";
+                  const propTitle = enquiry.propertyTitle || enquiry.property?.title || "Property";
 
-      {/* Enquiry Detail Modal */}
-      {selectedEnquiry && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-[500px] p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-800">Enquiry Details</h3>
-              <button
-                onClick={() => setSelectedEnquiry(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500">Property</label>
-                <p className="text-gray-800">{selectedEnquiry.propertyTitle}</p>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500">From</label>
-                <p className="text-gray-800">{selectedEnquiry.userName}</p>
-                <p className="text-gray-500 text-sm">{selectedEnquiry.userEmail}</p>
-                <p className="text-gray-500 text-sm">{selectedEnquiry.userPhone}</p>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500">Message</label>
-                <div className="bg-gray-50 rounded-lg p-3 text-gray-700 text-sm whitespace-pre-wrap">
-                  {selectedEnquiry.message}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500">Date</label>
-                <p className="text-gray-500 text-sm">
-                  {new Date(selectedEnquiry.createdAt).toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 mt-5">
-              <button
-                onClick={() => setSelectedEnquiry(null)}
-                className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-gray-50"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  updateStatus(selectedEnquiry.id, "contacted");
-                  setSelectedEnquiry(null);
-                }}
-                className="flex-1 bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold py-2.5 rounded-lg"
-              >
-                Mark as Contacted
-              </button>
-            </div>
+                  return (
+                    <tr key={enqId} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <span className="font-bold text-gray-900 block max-w-xs truncate">
+                          {propTitle}
+                        </span>
+                        {enquiry.propertyLocation && (
+                          <span className="text-[11px] text-gray-400 block truncate">
+                            📍 {enquiry.propertyLocation}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className="font-bold text-gray-900 block">{userName}</span>
+                        {userPhone && (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <a
+                              href={`tel:${userPhone}`}
+                              className="text-[11px] text-blue-600 font-semibold hover:underline"
+                            >
+                              📞 +91 {userPhone}
+                            </a>
+                            <a
+                              href={`https://wa.me/91${userPhone.replace(/\D/g, "")}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-emerald-600 text-xs"
+                              title="WhatsApp"
+                            >
+                              <i className="fab fa-whatsapp"></i>
+                            </a>
+                          </div>
+                        )}
+                        {userEmail && (
+                          <span className="text-[11px] text-gray-400 block truncate max-w-[160px]">
+                            {userEmail}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-700 max-w-xs">
+                        <p className="line-clamp-2 text-xs italic bg-gray-50 p-2 rounded-lg border border-gray-100">
+                          "{enquiry.message}"
+                        </p>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <select
+                          value={enquiry.status || "new"}
+                          onChange={(e) => updateStatus(enqId, e.target.value)}
+                          disabled={actionId === enqId}
+                          className={`text-xs font-bold px-2.5 py-1 rounded-lg border outline-none cursor-pointer capitalize ${getStatusBadge(
+                            enquiry.status
+                          )}`}
+                        >
+                          <option value="new">New</option>
+                          <option value="contacted">Contacted</option>
+                          <option value="in_progress">In Progress</option>
+                          <option value="closed">Closed</option>
+                        </select>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-400 text-xs whitespace-nowrap">
+                        {enquiry.createdAt
+                          ? new Date(enquiry.createdAt).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                            })
+                          : "Today"}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <button
+                          onClick={() => deleteEnquiry(enqId)}
+                          disabled={actionId === enqId}
+                          className="px-2.5 py-1.5 rounded-lg text-red-500 hover:bg-red-50 text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
