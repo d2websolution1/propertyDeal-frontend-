@@ -22,7 +22,7 @@ const formatIndianPrice = (price, listingType) => {
 const ReportListings = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState("week");
+  const [dateRange, setDateRange] = useState("all");
 
   useEffect(() => {
     fetchListings();
@@ -46,6 +46,9 @@ const ReportListings = () => {
         <div>
           <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
             <span>📑</span> New Listing Audit Report
+            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Live DB ({listings.length})
+            </span>
           </h1>
           <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
             Audit properties posted during specified timeframes with poster details
@@ -53,6 +56,14 @@ const ReportListings = () => {
         </div>
 
         <div className="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-bold">
+          <button
+            onClick={() => setDateRange("all")}
+            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+              dateRange === "all" ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+            }`}
+          >
+            All Time
+          </button>
           <button
             onClick={() => setDateRange("week")}
             className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${

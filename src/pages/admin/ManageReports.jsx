@@ -1,5 +1,6 @@
 // pages/admin/ManageReports.jsx
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
@@ -99,13 +100,13 @@ const ManageReports = () => {
 
             <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs hover:shadow-md transition-all">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block">
-                Est. Platform Revenue
+                Total Real Revenue
               </span>
               <p className="text-3xl font-black text-[#005744] mt-1">
-                ₹{Number(stats.totalRevenue).toLocaleString("en-IN")}
+                ₹{Number(stats.totalRevenue || 0).toLocaleString("en-IN")}
               </p>
-              <span className="inline-block mt-2 text-xs font-bold text-slate-500 bg-slate-50 px-2.5 py-0.5 rounded-full border border-slate-200">
-                Lifetime value
+              <span className="inline-block mt-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Live MongoDB
               </span>
             </div>
           </div>
@@ -117,13 +118,13 @@ const ManageReports = () => {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Inspect detailed listings submitted by verified Owners, Dealers / Agents, and Builders across metropolitan regions.
               </p>
-              <a
-                href="/admin/reports/listings"
+              <Link
+                to="/admin/reports/listings"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all"
               >
                 <span>View Full Listing Report</span>
                 <span>→</span>
-              </a>
+              </Link>
             </div>
 
             <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-xs space-y-4">
@@ -131,13 +132,13 @@ const ManageReports = () => {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Inspect accounts created via Instant Gmail and Google OAuth with contact details and company associations.
               </p>
-              <a
-                href="/admin/reports/users"
+              <Link
+                to="/admin/reports/users"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all"
               >
                 <span>View Full User Report</span>
                 <span>→</span>
-              </a>
+              </Link>
             </div>
           </div>
         </>
