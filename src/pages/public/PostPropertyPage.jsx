@@ -229,6 +229,15 @@ export default function PostPropertyPage() {
     return Math.round((completedCount / checklist.length) * 100);
   }, [checklist]);
 
+  useEffect(() => {
+    if (user) {
+      if (!contactName) setContactName(user.name || user.firstName || '');
+      if (!contactPhone && user.phone) setContactPhone(user.phone);
+      if (!contactEmail && user.email) setContactEmail(user.email);
+      if (!reraNumber && user.reraNumber) setReraNumber(user.reraNumber);
+    }
+  }, [user]);
+
   // Form Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -257,6 +266,9 @@ export default function PostPropertyPage() {
     try {
       setSubmitting(true);
 
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
       const payload = {
         title: title.trim(),
         description: description.trim(),
@@ -284,10 +296,11 @@ export default function PostPropertyPage() {
         ownerName: contactName.trim() || user?.name || 'Property Owner',
         ownerPhone: contactPhone.trim() || user?.phone || '',
         ownerEmail: contactEmail.trim() || user?.email || '',
+        postedByType: user?.userType || 'Owner',
       };
 
-      const res = await axios.post(`${API_BASE_URL}/properties`, payload);
-      setSuccessData(res.data.property || { uniqueCode: 'HW-POSTED' });
+      const res = await axios.post(`${API_BASE_URL}/properties`, payload, { headers });
+      setSuccessData(res.data.property || { uniqueCode: 'HW-POSTED', status: 'pending' });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('Failed to post property:', err);
@@ -300,22 +313,37 @@ export default function PostPropertyPage() {
 
   // Success view
   if (successData) {
+    const isApproved = successData.status === 'approved';
     return (
       <div className="min-h-screen bg-[#fbfcfb] py-14 px-4 sm:px-6 font-sans">
         <div className="max-w-xl mx-auto bg-white rounded-3xl border border-[#a7f3d0] p-8 text-center shadow-xl">
           <div className="w-16 h-16 bg-[#ecfdf5] border-2 border-[#10b981] rounded-full flex items-center justify-center mx-auto text-3xl mb-4">
             🎉
           </div>
-          <h2 className="text-2xl font-black text-[#0f172a]">Property Posted Successfully!</h2>
+          <h2 className="text-2xl font-black text-[#0f172a]">
+            {isApproved ? 'Property Posted & Live!' : 'Property Submitted for Review!'}
+          </h2>
           <p className="text-sm text-[#475569] mt-2">
-            Your listing is live on HomesWale. Interested buyers and tenants will contact you directly via call and WhatsApp.
+            {isApproved
+              ? 'Your listing is approved and live on PropertyDeal. Prospective buyers and tenants can now view and contact you.'
+              : 'Your listing has been submitted successfully and is currently Under Review by the admin. Once verified, it will be published live across the website.'}
           </p>
 
-          <div className="my-6 p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] inline-block text-left w-full">
+          <div className="my-6 p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] inline-block text-left w-full space-y-2">
             <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
               <span className="text-xs text-[#64748b]">Listing Code:</span>
               <span className="text-xs font-black text-[#005744] bg-[#ecfdf5] px-2 py-0.5 rounded-md">
                 {successData.uniqueCode || 'HW-NEW'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
+              <span className="text-xs text-[#64748b]">Current Status:</span>
+              <span
+                className={`text-xs font-bold px-2 py-0.5 rounded-md ${
+                  isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                }`}
+              >
+                {isApproved ? '● Active & Live' : '⏳ Under Review (Pending Admin Approval)'}
               </span>
             </div>
             <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
