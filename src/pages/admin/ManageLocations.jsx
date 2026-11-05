@@ -421,3 +421,4 @@ const ManageLocations = () => {
 };
 
 export default ManageLocations;
+
