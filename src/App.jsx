@@ -10,6 +10,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute';
 import ManageUsers from './pages/admin/ManageUsers';
+import ManageLocations from './pages/admin/ManageLocations';
 import ManageProperties from './pages/admin/ManageProperties';
 import ManageHomeContent from './pages/admin/ManageHomeContent';
 import ClientAuthPage from './pages/public/ClientAuthPage';
@@ -18,6 +19,8 @@ import MyListingsPage from './pages/public/MyListingsPage';
 import PostPropertyPage from './pages/public/PostPropertyPage';
 import Pgpage from './pages/public/Pgpage';
 import Plotspage from './pages/public/Plotspage';
+import BlogsPage from './pages/public/BlogsPage';
+import BlogDetailPage from './pages/public/BlogDetailPage';
 
 // Content & Marketing admin pages
 import ManageBlogs from './pages/admin/ManageBlogs';
@@ -67,6 +70,8 @@ function AppContent() {
         <Route path="/commercial" element={<CommercialPage city="Mumbai" />} />
         <Route path="/pg-co-living" element={<Pgpage city="Mumbai" />} />
         <Route path="/plots" element={<Plotspage city="Mumbai" />} />
+        <Route path="/blogs" element={<BlogsPage />} />
+        <Route path="/blogs/:slug" element={<BlogDetailPage />} />
         <Route path="/login" element={<ClientAuthPage initialMode="login" />} />
         <Route path="/signup" element={<ClientAuthPage initialMode="signup" />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -88,6 +93,7 @@ function AppContent() {
 
           {/* Users & Listings */}
           <Route path="users" element={<ManageUsers />} />
+          <Route path="locations" element={<ManageLocations />} />
           <Route path="properties" element={<ManageProperties />} />
           <Route path="listings/approvals" element={<ManageProperties />} />
           <Route path="listings/featured" element={<ManageFeaturedListings />} />

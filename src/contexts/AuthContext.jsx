@@ -94,6 +94,26 @@ export const AuthProvider = ({ children }) => {
     return authedUser;
   }, []);
 
+  const mobileRegister = useCallback(async (payload) => {
+    const res = await api.post("/auth/mobile-register", payload);
+    const { token, user: newUser } = res.data;
+    if (token) {
+      localStorage.setItem("token", token);
+      setUser(newUser);
+    }
+    return newUser;
+  }, []);
+
+  const mobileLogin = useCallback(async (payload) => {
+    const res = await api.post("/auth/mobile-login", payload);
+    const { token, user: loggedUser } = res.data;
+    if (token) {
+      localStorage.setItem("token", token);
+      setUser(loggedUser);
+    }
+    return loggedUser;
+  }, []);
+
   const updateProfile = useCallback(async (payload) => {
     const res = await api.put("/auth/profile", payload);
     const updatedUser = res.data.user;
@@ -118,6 +138,8 @@ export const AuthProvider = ({ children }) => {
     verifyOtp,
     googleAuth,
     instantGmailAuth,
+    mobileRegister,
+    mobileLogin,
     updateProfile,
     logout,
   };

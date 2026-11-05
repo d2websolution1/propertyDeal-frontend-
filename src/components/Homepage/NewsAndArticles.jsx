@@ -1,5 +1,6 @@
 // NewsAndArticles.jsx
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
@@ -20,18 +21,36 @@ const getItems = (section) => {
 
 const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
   const [section, setSection] = useState(null);
+  const [dynamicBlogs, setDynamicBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`${API_BASE_URL}/home-sections/${sectionKey}`)
-      .then((res) => setSection(res.data))
-      .catch((err) => console.error(`Failed to load ${sectionKey}:`, err))
+    // Fetch both section settings and real dynamic published blogs
+    Promise.all([
+      axios.get(`${API_BASE_URL}/home-sections/${sectionKey}`).catch(() => ({ data: null })),
+      axios.get(`${API_BASE_URL}/blogs`).catch(() => ({ data: [] })),
+    ])
+      .then(([sectionRes, blogsRes]) => {
+        if (sectionRes.data) setSection(sectionRes.data);
+        if (Array.isArray(blogsRes.data) && blogsRes.data.length > 0) {
+          setDynamicBlogs(blogsRes.data.slice(0, 3));
+        }
+      })
       .finally(() => setLoading(false));
   }, [sectionKey]);
 
-  const items = getItems(section);
+  const items = dynamicBlogs.length > 0
+    ? dynamicBlogs.map((b) => ({
+        id: b.id || b._id,
+        title: b.title,
+        subtitle: b.excerpt || b.content?.replace(/<[^>]+>/g, '').slice(0, 100) + '...',
+        image: b.coverImage || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80',
+        badge: b.category || 'Guide',
+        link: `/blogs/${b.slug}`,
+      }))
+    : getItems(section);
+
   if (!loading && items.length === 0) return null;
 
   return (
@@ -40,31 +59,38 @@ const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
       <div className="flex items-start justify-between mb-5 gap-4">
         <div>
           <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
-            {loading ? "Loading..." : section.title}
+            {loading ? "Loading..." : section?.title || "News & Articles"}
           </h2>
           {section?.subtitle && (
             <p className="text-gray-500 text-sm">{section.subtitle}</p>
           )}
         </div>
-        <button className="hidden sm:flex items-center border border-[#6C3EE6] text-[#6C3EE6] font-semibold text-sm px-4 py-2 rounded-md hover:bg-[#6C3EE6] hover:text-white transition-colors flex-shrink-0 whitespace-nowrap">
+        <Link
+          to="/blogs"
+          className="hidden sm:flex items-center border border-[#005744] text-[#005744] font-semibold text-sm px-4 py-2 rounded-md hover:bg-[#005744] hover:text-white transition-colors flex-shrink-0 whitespace-nowrap"
+        >
           See all news and articles <span className="ml-1">›</span>
-        </button>
+        </Link>
       </div>
 
       {!loading && (
         <div className="relative">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {items.map((article, idx) => (
-              <a key={article.id || idx} href={article.link || "#"}>
-                <div className="h-[180px] w-full rounded-lg overflow-hidden mb-3">
+              <Link
+                key={article.id || idx}
+                to={article.link?.startsWith('/') ? article.link : `/blogs`}
+                className="group block"
+              >
+                <div className="h-[180px] w-full rounded-lg overflow-hidden mb-3 bg-slate-100">
                   <img
                     src={article.image}
                     alt={article.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
 
-                <h3 className="text-[#0b1a2e] font-bold text-base leading-snug mb-2">
+                <h3 className="text-[#0b1a2e] font-bold text-base leading-snug mb-2 group-hover:text-[#005744] transition-colors line-clamp-2">
                   {article.title}
                 </h3>
 
@@ -74,30 +100,17 @@ const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
                   </p>
                 )}
 
-                {(article.badge || article.price) && (
+                {article.badge && (
                   <div className="border-t border-gray-200 pt-2 flex items-center justify-between">
-                    <span className="text-gray-500 text-xs">{article.badge}</span>
-                    <span className="text-gray-500 text-xs">{article.price}</span>
+                    <span className="text-[#005744] font-extrabold text-xs uppercase">{article.badge}</span>
+                    <span className="text-gray-400 text-xs font-bold">Read article →</span>
                   </div>
                 )}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
       )}
-
-      {/* REA Group branding */}
-      <div className="flex items-center justify-center gap-3 mt-14">
-        <span className="text-gray-400 text-2xl md:text-3xl font-light">Part of</span>
-        <svg viewBox="0 0 40 40" className="w-9 h-9 md:w-10 md:h-10">
-          <circle cx="20" cy="20" r="20" fill="#E31E24" />
-          <path d="M20 9 L31 18 V31 H24 V22 H16 V31 H9 V18 Z" fill="#fff" />
-        </svg>
-        <span className="text-gray-500 text-2xl md:text-3xl font-bold tracking-tight">
-          REA Group
-          <sup className="text-xs font-normal align-super ml-0.5">®</sup>
-        </span>
-      </div>
     </section>
   );
 };

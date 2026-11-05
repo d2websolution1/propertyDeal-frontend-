@@ -23,6 +23,7 @@ const NAV_GROUPS = [
     label: "Users & Listings",
     items: [
       { label: "Manage Users", icon: "fa-users", path: "/admin/users" },
+      { label: "Manage Locations", icon: "fa-map-marker-alt", path: "/admin/locations" },
       { label: "Manage Properties", icon: "fa-building", path: "/admin/properties" },
       { label: "Approve / Reject Listings", icon: "fa-check-circle", path: "/admin/listings/approvals" },
       { label: "Featured Listings", icon: "fa-star", path: "/admin/listings/featured" },

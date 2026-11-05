@@ -4,6 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import ClientAuthModal from "./ClientAuthModal";
 import propertyDealIcon from "../../assets/property-adda-logo.png";
+import axios from "axios";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
 export const PropertyDealLogo = ({
   size,
@@ -43,6 +45,18 @@ const CITIES = [
 
 const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const [dynamicCities, setDynamicCities] = useState(CITIES);
+
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/locations`)
+      .then((res) => {
+        if (res.data?.cities?.length > 0) {
+          setDynamicCities(res.data.cities);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -208,7 +222,7 @@ const Header = () => {
     { title: "Housing Research", desc: "Data-driven quarterly real estate market reports", link: "/blogs" },
   ];
 
-  const filteredCities = CITIES.filter((c) =>
+  const filteredCities = dynamicCities.filter((c) =>
     c.toLowerCase().includes(citySearch.toLowerCase())
   );
 

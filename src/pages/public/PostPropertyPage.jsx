@@ -124,8 +124,29 @@ export default function PostPropertyPage() {
   const [propertyAge, setPropertyAge] = useState('Ready to move');
   const [areaSqft, setAreaSqft] = useState('');
 
+  // Dynamic locations from Admin
+  const [locationsData, setLocationsData] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/locations`)
+      .then((res) => {
+        if (res.data?.locations?.length > 0) {
+          setLocationsData(res.data.locations);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const currentCityAreas = useMemo(() => {
+    if (!city) return [];
+    const matched = locationsData.find(
+      (l) => l.city.toLowerCase() === city.trim().toLowerCase()
+    );
+    return matched?.areas || [];
+  }, [locationsData, city]);
+
   // 2. Location
-  const [state, setState] = useState('Uttar Pradesh');
+  const [state, setState] = useState('Rajasthan');
   const [city, setCity] = useState('');
   const [projectName, setProjectName] = useState('');
   const [locality, setLocality] = useState('');
@@ -620,11 +641,24 @@ export default function PostPropertyPage() {
                     <input
                       type="text"
                       required
+                      list="city-datalist"
                       value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="e.g. Greater Noida"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCity(val);
+                        const match = locationsData.find(l => l.city.toLowerCase() === val.trim().toLowerCase());
+                        if (match?.state) setState(match.state);
+                      }}
+                      placeholder="e.g. Jaipur, Delhi NCR, Noida"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] bg-white text-xs sm:text-sm text-[#0f172a] focus:border-[#005744] outline-none"
                     />
+                    <datalist id="city-datalist">
+                      {locationsData.map((l) => (
+                        <option key={l.id || l._id || l.city} value={l.city}>
+                          {l.city} ({l.state || 'India'})
+                        </option>
+                      ))}
+                    </datalist>
                   </div>
                 </div>
 
@@ -647,16 +681,38 @@ export default function PostPropertyPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-[#0f172a] mb-1">
-                      Locality / sector <span className="text-rose-500">*</span>
+                      Locality / Sector / Area <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       required
+                      list="locality-datalist"
                       value={locality}
                       onChange={(e) => setLocality(e.target.value)}
-                      placeholder="e.g. Sector 16B, Greater Noida West"
+                      placeholder="e.g. Mansarovar, Vaishali Nagar, Jagatpura"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] bg-white text-xs sm:text-sm text-[#0f172a] focus:border-[#005744] outline-none"
                     />
+                    <datalist id="locality-datalist">
+                      {currentCityAreas.map((area, idx) => (
+                        <option key={idx} value={area} />
+                      ))}
+                    </datalist>
+
+                    {currentCityAreas.length > 0 && (
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        <span className="text-[10px] text-slate-400 font-bold self-center mr-1">Popular in {city}:</span>
+                        {currentCityAreas.slice(0, 8).map((area, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setLocality(area)}
+                            className="px-2 py-0.5 rounded-md text-[10px] bg-slate-100 hover:bg-[#005744] hover:text-white text-slate-700 transition-colors font-semibold"
+                          >
+                            + {area}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[#0f172a] mb-1">

@@ -44,6 +44,7 @@ const Footer = () => {
               <li><Link to="/commercial" className="hover:text-white transition-colors">Commercial Shops & Office Spaces</Link></li>
               <li><Link to="/plots" className="hover:text-white transition-colors">Residential Plots & Land</Link></li>
               <li><Link to="/pg-co-living" className="hover:text-white transition-colors">PG & Co-Living Spaces</Link></li>
+              <li><Link to="/blogs" className="hover:text-white transition-colors">Latest News & Blogs</Link></li>
               <li><Link to="/post-property" className="text-[#f59e0b] hover:underline font-bold">Post Property for FREE →</Link></li>
             </ul>
           </div>
@@ -64,31 +65,32 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Admin & Support */}
+          {/* Contact & Support */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Admin & Portals
+              Contact & Helpdesk
             </h4>
             <ul className="space-y-2.5 text-xs">
-              <li>
-                <Link
-                  to="/admin/login"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2563eb] text-white font-bold hover:bg-[#1d4ed8] transition-colors shadow-xs"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  <span>Property Adda Admin Login</span>
-                </Link>
+              <li className="flex items-center gap-2">
+                <i className="fas fa-phone-alt text-[#2563eb] text-xs"></i>
+                <a href="tel:+919672056670" className="hover:text-white">+91 9672 056 670</a>
               </li>
-              <li className="pt-2 text-[11px] text-[#94a3b8]">
-                Admin Credentials: <br />
-                <span className="text-[#f59e0b] font-mono">admin@property-adda.com</span> / <span className="text-[#f59e0b] font-mono">admin123</span>
+              <li className="flex items-center gap-2">
+                <i className="fas fa-phone-alt text-[#2563eb] text-xs"></i>
+                <a href="tel:+919509505892" className="hover:text-white">+91 9509 505 892</a>
               </li>
-              <li className="pt-2"><a href="tel:+919672056670" className="hover:text-white">Call: +91 9672 056 670</a></li>
-              <li><a href="tel:+919509505892" className="hover:text-white">Call: +91 9509 505 892</a></li>
-              <li><a href="mailto:info@property-adda.com" className="hover:text-white">Email: info@property-adda.com</a></li>
+              <li className="flex items-center gap-2">
+                <i className="fas fa-envelope text-[#2563eb] text-xs"></i>
+                <a href="mailto:info@property-adda.com" className="hover:text-white">info@property-adda.com</a>
+              </li>
+              <li className="pt-2 text-[11px] text-[#94a3b8] flex items-center gap-2">
+                <i className="fas fa-clock text-[#2563eb] text-xs"></i>
+                <span>Mon - Sat: 9:00 AM – 7:00 PM</span>
+              </li>
+              <li className="text-[11px] text-[#94a3b8] flex items-center gap-2">
+                <i className="fas fa-map-marker-alt text-[#2563eb] text-xs"></i>
+                <span>Jaipur & Delhi NCR, India</span>
+              </li>
             </ul>
           </div>
         </div>
