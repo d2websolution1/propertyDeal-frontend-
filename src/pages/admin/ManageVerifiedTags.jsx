@@ -78,7 +78,7 @@ const ManageVerifiedTags = () => {
             <span>🛡️</span> Verified Property Tags
           </h1>
           <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
-            Audit and grant green 'Verified by PropertyDeal' trust badges to listings
+            Audit and grant green 'Verified by Property Adda' trust badges to listings
           </p>
         </div>
 

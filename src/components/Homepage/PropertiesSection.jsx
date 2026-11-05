@@ -51,7 +51,7 @@ const CATEGORY_DATA = {
       },
       {
         id: 4,
-        title: 'Post Free Property on PropertyDeal',
+        title: 'Post Free Property on Property Adda',
         subtitle: 'Direct enquiries on WhatsApp & phone with zero brokerage',
         location: 'All India · Verified Network',
         price: '100% Free',

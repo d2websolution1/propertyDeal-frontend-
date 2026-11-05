@@ -296,7 +296,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                       </button>
 
                       <a
-                        href={`https://wa.me/919876543210?text=Hi,%20I%20am%20interested%20in%20PropertyDeal%20listing:%20${encodeURIComponent(prop.title)}%20(${prop.uniqueCode || ''})`}
+                        href={`https://wa.me/919509505892?text=Hi,%20I%20am%20interested%20in%20Property%20Adda%20listing:%20${encodeURIComponent(prop.title)}%20(${prop.uniqueCode || ''})`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1 transition-colors border border-emerald-200"
@@ -347,7 +347,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
 
               <div className="mb-4">
                 <span className="text-[10px] font-extrabold uppercase text-[#2563eb] bg-[#eff6ff] px-2 py-0.5 rounded">
-                  DIRECT PROPERTYDEAL ENQUIRY
+                  DIRECT PROPERTY ADDA ENQUIRY
                 </span>
                 <h3 className="text-lg font-extrabold text-[#0f172a] mt-1">
                   Connect with Owner / Dealer
@@ -367,7 +367,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                   </div>
                   <h4 className="font-extrabold text-[#0f172a] text-base">Enquiry Sent Successfully!</h4>
                   <p className="text-xs text-[#64748b]">
-                    The property owner and PropertyDeal support team will contact you shortly on WhatsApp.
+                    The property owner and Property Adda support team will contact you shortly on WhatsApp.
                   </p>
                 </div>
               ) : (
@@ -389,7 +389,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 96720 56670"
                       value={enquiryData.phone}
                       onChange={(e) => setEnquiryData({ ...enquiryData, phone: e.target.value })}
                       className="w-full px-3 py-2.5 rounded-xl border border-[#e2e8f0] text-xs outline-none focus:border-[#2563eb]"
@@ -415,7 +415,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                   </button>
 
                   <p className="text-[10px] text-center text-[#64748b]">
-                    By submitting, you agree to PropertyDeal terms & direct owner connect.
+                    By submitting, you agree to Property Adda terms & direct owner connect.
                   </p>
                 </form>
               )}

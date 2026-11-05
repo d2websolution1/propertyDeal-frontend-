@@ -26,17 +26,17 @@ const Footer = () => {
               <PropertyDealLogo height={38} className="h-9 w-auto" />
             </div>
             <p className="text-xs text-[#94a3b8] leading-relaxed">
-              India's trusted real estate marketplace. Buy, sell, or rent flats, builder floors, plots, and commercial properties directly from owners and verified agents.
+              Real estate at one place - India's trusted property marketplace. Buy, sell, or rent flats, builder floors, plots, and commercial properties directly from owners and verified agents.
             </p>
             <div className="text-xs text-[#cbd5e1] font-semibold">
-              Over 71,000+ verified listings across major Indian cities.
+              Over 71,000+ verified listings across Delhi NCR, Jaipur, Mumbai & major Indian cities.
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Explore PropertyDeal
+              Explore Property Adda
             </h4>
             <ul className="space-y-2.5 text-xs">
               <li><Link to="/" className="hover:text-white transition-colors">Residential Properties for Sale</Link></li>
@@ -79,22 +79,23 @@ const Footer = () => {
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
-                  <span>PropertyDeal Admin Login</span>
+                  <span>Property Adda Admin Login</span>
                 </Link>
               </li>
               <li className="pt-2 text-[11px] text-[#94a3b8]">
                 Admin Credentials: <br />
-                <span className="text-[#f59e0b] font-mono">admin@propertydeal.com</span> / <span className="text-[#f59e0b] font-mono">admin123</span>
+                <span className="text-[#f59e0b] font-mono">admin@property-adda.com</span> / <span className="text-[#f59e0b] font-mono">admin123</span>
               </li>
-              <li className="pt-2"><a href="tel:+919876543210" className="hover:text-white">Customer Support: +91 98765 43210</a></li>
-              <li><a href="mailto:support@propertydeal.com" className="hover:text-white">Email: support@propertydeal.com</a></li>
+              <li className="pt-2"><a href="tel:+919672056670" className="hover:text-white">Call: +91 9672 056 670</a></li>
+              <li><a href="tel:+919509505892" className="hover:text-white">Call: +91 9509 505 892</a></li>
+              <li><a href="mailto:info@property-adda.com" className="hover:text-white">Email: info@property-adda.com</a></li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748b]">
-          <p>© {new Date().getFullYear()} PropertyDeal Technologies Pvt. Ltd. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Property Adda. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-white">Terms of Use</Link>
@@ -105,7 +106,7 @@ const Footer = () => {
 
       {/* Floating WhatsApp Action */}
       <a
-        href="https://wa.me/919876543210?text=Hi%20PropertyDeal,%20I%20am%20interested%20in%20properties"
+        href="https://wa.me/919509505892?text=Hi%20Property%20Adda,%20I%20am%20interested%20in%20properties"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"

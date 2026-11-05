@@ -46,7 +46,7 @@ const ManageReports = () => {
             <span>📈</span> Platform Analytics & Revenue Reports
           </h1>
           <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
-            Key metrics and aggregated health indicators across PropertyDeal
+            Key metrics and aggregated health indicators across Property Adda
           </p>
         </div>
 

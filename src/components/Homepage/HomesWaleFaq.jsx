@@ -3,19 +3,19 @@ import React, { useState } from 'react';
 
 const FAQS = [
   {
-    question: 'How do I find flats without brokerage on PropertyDeal?',
+    question: 'How do I find flats without brokerage on Property Adda?',
     answer:
-      'PropertyDeal lists thousands of direct owner properties across top Indian cities. Simply select "Owner Properties" or filter by "Zero Brokerage" to connect directly with property owners via phone or WhatsApp.',
+      'Property Adda lists thousands of direct owner properties across top Indian cities. Simply select "Owner Properties" or filter by "Zero Brokerage" to connect directly with property owners via phone or WhatsApp.',
   },
   {
-    question: 'Does PropertyDeal charge any fee for buyers or tenants?',
+    question: 'Does Property Adda charge any fee for buyers or tenants?',
     answer:
       'No! Searching, shortlisting, and connecting with property owners or scheduling site visits is 100% free for all buyers and tenants.',
   },
   {
     question: 'Do you help with home loans and documentation?',
     answer:
-      'Yes, PropertyDeal partners with major leading banks (SBI, HDFC, ICICI, Axis, PNB) to offer pre-approved home loans at competitive interest rates, along with legal verification and agreement drafting support.',
+      'Yes, Property Adda partners with major leading banks (SBI, HDFC, ICICI, Axis, PNB) to offer pre-approved home loans at competitive interest rates, along with legal verification and agreement drafting support.',
   },
   {
     question: 'How can owners post property for free?',
@@ -25,7 +25,7 @@ const FAQS = [
   {
     question: 'Are commercial properties and plots also listed?',
     answer:
-      'Yes, you can browse dedicated categories for Commercial Shops, Showrooms, Office Spaces, and Residential & Commercial Plots across Mumbai, Delhi NCR, Noida, Gurgaon, Pune, and Bengaluru.',
+      'Yes, you can browse dedicated categories for Commercial Shops, Showrooms, Office Spaces, and Residential & Commercial Plots across Mumbai, Delhi NCR, Jaipur, Noida, Gurgaon, Pune, and Bengaluru.',
   },
 ];
 
@@ -62,10 +62,10 @@ const HomesWaleFaq = () => {
         <div className="mb-14">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs font-bold uppercase tracking-wider text-[#2563eb] block mb-1">
-              THE PROPERTYDEAL ADVANTAGE
+              THE PROPERTY ADDA ADVANTAGE
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a]">
-              Why Choose PropertyDeal?
+              Why Choose Property Adda?
             </h2>
             <p className="text-xs sm:text-sm text-[#64748b] mt-1">
               Trusted by thousands of home seekers, tenants, and property owners across India.

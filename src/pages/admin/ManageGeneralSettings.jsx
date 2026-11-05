@@ -12,15 +12,15 @@ api.interceptors.request.use((config) => {
 
 const ManageGeneralSettings = () => {
   const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem("propertydeal_general_settings");
+    const saved = localStorage.getItem("property_adda_general_settings");
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
     return {
-      siteName: "PropertyDeal",
-      siteEmail: "admin@propertydeal.com",
-      sitePhone: "+91 9084486898",
-      address: "Techzone 4, Greater Noida West, Uttar Pradesh 201306",
+      siteName: "Property Adda",
+      siteEmail: "info@property-adda.com",
+      sitePhone: "+91 9672056670",
+      address: "Jaipur, Rajasthan, India",
       currency: "INR",
       timezone: "Asia/Kolkata",
       maintenanceMode: false,
@@ -33,7 +33,7 @@ const ManageGeneralSettings = () => {
   const saveSettings = async () => {
     setLoading(true);
     try {
-      localStorage.setItem("propertydeal_general_settings", JSON.stringify(settings));
+      localStorage.setItem("property_adda_general_settings", JSON.stringify(settings));
       try {
         await api.put("/admin/settings", settings);
       } catch (err) {

@@ -325,7 +325,7 @@ export default function PostPropertyPage() {
           </h2>
           <p className="text-sm text-[#475569] mt-2">
             {isApproved
-              ? 'Your listing is approved and live on PropertyDeal. Prospective buyers and tenants can now view and contact you.'
+              ? 'Your listing is approved and live on Property Adda. Prospective buyers and tenants can now view and contact you.'
               : 'Your listing has been submitted successfully and is currently Under Review by the admin. Once verified, it will be published live across the website.'}
           </p>
 
@@ -1199,7 +1199,7 @@ export default function PostPropertyPage() {
                 Our support team is available on WhatsApp to assist you.
               </p>
               <a
-                href="https://wa.me/919084486898?text=Hello%20HomesWale,%20I%20need%20help%20posting%20my%20property"
+                href="https://wa.me/919509505892?text=Hello%20Property%20Adda,%20I%20need%20help%20posting%20my%20property"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-block mt-2 font-bold text-[#005744] underline hover:opacity-80"

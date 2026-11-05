@@ -197,7 +197,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
           {/* Title */}
           <div className="text-center">
             <h3 className="text-xl font-black text-slate-900">
-              {mode === 'signup' ? 'Sign Up Instantly with Gmail' : 'Sign In to PropertyDeal'}
+              {mode === 'signup' ? 'Sign Up Instantly with Gmail' : 'Sign In to Property Adda'}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
               Zero OTP Required • Instant 1-Click Access

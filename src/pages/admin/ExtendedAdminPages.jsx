@@ -282,7 +282,7 @@ export const EmailTemplatesPage = () => (
     subtitle="Create reusable email templates for leads and clients"
     storageKey="admin-email-templates"
     initialItems={[
-      { id: "email-1", name: "Welcome Email", subject: "Welcome to Housing", status: "Active", body: "Hi {{name}}, thanks for joining our platform." },
+      { id: "email-1", name: "Welcome Email", subject: "Welcome to Property Adda", status: "Active", body: "Hi {{name}}, thanks for joining our platform." },
     ]}
     fields={[
       { key: "name", label: "Template Name" },
@@ -475,8 +475,8 @@ export const UsersReportPage = () => (
 
 export const GeneralSettingsPage = () => {
   const [settings, setSettings] = useLocalStorageState("admin-general-settings", {
-    siteName: "Housing",
-    supportEmail: "support@housing.com",
+    siteName: "Property Adda",
+    supportEmail: "info@property-adda.com",
     maintenanceMode: false,
   });
 

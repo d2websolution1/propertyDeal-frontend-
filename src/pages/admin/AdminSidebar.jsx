@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import propertyDealIcon from "../../assets/icon-propertydeal.png";
+import propertyDealIcon from "../../assets/property-adda-logo.png";
 
 const NAV_GROUPS = [
   {
@@ -80,12 +80,12 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       <div className="h-16 flex items-center gap-2.5 px-4 border-b border-white/10 flex-shrink-0">
         <img
           src={propertyDealIcon}
-          alt="PropertyDeal Logo"
+          alt="Property Adda Logo"
           className="w-8 h-8 object-contain flex-shrink-0 rounded-md"
         />
         {!collapsed && (
           <span className="font-extrabold text-base tracking-tight whitespace-nowrap text-white">
-            Property<span className="text-[#3b82f6]">Deal</span>
+            Property<span className="text-[#3b82f6]">Adda</span>
             <span className="text-[10px] font-normal uppercase tracking-wider text-slate-400 ml-1.5 bg-white/10 px-1.5 py-0.5 rounded">ADMIN</span>
           </span>
         )}
@@ -142,7 +142,7 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
         {!collapsed && user && (
           <div className="mb-2 px-1">
             <p className="text-xs font-bold text-white truncate">{user.name || "Administrator"}</p>
-            <p className="text-[10px] text-white/40 truncate">{user.email || "admin@propertydeal.com"}</p>
+            <p className="text-[10px] text-white/40 truncate">{user.email || "admin@property-adda.com"}</p>
           </div>
         )}
         <button

@@ -3,13 +3,13 @@ import { createPortal } from "react-dom";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import ClientAuthModal from "./ClientAuthModal";
-import propertyDealIcon from "../../assets/icon-propertydeal.png";
+import propertyDealIcon from "../../assets/property-adda-logo.png";
 
 export const PropertyDealLogo = ({
   size,
   height = 50,
   className = "",
-  alt = "PropertyDeal",
+  alt = "Property Adda",
 }) => {
   const logoHeight = size || height;
   return (
@@ -23,6 +23,8 @@ export const PropertyDealLogo = ({
     </div>
   );
 };
+
+export const PropertyAddaLogo = PropertyDealLogo;
 
 const CITIES = [
   "Mumbai",

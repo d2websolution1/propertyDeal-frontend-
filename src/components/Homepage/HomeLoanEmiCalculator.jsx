@@ -174,7 +174,7 @@ const HomeLoanEmiCalculator = () => {
 
             <div className="mt-6 pt-4 border-t border-[#f1f5f9]">
               <a
-                href="https://wa.me/919876543210?text=Hi%20PropertyDeal,%20I%20want%20to%20apply%20for%20a%20home%20loan%20at%20lowest%20interest%20rates"
+                href="https://wa.me/919509505892?text=Hi%20Property%20Adda,%20I%20want%20to%20apply%20for%20a%20home%20loan%20at%20lowest%20interest%20rates"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"

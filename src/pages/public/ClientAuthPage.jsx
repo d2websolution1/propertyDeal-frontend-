@@ -139,7 +139,7 @@ export default function ClientAuthPage({ initialMode = 'login' }) {
         </div>
 
         <h2 className="text-center text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">
-          {mode === 'signup' ? 'Create Your Account' : 'Welcome to PropertyDeal'}
+          {mode === 'signup' ? 'Create Your Account' : 'Welcome to Property Adda'}
         </h2>
         <p className="mt-1.5 text-center text-xs sm:text-sm text-[#64748b]">
           {mode === 'signup'
@@ -332,7 +332,7 @@ export default function ClientAuthPage({ initialMode = 'login' }) {
                 <input
                   type="email"
                   required
-                  placeholder="admin@propertydeal.com"
+                  placeholder="admin@property-adda.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-[#cbd5e1] text-xs sm:text-sm text-[#0f172a] outline-none focus:border-[#005744]"

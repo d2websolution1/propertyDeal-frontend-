@@ -51,7 +51,7 @@ const AdminLogin = () => {
           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#64748b] hover:text-[#0f172a] transition-colors bg-white px-3.5 py-1.5 rounded-full border border-[#e2e8f0] shadow-xs"
         >
           <span>←</span>
-          <span>Back to PropertyDeal Website</span>
+          <span>Back to Property Adda Website</span>
         </Link>
       </div>
 
@@ -134,7 +134,7 @@ const AdminLogin = () => {
 
         <div className="mt-6 pt-5 border-t border-[#f1f5f9] text-center">
           <p className="text-[11px] text-[#64748b]">
-            Protected by PropertyDeal Authentication & SSL Encryption
+            Protected by Property Adda Authentication & SSL Encryption
           </p>
         </div>
       </div>
