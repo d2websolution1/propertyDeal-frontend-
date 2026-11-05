@@ -124,6 +124,14 @@ export default function PostPropertyPage() {
   const [propertyAge, setPropertyAge] = useState('Ready to move');
   const [areaSqft, setAreaSqft] = useState('');
 
+  // 2. Location
+  const [state, setState] = useState('Rajasthan');
+  const [city, setCity] = useState('');
+  const [projectName, setProjectName] = useState('');
+  const [locality, setLocality] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [address, setAddress] = useState('');
+
   // Dynamic locations from Admin
   const [locationsData, setLocationsData] = useState([]);
   useEffect(() => {
@@ -144,14 +152,6 @@ export default function PostPropertyPage() {
     );
     return matched?.areas || [];
   }, [locationsData, city]);
-
-  // 2. Location
-  const [state, setState] = useState('Rajasthan');
-  const [city, setCity] = useState('');
-  const [projectName, setProjectName] = useState('');
-  const [locality, setLocality] = useState('');
-  const [pincode, setPincode] = useState('');
-  const [address, setAddress] = useState('');
 
   // 3. Price
   const [expectedPrice, setExpectedPrice] = useState('');
