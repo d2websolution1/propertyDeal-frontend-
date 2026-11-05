@@ -160,7 +160,7 @@ const ManageLocations = () => {
   });
 
   return (
-    <div className="max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6 font-sans">
+    <div className="max-w-[1400px] mx-auto space-y-6 font-sans">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
@@ -327,7 +327,7 @@ const ManageLocations = () => {
       {/* CREATE / EDIT CITY MODAL */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-200 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-200 p-4 sm:p-6 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-2 border-b border-gray-200">
               <h3 className="text-lg font-black text-gray-900">
                 {editingLoc ? `Edit City: ${editingLoc.city}` : "Add New City / Location"}

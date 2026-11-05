@@ -348,7 +348,7 @@ const ManageHomeContent = () => {
                 <div className="p-4 sm:p-5 flex items-center justify-between flex-wrap gap-3 bg-gradient-to-r from-gray-50/80 via-white to-gray-50/40 border-b border-gray-100">
                   <div
                     onClick={() => toggleExpand(section.id)}
-                    className="flex items-center gap-3 flex-1 min-w-[260px] cursor-pointer select-none"
+                    className="flex items-center gap-3 flex-1 min-w-[200px] cursor-pointer select-none"
                   >
                     <button
                       type="button"
@@ -377,7 +377,7 @@ const ManageHomeContent = () => {
                   </div>
 
                   {/* Section Controls */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap flex-shrink-0">
                     {/* Add Card Button (Directly visible!) */}
                     <button
                       type="button"
@@ -547,7 +547,7 @@ const ManageHomeContent = () => {
       {/* Section Create / Edit Modal */}
       {sectionModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[440px] p-6 border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[440px] p-4 sm:p-6 border border-gray-100">
             <h3 className="font-extrabold text-[#0f172a] text-lg mb-4 flex items-center gap-2">
               <span>{sectionModal.mode === "create" ? "➕ Create New Section" : "✏️ Edit Section Details"}</span>
             </h3>
@@ -644,7 +644,7 @@ const ManageHomeContent = () => {
       {/* Card (Item) Add / Edit Modal */}
       {itemModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[480px] p-6 max-h-[92vh] overflow-y-auto border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[480px] p-4 sm:p-6 max-h-[92vh] overflow-y-auto border border-gray-100">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
               <div>
                 <h3 className="font-extrabold text-[#0f172a] text-base sm:text-lg">

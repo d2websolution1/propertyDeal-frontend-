@@ -7,7 +7,6 @@ const AdminTopbar = ({ onToggleSidebar, onOpenMobileSidebar }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -48,15 +47,6 @@ const AdminTopbar = ({ onToggleSidebar, onOpenMobileSidebar }) => {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
-        {/* Theme toggle */}
-        <button
-          onClick={() => setDarkMode((d) => !d)}
-          className="w-9 h-9 rounded-md hover:bg-gray-100 flex items-center justify-center text-gray-600"
-          aria-label="Toggle theme"
-          title="Light / Dark theme"
-        >
-          <i className={`fas ${darkMode ? "fa-sun" : "fa-moon"} text-sm`}></i>
-        </button>
 
         {/* Notifications */}
         <button

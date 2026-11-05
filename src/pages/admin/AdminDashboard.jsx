@@ -143,7 +143,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto p-4 sm:p-6 space-y-6 font-sans">
+    <div className="max-w-[1440px] mx-auto space-y-6 font-sans">
       {/* Top Banner Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
