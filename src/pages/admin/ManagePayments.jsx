@@ -410,7 +410,7 @@ const ManagePayments = () => {
                   <label className="block text-xs font-bold text-gray-700 mb-1">Phone Number</label>
                   <input
                     type="tel"
-                    placeholder="+91 9876543210"
+                    placeholder="+91 9672056670"
                     value={newPayment.userPhone}
                     onChange={(e) => setNewPayment({ ...newPayment, userPhone: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"

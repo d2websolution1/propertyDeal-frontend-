@@ -1041,7 +1041,7 @@ export default function PostPropertyPage() {
                       type="text"
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value)}
-                      placeholder="e.g. 9876543210"
+                      placeholder="e.g. 9672056670"
                       className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] bg-white text-xs sm:text-sm text-[#0f172a] focus:border-[#005744] outline-none"
                     />
                   </div>
