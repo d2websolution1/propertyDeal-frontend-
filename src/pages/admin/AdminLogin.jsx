@@ -59,7 +59,16 @@ const AdminLogin = () => {
       <div className="relative z-10 w-full max-w-[420px] bg-white rounded-3xl shadow-xl border border-[#e2e8f0] p-8 sm:p-10 animate-hw-fade">
         {/* Logo */}
         <div className="flex flex-col items-center justify-center mb-6">
-          <PropertyDealLogo height={48} className="h-12 w-auto" />
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/favicon.png"
+              alt="Property Adda"
+              className="w-12 h-12 object-contain rounded-2xl shadow-xs"
+            />
+            <span className="font-black text-2xl tracking-tight text-[#0f172a]">
+              Property<span className="text-[#2563eb]">Adda</span>
+            </span>
+          </div>
           <span className="mt-2.5 text-[10.5px] font-black uppercase tracking-widest text-[#2563eb] bg-[#eff6ff] px-2.5 py-0.5 rounded-full border border-[#bfdbfe]">
             SECURE ADMIN PORTAL
           </span>

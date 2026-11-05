@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import propertyDealIcon from "../../assets/property-adda-logo.png";
 
 const NAV_GROUPS = [
   {
@@ -80,9 +79,9 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       {/* Logo Header */}
       <div className="h-16 flex items-center gap-2.5 px-4 border-b border-white/10 flex-shrink-0">
         <img
-          src={propertyDealIcon}
+          src="/favicon.png"
           alt="Property Adda Logo"
-          className="w-8 h-8 object-contain flex-shrink-0 rounded-md"
+          className="w-8 h-8 object-contain flex-shrink-0 rounded-lg shadow-xs"
         />
         {!collapsed && (
           <span className="font-extrabold text-base tracking-tight whitespace-nowrap text-white">
