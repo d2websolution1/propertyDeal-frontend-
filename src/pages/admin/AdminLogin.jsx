@@ -1,25 +1,47 @@
 // frontend/src/pages/admin/AdminLogin.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { PropertyDealLogo } from '../../components/common/Header';
 
 const AdminLogin = () => {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // If already authenticated as admin, go straight to admin dashboard
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, navigate]);
+
+  const handleQuickFill = (adminEmail = 'admin@property-adda.com', adminPass = 'admin123') => {
+    setEmail(adminEmail);
+    setPassword(adminPass);
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    if (!cleanEmail || !cleanPassword) {
+      setError('Please enter both admin email and password.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const loggedInUser = await login(email, password);
+      const loggedInUser = await login(cleanEmail, cleanPassword);
 
       if (loggedInUser?.role !== 'admin') {
         setError('Access denied. This account does not have administrator privileges.');
@@ -83,6 +105,16 @@ const AdminLogin = () => {
           </p>
         </div>
 
+        {/* If logged in as non-admin client */}
+        {user && user.role !== 'admin' && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3.5 py-2.5 rounded-xl mb-4">
+            <span className="font-bold">Signed in as client:</span> {user.email || user.name}
+            <p className="text-[11px] text-amber-700 mt-0.5">
+              Please enter your administrator email and password below to open the Admin Dashboard.
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 text-xs px-4 py-3 rounded-xl mb-5 flex items-start gap-2">
             <span className="font-bold">⚠️</span>
@@ -92,6 +124,15 @@ const AdminLogin = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center justify-end">
+            <button
+              type="button"
+              onClick={() => handleQuickFill('admin@property-adda.com', 'admin123')}
+              className="text-[#2563eb] hover:underline font-bold text-[11px] cursor-pointer bg-[#eff6ff] px-2 py-0.5 rounded-md border border-[#bfdbfe]"
+            >
+              🔑 Auto-fill Admin Credentials
+            </button>
+          </div>
           <div>
             <label className="block text-xs font-bold text-[#0f172a] mb-1.5">
               Admin Email

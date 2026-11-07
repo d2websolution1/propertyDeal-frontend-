@@ -22,8 +22,8 @@ const ProtectedAdminRoute = ({ children }) => {
   }
 
   if (user?.role !== "admin") {
-    // Logged in but not an admin
-    return <Navigate to="/" replace />;
+    // Logged in as regular client — redirect to admin login to authenticate with admin credentials
+    return <Navigate to="/admin/login?reason=admin_required" state={{ from: location }} replace />;
   }
 
   return children;

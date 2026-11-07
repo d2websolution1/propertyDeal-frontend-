@@ -735,13 +735,21 @@ const Header = () => {
                     <span>📑</span>
                     <span>My Listings</span>
                   </Link>
-                  {user?.role === "admin" && (
+                  {user?.role === "admin" ? (
                     <Link
                       to="/admin"
                       className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#2563eb] hover:bg-[#eff6ff] rounded-lg transition-colors"
                     >
                       <span>🛡️</span>
                       <span>Admin Dashboard</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/admin/login"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#64748b] hover:bg-[#f8fafc] hover:text-[#2563eb] rounded-lg transition-colors"
+                    >
+                      <span>🛡️</span>
+                      <span>Admin Portal</span>
                     </Link>
                   )}
                 </div>

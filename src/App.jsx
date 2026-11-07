@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
@@ -52,13 +53,39 @@ import ManageSecuritySettings from './pages/admin/ManageSecuritySettings';
 import ManageSessions from './pages/admin/ManageSessions';
 
 // Routes jinke apne khud ke header/footer hain (common Header/Footer yahan nahi dikhana)
-const ROUTES_WITH_CUSTOM_HEADER = ['/admin'];
+const ROUTES_WITH_CUSTOM_HEADER = ['/admin', '/%20admin', '/ admin', ' /admin'];
 
 function AppContent() {
   const location = useLocation();
-  const hideCommonChrome = ROUTES_WITH_CUSTOM_HEADER.some((path) =>
-    location.pathname.startsWith(path)
-  );
+  const navigate = useNavigate();
+
+  // Normalize any accidental %20, leading/trailing whitespace in URL paths
+  useEffect(() => {
+    try {
+      const rawPath = location.pathname;
+      if (rawPath.includes('%20') || rawPath.includes(' ') || (rawPath.endsWith('/') && rawPath.length > 1)) {
+        const decoded = decodeURIComponent(rawPath);
+        const cleaned = '/' + decoded.replace(/\s+/g, '').replace(/^\/+/, '');
+        if (cleaned && cleaned !== rawPath) {
+          navigate(cleaned + location.search + location.hash, { replace: true });
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [location.pathname, location.search, location.hash, navigate]);
+
+  let decodedPath = location.pathname;
+  try {
+    decodedPath = decodeURIComponent(location.pathname);
+  } catch (e) {}
+
+  const isNormalizedAdmin =
+    /^\/?\s*admin(\/|$)/i.test(decodedPath) ||
+    /^\/?%20admin(\/|$)/i.test(location.pathname) ||
+    ROUTES_WITH_CUSTOM_HEADER.some((path) => location.pathname.startsWith(path));
+
+  const hideCommonChrome = isNormalizedAdmin;
 
   return (
     <>
@@ -78,8 +105,18 @@ function AppContent() {
         <Route path="/my-listings" element={<MyListingsPage />} />
         <Route path="/post-property" element={<PostPropertyPage />} />
 
-        {/* Admin Routes */}
+        {/* Admin Login & Aliases (Handles /%20admin/login, / admin/login, /admin-login) */}
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/%20admin/login" element={<AdminLogin />} />
+        <Route path="/ admin/login" element={<AdminLogin />} />
+        <Route path=" /admin/login" element={<AdminLogin />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/adminlogin" element={<AdminLogin />} />
+        <Route path="/%20admin" element={<Navigate to="/admin" replace />} />
+        <Route path="/ admin" element={<Navigate to="/admin" replace />} />
+        <Route path="/%20admin/*" element={<Navigate to="/admin" replace />} />
+        <Route path="/ admin/*" element={<Navigate to="/admin" replace />} />
+
         <Route
           path="/admin"
           element={
@@ -125,6 +162,9 @@ function AppContent() {
           <Route path="settings/security" element={<ManageSecuritySettings />} />
           <Route path="settings/sessions" element={<ManageSessions />} />
         </Route>
+
+        {/* Global Catch-all fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {!hideCommonChrome && <Footer />}
     </>
