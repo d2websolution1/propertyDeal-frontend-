@@ -59,9 +59,16 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
       return;
     }
 
-    if (mode === 'signup' && !name.trim()) {
-      setError('Please enter your full name.');
-      return;
+    if (mode === 'signup') {
+      if (!name.trim()) {
+        setError('Please enter your full name.');
+        return;
+      }
+      const rawDigits = phone.replace(/\D/g, '');
+      if (rawDigits.length < 10) {
+        setError('Mobile number is mandatory. Please enter a valid 10-digit phone number.');
+        return;
+      }
     }
 
     try {
@@ -69,6 +76,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
       const res = await instantGmailAuth({
         email: cleanEmail,
         name: name.trim() || undefined,
+        phone: phone ? phone.trim() : undefined,
         userType: userType || 'Owner',
       });
 
@@ -371,21 +379,45 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
 
                       <div>
                         <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Mobile Number <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex rounded-xl border border-slate-300 overflow-hidden focus-within:border-[#005744] focus-within:ring-1 focus-within:ring-[#005744]">
+                          <span className="px-3 py-2 bg-slate-100 text-slate-600 text-xs font-bold border-r border-slate-200 flex items-center">
+                            +91
+                          </span>
+                          <input
+                            type="tel"
+                            required
+                            maxLength="10"
+                            placeholder="10-digit mobile number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-full px-3 py-2 text-xs text-slate-900 outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
                           User Type:
                         </label>
                         <div className="grid grid-cols-3 gap-1.5">
-                          {['Owner', 'Dealer / Agent', 'Builder'].map((t) => (
+                          {[
+                            { id: 'Owner', label: '👤 Owner' },
+                            { id: 'Dealer / Agent', label: '💼 Agent' },
+                            { id: 'Builder', label: '🏗️ Builder' },
+                          ].map((t) => (
                             <button
-                              key={t}
+                              key={t.id}
                               type="button"
-                              onClick={() => setUserType(t)}
+                              onClick={() => setUserType(t.id)}
                               className={`py-1.5 px-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
-                                userType === t
+                                userType === t.id
                                   ? 'bg-[#005744] text-white border-[#005744]'
                                   : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                               }`}
                             >
-                              {t}
+                              {t.label}
                             </button>
                           ))}
                         </div>

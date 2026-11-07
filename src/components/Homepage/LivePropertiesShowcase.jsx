@@ -29,7 +29,11 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   const queryQ = searchParams.get('q') || '';
   const queryPropertyType = searchParams.get('propertyType') || '';
   const queryListingType = searchParams.get('listingType') || '';
+  const queryPurpose = searchParams.get('purpose') || '';
+  const queryCategory = searchParams.get('propertyCategory') || '';
   const queryCity = searchParams.get('city') || '';
+  const queryMinPrice = searchParams.get('minPrice') || '';
+  const queryMaxPrice = searchParams.get('maxPrice') || '';
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +41,54 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [enquirySuccess, setEnquirySuccess] = useState(false);
   const [enquiryData, setEnquiryData] = useState({ name: '', phone: '', note: '' });
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
+
+  // Load user favorites if logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios
+        .get(`${API_BASE_URL}/users/favorites`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          if (res.data?.success && Array.isArray(res.data.favorites)) {
+            const ids = res.data.favorites.map((f) => String(f.id || f._id));
+            setFavoriteIds(new Set(ids));
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  const handleToggleFavorite = async (e, propId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to save properties to your Favorites.');
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/users/favorites/${propId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data?.success) {
+        setFavoriteIds((prev) => {
+          const next = new Set(prev);
+          const strId = String(propId);
+          if (next.has(strId)) next.delete(strId);
+          else next.add(strId);
+          return next;
+        });
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    }
+  };
 
   useEffect(() => {
     fetchProperties();
@@ -46,14 +98,17 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
     try {
       setLoading(true);
       let url = `${API_BASE_URL}/properties?limit=24`;
-      if (filter === 'sale') url += '&listingType=sale';
-      else if (filter === 'rent') url += '&listingType=rent';
-      else if (filter === 'commercial') url += '&propertyType=Commercial';
-      else if (filter === 'plots') url += '&propertyType=Plot';
-      else if (queryListingType) url += `&listingType=${encodeURIComponent(queryListingType)}`;
+      const finalPurp = queryPurpose || (filter === 'sale' ? 'sale' : filter === 'rent' ? 'rent' : queryListingType);
+      if (finalPurp && finalPurp !== 'all') url += `&purpose=${encodeURIComponent(finalPurp)}`;
 
-      if (queryPropertyType) url += `&propertyType=${encodeURIComponent(queryPropertyType)}`;
-      if (queryCity && queryCity !== 'All India') url += `&city=${encodeURIComponent(queryCity)}`;
+      if (queryCategory && queryCategory !== 'all') url += `&propertyCategory=${encodeURIComponent(queryCategory)}`;
+      if (filter === 'commercial') url += '&propertyCategory=Commercial';
+      if (filter === 'plots') url += '&propertyType=Plot';
+
+      if (queryPropertyType && queryPropertyType !== 'all') url += `&propertyType=${encodeURIComponent(queryPropertyType)}`;
+      if (queryCity && queryCity !== 'All India' && queryCity !== 'all') url += `&city=${encodeURIComponent(queryCity)}`;
+      if (queryMinPrice) url += `&minPrice=${encodeURIComponent(queryMinPrice)}`;
+      if (queryMaxPrice) url += `&maxPrice=${encodeURIComponent(queryMaxPrice)}`;
       if (queryQ) url += `&q=${encodeURIComponent(queryQ)}`;
 
       const res = await axios.get(url);
@@ -231,6 +286,22 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                         {prop.listingType === 'rent' ? 'For Rent' : 'For Sale'}
                       </span>
                     </div>
+
+                    {/* Favorite Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => handleToggleFavorite(e, prop.id || prop._id)}
+                      className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer ${
+                        favoriteIds.has(String(prop.id || prop._id))
+                          ? 'bg-rose-500 text-white shadow-md'
+                          : 'bg-white/80 hover:bg-white text-slate-600 hover:text-rose-500 shadow-xs'
+                      }`}
+                      title={favoriteIds.has(String(prop.id || prop._id)) ? 'Remove from favorites' : 'Add to favorites'}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill={favoriteIds.has(String(prop.id || prop._id)) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                      </svg>
+                    </button>
 
                     {prop.uniqueCode && (
                       <div className="absolute bottom-3 right-3 z-10 bg-slate-900/70 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-mono">

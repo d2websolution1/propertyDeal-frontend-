@@ -417,8 +417,34 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
   const data = CATEGORY_DATA[resolvedCategory];
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [propertyType, setPropertyType] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [purpose, setPurpose] = useState(
+    resolvedCategory === 'rent' ? 'rent' : resolvedCategory === 'commercial' ? 'all' : resolvedCategory === 'plots' ? 'sale' : 'sale'
+  );
+  const [propertyCategory, setPropertyCategory] = useState(
+    resolvedCategory === 'commercial' ? 'Commercial' : 'all'
+  );
+  const [propertyType, setPropertyType] = useState(
+    resolvedCategory === 'plots' ? 'Plot' : ''
+  );
+  const [searchCity, setSearchCity] = useState('');
+  const [budget, setBudget] = useState('');
+  const [availableCities, setAvailableCities] = useState([
+    'Mumbai', 'Delhi NCR', 'Noida', 'Greater Noida', 'Gurgaon', 'Jaipur', 'Bengaluru', 'Pune', 'Hyderabad', 'Kolkata'
+  ]);
+
+  // Load dynamic cities from locations API
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/locations`)
+      .then((res) => {
+        if (res.data?.locations?.length > 0) {
+          const fetchedCities = res.data.locations.map((l) => l.city).filter(Boolean);
+          const combined = Array.from(new Set([...fetchedCities, ...availableCities]));
+          setAvailableCities(combined);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Dynamic content from MongoDB Atlas
   const [dbTiles, setDbTiles] = useState(null);
@@ -454,10 +480,20 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
   // Sync inputs with URL query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const q = params.get('q');
+    const purp = params.get('purpose') || params.get('listingType');
+    const cat = params.get('propertyCategory');
     const pType = params.get('propertyType');
-    if (q !== null) setSearchQuery(q);
-    if (pType !== null) setPropertyType(pType);
+    const ct = params.get('city');
+    const minP = params.get('minPrice');
+    const maxP = params.get('maxPrice');
+
+    if (purp) setPurpose(purp);
+    if (cat) setPropertyCategory(cat);
+    if (pType) setPropertyType(pType);
+    if (ct) setSearchCity(ct);
+    if (minP || maxP) {
+      setBudget(`${minP || ''}-${maxP || ''}`);
+    }
   }, [location.search]);
 
   // Reset slide index when category changes
@@ -477,14 +513,21 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
   const handleSearch = (e) => {
     if (e) e.preventDefault();
     const params = new URLSearchParams();
-    if (propertyType) params.set('propertyType', propertyType);
-    if (searchQuery.trim()) params.set('q', searchQuery.trim());
+    if (purpose && purpose !== 'all') params.set('purpose', purpose);
+    if (propertyCategory && propertyCategory !== 'all') params.set('propertyCategory', propertyCategory);
+    if (propertyType && propertyType !== 'all') params.set('propertyType', propertyType);
+    if (searchCity && searchCity !== 'all') params.set('city', searchCity);
+    if (budget && budget !== 'all') {
+      const parts = budget.split('-');
+      if (parts[0]) params.set('minPrice', parts[0]);
+      if (parts[1]) params.set('maxPrice', parts[1]);
+    }
 
     let targetPath = '/';
-    if (resolvedCategory === 'rent') targetPath = '/rent';
-    else if (resolvedCategory === 'commercial') targetPath = '/commercial';
-    else if (resolvedCategory === 'plots') targetPath = '/plots';
-    else if (resolvedCategory === 'pg') targetPath = '/pg-co-living';
+    if (purpose === 'rent') targetPath = '/rent';
+    else if (propertyCategory === 'Commercial') targetPath = '/commercial';
+    else if (propertyType === 'Plot') targetPath = '/plots';
+    else if (propertyType === 'Pg/hostel') targetPath = '/pg-co-living';
 
     const searchStr = params.toString();
     navigate(searchStr ? `${targetPath}?${searchStr}` : targetPath);
@@ -639,63 +682,123 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
             </Link>
           </div>
 
-          {/* Search Inputs */}
-          <form onSubmit={handleSearch} className="pt-3 flex flex-col md:flex-row items-center gap-2.5">
-            {/* Type selector */}
-            <div className="w-full md:w-[220px] flex-shrink-0">
+          {/* Search Inputs: ONLY Drop-down selection */}
+          <form onSubmit={handleSearch} className="pt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5 items-end">
+            {/* 1. Purpose Dropdown */}
+            <div className="w-full">
+              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+                Purpose
+              </label>
+              <select
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+              >
+                <option value="all">All (Buy / Rent)</option>
+                <option value="sale">Buy / Sale</option>
+                <option value="rent">Rent / Lease</option>
+              </select>
+            </div>
+
+            {/* 2. Category Dropdown */}
+            <div className="w-full">
+              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+                Category
+              </label>
+              <select
+                value={propertyCategory}
+                onChange={(e) => setPropertyCategory(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+              >
+                <option value="all">All Categories</option>
+                <option value="Residential">Residential</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+
+            {/* 3. Property Type Dropdown */}
+            <div className="w-full">
+              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+                Property Type
+              </label>
               <select
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] text-xs sm:text-sm font-semibold text-[#0f172a] outline-none focus:border-[#2563eb] transition-colors cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
               >
-                {data.types.map((pt) => (
-                  <option key={pt.value} value={pt.value}>
-                    {pt.label}
-                  </option>
+                <option value="">All Types</option>
+                <option value="Flat">Flat / Apartment</option>
+                <option value="House/villa">House / Villa</option>
+                <option value="Plot">Plot / Land</option>
+                <option value="Farm house">Farm house</option>
+                <option value="Building">Building / Floor</option>
+                <option value="Studio Apartment">Studio Apartment</option>
+                <option value="room">Room</option>
+                <option value="Pg/hostel">PG / Hostel</option>
+                <option value="office space">Office Space</option>
+                <option value="Commercial space">Commercial Space</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* 4. City Dropdown */}
+            <div className="w-full">
+              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+                City
+              </label>
+              <select
+                value={searchCity}
+                onChange={(e) => setSearchCity(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+              >
+                <option value="">All Cities</option>
+                {availableCities.map((c) => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
 
-            {/* Query input */}
-            <div className="w-full flex-1 relative flex items-center">
-              <svg
-                className="absolute left-3.5 w-4 h-4 text-gray-400"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
+            {/* 5. Budget Dropdown */}
+            <div className="w-full">
+              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+                Budget
+              </label>
+              <select
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
               >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={data.searchPlaceholder}
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[#e2e8f0] text-xs sm:text-sm text-[#0f172a] placeholder:text-gray-400 outline-none focus:border-[#2563eb] transition-colors"
-              />
-              <button
-                type="button"
-                onClick={handleUseLocation}
-                title="Use current location"
-                className="absolute right-3 text-gray-400 hover:text-[#2563eb] transition-colors"
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-                  <circle cx="12" cy="12" r="3" />
-                  <circle cx="12" cy="12" r="8" />
-                </svg>
-              </button>
+                <option value="">Any Budget</option>
+                {purpose === 'rent' ? (
+                  <>
+                    <option value="0-10000">Up to ₹10,000</option>
+                    <option value="10000-25000">₹10k - ₹25,000</option>
+                    <option value="25000-50000">₹25k - ₹50,000</option>
+                    <option value="50000-100000">₹50k - ₹1 Lakh</option>
+                    <option value="100000-">₹1 Lakh+</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="0-2500000">Up to ₹25 Lakh</option>
+                    <option value="2500000-5000000">₹25 L - ₹50 Lakh</option>
+                    <option value="5000000-10000000">₹50 L - ₹1 Crore</option>
+                    <option value="10000000-20000000">₹1 Cr - ₹2 Crore</option>
+                    <option value="20000000-">₹2 Crore+</option>
+                  </>
+                )}
+              </select>
             </div>
 
-            {/* Search CTA */}
-            <button
-              type="submit"
-              className="w-full md:w-auto px-7 py-2.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs sm:text-sm shadow-sm transition-all duration-200 flex-shrink-0 flex items-center justify-center gap-1.5"
-            >
-              <span>Search</span>
-              <span>→</span>
-            </button>
+            {/* 6. Search CTA Button */}
+            <div className="w-full col-span-2 sm:col-span-1">
+              <button
+                type="submit"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-black text-xs sm:text-sm shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>Search</span>
+                <span>→</span>
+              </button>
+            </div>
           </form>
         </div>
 

@@ -51,9 +51,16 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
       return;
     }
 
-    if (mode === 'signup' && !name.trim()) {
-      setError('Please enter your full name.');
-      return;
+    if (mode === 'signup') {
+      if (!name.trim()) {
+        setError('Please enter your full name.');
+        return;
+      }
+      const rawDigits = phone.replace(/\D/g, '');
+      if (rawDigits.length < 10) {
+        setError('Mobile number is mandatory. Please enter a valid 10-digit number.');
+        return;
+      }
     }
 
     try {
@@ -61,6 +68,7 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
       const res = await instantGmailAuth({
         email: cleanEmail,
         name: name.trim() || undefined,
+        phone: phone ? phone.trim() : undefined,
         userType: userType || 'Owner',
       });
 
@@ -340,21 +348,45 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
 
                       <div>
                         <label className="block text-xs font-bold text-[#334155] mb-1.5">
+                          Mobile Number <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex rounded-xl border border-[#cbd5e1] overflow-hidden focus-within:border-[#005744] focus-within:ring-1 focus-within:ring-[#005744]">
+                          <span className="px-3.5 py-2.5 bg-[#f8fafc] text-slate-600 text-xs sm:text-sm font-bold border-r border-[#cbd5e1] flex items-center">
+                            +91
+                          </span>
+                          <input
+                            type="tel"
+                            required
+                            maxLength="10"
+                            placeholder="10-digit mobile number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-full px-3.5 py-2.5 text-xs sm:text-sm text-[#0f172a] outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#334155] mb-1.5">
                           Register as
                         </label>
                         <div className="grid grid-cols-3 gap-2">
-                          {['Owner', 'Dealer / Agent', 'Builder'].map((type) => (
+                          {[
+                            { id: 'Owner', label: '👤 Owner' },
+                            { id: 'Dealer / Agent', label: '💼 Agent' },
+                            { id: 'Builder', label: '🏗️ Builder' },
+                          ].map((type) => (
                             <button
-                              key={type}
+                              key={type.id}
                               type="button"
-                              onClick={() => setUserType(type)}
+                              onClick={() => setUserType(type.id)}
                               className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                                userType === type
+                                userType === type.id
                                   ? 'bg-[#005744] text-white border-[#005744] shadow-xs'
                                   : 'bg-[#f8fafc] text-[#475569] border-[#e2e8f0] hover:bg-[#f1f5f9]'
                               }`}
                             >
-                              {type}
+                              {type.label}
                             </button>
                           ))}
                         </div>

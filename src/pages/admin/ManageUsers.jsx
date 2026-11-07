@@ -93,6 +93,52 @@ const ManageUsers = () => {
     }
   };
 
+  const handleQuickVerifyAgent = async (user) => {
+    const uid = user.id || user._id;
+    setActionLoadingId(uid);
+    try {
+      const nextVerified = !user.isVerifiedAgent;
+      await api.put(`/users/admin/${uid}/agent-status`, {
+        isVerifiedAgent: nextVerified,
+        userType: nextVerified ? 'Dealer / Agent' : user.userType,
+      });
+      setUsers((prev) =>
+        prev.map((u) =>
+          (u.id || u._id) === uid
+            ? { ...u, isVerifiedAgent: nextVerified, userType: nextVerified ? 'Dealer / Agent' : u.userType }
+            : u
+        )
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update agent verification");
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleApproveAgentRequest = async (user) => {
+    const uid = user.id || user._id;
+    setActionLoadingId(uid);
+    try {
+      await api.put(`/users/admin/${uid}/agent-status`, {
+        agentRequestStatus: 'approved',
+        userType: 'Dealer / Agent',
+        isVerifiedAgent: true,
+      });
+      setUsers((prev) =>
+        prev.map((u) =>
+          (u.id || u._id) === uid
+            ? { ...u, agentRequestStatus: 'approved', userType: 'Dealer / Agent', isVerifiedAgent: true }
+            : u
+        )
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to approve agent request");
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   const openEditModal = (user) => {
     setEditModalUser(user);
     setEditForm({
@@ -109,6 +155,10 @@ const ManageUsers = () => {
       localities: user.localities || "",
       about: user.about || "",
       isBlocked: !!user.isBlocked,
+      isVerifiedAgent: !!user.isVerifiedAgent,
+      agentRequestStatus: user.agentRequestStatus || "none",
+      listingLimit: user.listingLimit !== undefined ? user.listingLimit : 2,
+      activePlan: user.activePlan || "Free Starter",
     });
     setSaveSuccess(false);
   };
@@ -285,7 +335,31 @@ const ManageUsers = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5">{getRoleBadge(u.userType)}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="space-y-1">
+                          {getRoleBadge(u.userType)}
+                          {u.isVerifiedAgent && (
+                            <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md flex items-center gap-1 w-max shadow-xs">
+                              ✓ Verified Agent
+                            </span>
+                          )}
+                          {u.agentRequestStatus === "pending" && (
+                            <div className="flex items-center gap-1.5 pt-1">
+                              <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                                ⏳ Upgrade Pending
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleApproveAgentRequest(u)}
+                                className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black rounded cursor-pointer shadow-xs"
+                                title="Approve as Verified Agent"
+                              >
+                                Approve
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-5 py-3.5">
                         <span className="text-gray-700 block truncate max-w-[180px]">{u.email}</span>
                         {u.phone ? (
@@ -349,6 +423,22 @@ const ManageUsers = () => {
                       </td>
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Quick Verify Agent Button */}
+                          {!isAdmin && (
+                            <button
+                              onClick={() => handleQuickVerifyAgent(u)}
+                              disabled={actionLoadingId === uid}
+                              className={`px-2 py-1.5 rounded-lg border text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                                u.isVerifiedAgent
+                                  ? "border-blue-400 bg-blue-600 text-white hover:bg-blue-700"
+                                  : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                              }`}
+                              title={u.isVerifiedAgent ? "Revoke Agent Verification" : "Mark as Verified Agent"}
+                            >
+                              <span>{u.isVerifiedAgent ? "✓ Verified" : "Verify Agent"}</span>
+                            </button>
+                          )}
+
                           {/* Manage Profile Button */}
                           <button
                             onClick={() => openEditModal(u)}
@@ -595,7 +685,39 @@ const ManageUsers = () => {
                 ></textarea>
               </div>
 
-              <div className="flex items-center gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Active Subscription Plan</label>
+                  <input
+                    type="text"
+                    value={editForm.activePlan}
+                    onChange={(e) => setEditForm({ ...editForm, activePlan: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Listing Limit Quota</label>
+                  <input
+                    type="number"
+                    value={editForm.listingLimit}
+                    onChange={(e) => setEditForm({ ...editForm, listingLimit: Number(e.target.value) })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-blue-600"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 pt-2 flex-wrap">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-700">
+                  <input
+                    type="checkbox"
+                    checked={editForm.isVerifiedAgent}
+                    onChange={(e) => setEditForm({ ...editForm, isVerifiedAgent: e.target.checked })}
+                    className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                  />
+                  <span>✓ Mark as Verified Real Estate Agent</span>
+                </label>
+
                 <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700">
                   <input
                     type="checkbox"
