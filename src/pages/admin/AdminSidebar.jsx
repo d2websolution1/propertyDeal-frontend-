@@ -14,8 +14,6 @@ const NAV_GROUPS = [
       { label: "Advertisements", icon: "fa-ad", path: "/admin/advertisements" },
       { label: "CMS Pages", icon: "fa-file-alt", path: "/admin/cms" },
       { label: "Blog Management", icon: "fa-blog", path: "/admin/blogs" },
-      { label: "Pop-up Banners", icon: "fa-window-restore", path: "/admin/banners" },
-      { label: "Bulk WhatsApp / SMS / Email", icon: "fa-paper-plane", path: "/admin/bulk-messaging" },
     ],
   },
   {
@@ -24,9 +22,7 @@ const NAV_GROUPS = [
       { label: "Manage Users", icon: "fa-users", path: "/admin/users" },
       { label: "Manage Locations", icon: "fa-map-marker-alt", path: "/admin/locations" },
       { label: "Manage Properties", icon: "fa-building", path: "/admin/properties" },
-      { label: "Approve / Reject Listings", icon: "fa-check-circle", path: "/admin/listings/approvals" },
       { label: "Featured Listings", icon: "fa-star", path: "/admin/listings/featured" },
-      { label: "Verified Property Tags", icon: "fa-shield-alt", path: "/admin/listings/verified" },
       { label: "Enquiries", icon: "fa-comment-dots", path: "/admin/enquiries" },
     ],
   },
@@ -38,18 +34,9 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Reports",
-    items: [
-      { label: "Reports & Analytics", icon: "fa-chart-line", path: "/admin/reports" },
-      { label: "New Listing Report", icon: "fa-file-invoice", path: "/admin/reports/listings" },
-      { label: "New User & Vendor Report", icon: "fa-user-plus", path: "/admin/reports/users" },
-    ],
-  },
-  {
     label: "Settings",
     items: [
       { label: "General Settings", icon: "fa-cog", path: "/admin/settings" },
-      { label: "Multi-language", icon: "fa-language", path: "/admin/settings/language" },
       { label: "Security & SSL", icon: "fa-lock", path: "/admin/settings/security" },
       { label: "Active Sessions", icon: "fa-laptop", path: "/admin/settings/sessions" },
     ],
