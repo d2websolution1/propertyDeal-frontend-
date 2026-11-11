@@ -152,17 +152,26 @@ const ManagePayments = () => {
   };
 
   const handleDeletePayment = async (payment) => {
-    const id = payment._id || payment.id;
+    const id = payment._id || payment.id || payment.transactionId;
     const confirmMsg = `Are you sure you want to permanently delete payment transaction "${payment.transactionId}" (${payment.userName} - ₹${payment.amount})?\n\nThis will remove the record directly from MongoDB Atlas.`;
     if (!window.confirm(confirmMsg)) return;
 
     try {
       setLoading(true);
-      await api.delete(`/admin/payments/${id}`);
+      try {
+        await api.delete(`/admin/payments/${id}`);
+      } catch (delErr) {
+        // Fallback to POST delete if DELETE is blocked or returning 404/405
+        if (delErr.response?.status === 404 || delErr.response?.status === 405 || !delErr.response) {
+          await api.post(`/admin/payments/${id}/delete`);
+        } else {
+          throw delErr;
+        }
+      }
       await fetchPayments();
     } catch (err) {
       console.error("Failed to delete payment:", err);
-      alert(err.response?.data?.message || "Failed to delete payment from DB");
+      alert(err.response?.data?.message || err.message || "Failed to delete payment from DB");
       setLoading(false);
     }
   };
