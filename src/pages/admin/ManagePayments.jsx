@@ -31,6 +31,11 @@ const ManagePayments = () => {
   const [newPayment, setNewPayment] = useState(EMPTY_PAYMENT_FORM);
   const [submitting, setSubmitting] = useState(false);
 
+  // Edit payment state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editPayment, setEditPayment] = useState(EMPTY_PAYMENT_FORM);
+
   const fetchPayments = useCallback(async () => {
     setLoading(true);
     try {
@@ -59,10 +64,6 @@ const ManagePayments = () => {
     0
   );
   const pendingAmount = pendingPayments.reduce(
-    (sum, p) => sum + (Number(p.amount) || 0),
-    0
-  );
-  const refundedAmount = refundedPayments.reduce(
     (sum, p) => sum + (Number(p.amount) || 0),
     0
   );
@@ -105,6 +106,64 @@ const ManagePayments = () => {
       alert(err.response?.data?.message || "Failed to record payment in DB");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleOpenEdit = (payment) => {
+    setEditingId(payment._id || payment.id);
+    setEditPayment({
+      transactionId: payment.transactionId || "",
+      userName: payment.userName || "",
+      userEmail: payment.userEmail || "",
+      userPhone: payment.userPhone || "",
+      userType: payment.userType || "Owner",
+      plan: payment.plan || "",
+      amount: payment.amount !== undefined ? String(payment.amount) : "0",
+      paymentMethod: payment.paymentMethod || "UPI",
+      status: payment.status || "completed",
+      notes: payment.notes || "",
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdatePayment = async (e) => {
+    e.preventDefault();
+    if (!editingId) return;
+    if (!editPayment.userName || !editPayment.userEmail || editPayment.amount === "") {
+      alert("Name, email and amount are required!");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await api.put(`/admin/payments/${editingId}`, {
+        ...editPayment,
+        amount: Number(editPayment.amount),
+      });
+      setIsEditModalOpen(false);
+      setEditingId(null);
+      await fetchPayments();
+    } catch (err) {
+      console.error("Failed to update payment:", err);
+      alert(err.response?.data?.message || "Failed to update payment record in DB");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeletePayment = async (payment) => {
+    const id = payment._id || payment.id;
+    const confirmMsg = `Are you sure you want to permanently delete payment transaction "${payment.transactionId}" (${payment.userName} - ₹${payment.amount})?\n\nThis will remove the record directly from MongoDB Atlas.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      setLoading(true);
+      await api.delete(`/admin/payments/${id}`);
+      await fetchPayments();
+    } catch (err) {
+      console.error("Failed to delete payment:", err);
+      alert(err.response?.data?.message || "Failed to delete payment from DB");
+      setLoading(false);
     }
   };
 
@@ -227,6 +286,7 @@ const ManagePayments = () => {
             { key: "completed", label: `Completed (${completedPayments.length})` },
             { key: "pending", label: `Pending (${pendingPayments.length})` },
             { key: "failed", label: `Failed (${failedPayments.length})` },
+            { key: "refunded", label: `Refunded (${refundedPayments.length})` },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -284,6 +344,7 @@ const ManagePayments = () => {
                   <th className="px-5 py-3.5">Amount</th>
                   <th className="px-5 py-3.5">Status</th>
                   <th className="px-5 py-3.5">Date</th>
+                  <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -326,6 +387,11 @@ const ManagePayments = () => {
                           Listing: {payment.propertyTitle}
                         </span>
                       )}
+                      {payment.notes && (
+                        <span className="text-[10px] text-gray-400 italic block">
+                          Note: {payment.notes}
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="text-xs font-bold px-2 py-1 rounded-lg bg-gray-100 text-gray-700 border border-gray-200 inline-flex items-center gap-1.5">
@@ -345,7 +411,7 @@ const ManagePayments = () => {
                         {payment.status}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-gray-500 text-xs">
+                    <td className="px-5 py-3.5 text-gray-500 text-xs whitespace-nowrap">
                       {payment.createdAt
                         ? new Date(payment.createdAt).toLocaleDateString("en-IN", {
                             day: "numeric",
@@ -353,6 +419,28 @@ const ManagePayments = () => {
                             year: "numeric",
                           })
                         : "Recent"}
+                    </td>
+                    <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(payment)}
+                          className="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="Edit Payment Details"
+                        >
+                          <i className="fas fa-pen text-[10px]"></i>
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePayment(payment)}
+                          className="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="Delete Payment Record"
+                        >
+                          <i className="fas fa-trash-alt text-[10px]"></i>
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -373,7 +461,7 @@ const ManagePayments = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center font-bold"
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center font-bold cursor-pointer"
               >
                 ✕
               </button>
@@ -426,13 +514,15 @@ const ManagePayments = () => {
                     <option value="Owner">Owner</option>
                     <option value="Dealer / Agent">Dealer / Agent</option>
                     <option value="Builder">Builder</option>
+                    <option value="Client">Client</option>
+                    <option value="Buyer">Buyer</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Plan / Package</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Plan / Package *</label>
                   <input
                     type="text"
                     required
@@ -464,7 +554,7 @@ const ManagePayments = () => {
                     onChange={(e) => setNewPayment({ ...newPayment, paymentMethod: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb] bg-white"
                   >
-                    <option value="UPI">UPI (Google Pay / PhonePe)</option>
+                    <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
                     <option value="Razorpay">Razorpay Gateway</option>
                     <option value="NetBanking">Net Banking</option>
                     <option value="Card">Credit / Debit Card</option>
@@ -501,7 +591,7 @@ const ManagePayments = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -511,6 +601,181 @@ const ManagePayments = () => {
                   className="px-4 py-2 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] disabled:opacity-60 cursor-pointer"
                 >
                   {submitting ? "Saving to DB..." : "Save Record in MongoDB"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Edit Existing Payment */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                  <span>✏️</span> Edit Payment Transaction
+                </h3>
+                <p className="text-xs text-gray-500 font-mono mt-0.5">
+                  Txn ID: {editPayment.transactionId || editingId}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditingId(null);
+                }}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdatePayment} className="space-y-3.5">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Invoice / Txn ID</label>
+                  <input
+                    type="text"
+                    required
+                    value={editPayment.transactionId}
+                    onChange={(e) => setEditPayment({ ...editPayment, transactionId: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-mono outline-none focus:border-[#2563eb]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">User Role</label>
+                  <select
+                    value={editPayment.userType}
+                    onChange={(e) => setEditPayment({ ...editPayment, userType: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb] bg-white"
+                  >
+                    <option value="Owner">Owner</option>
+                    <option value="Dealer / Agent">Dealer / Agent</option>
+                    <option value="Builder">Builder</option>
+                    <option value="Client">Client</option>
+                    <option value="Buyer">Buyer</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Customer Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editPayment.userName}
+                    onChange={(e) => setEditPayment({ ...editPayment, userName: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Customer Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editPayment.userEmail}
+                    onChange={(e) => setEditPayment({ ...editPayment, userEmail: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={editPayment.userPhone}
+                    onChange={(e) => setEditPayment({ ...editPayment, userPhone: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Amount (₹ INR) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={editPayment.amount}
+                    onChange={(e) => setEditPayment({ ...editPayment, amount: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold outline-none focus:border-[#2563eb]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Plan / Package *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editPayment.plan}
+                    onChange={(e) => setEditPayment({ ...editPayment, plan: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Payment Method</label>
+                  <select
+                    value={editPayment.paymentMethod}
+                    onChange={(e) => setEditPayment({ ...editPayment, paymentMethod: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb] bg-white"
+                  >
+                    <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
+                    <option value="Razorpay">Razorpay Gateway</option>
+                    <option value="NetBanking">Net Banking</option>
+                    <option value="Card">Credit / Debit Card</option>
+                    <option value="Offline / Cash">Offline / Cash Deposit</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Payment Status</label>
+                <select
+                  value={editPayment.status}
+                  onChange={(e) => setEditPayment({ ...editPayment, status: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold outline-none focus:border-[#2563eb] bg-white"
+                >
+                  <option value="completed">Completed (Paid)</option>
+                  <option value="pending">Pending</option>
+                  <option value="failed">Failed</option>
+                  <option value="refunded">Refunded</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Notes / Remarks</label>
+                <textarea
+                  rows="2"
+                  value={editPayment.notes}
+                  onChange={(e) => setEditPayment({ ...editPayment, notes: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                ></textarea>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditingId(null);
+                  }}
+                  className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 disabled:opacity-60 cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <i className="fas fa-check"></i>
+                  <span>{submitting ? "Updating MongoDB..." : "Save Changes"}</span>
                 </button>
               </div>
             </form>
