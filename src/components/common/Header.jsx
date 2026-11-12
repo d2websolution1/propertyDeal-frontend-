@@ -69,6 +69,103 @@ const Header = () => {
   const [clientAuthModalOpen, setClientAuthModalOpen] = useState(false);
   const [authInitialMode, setAuthInitialMode] = useState("login");
 
+  // ── Dynamic Navigation Dropdown Menus (Live from MongoDB) ──
+  const [propertyTypesBuy, setPropertyTypesBuy] = useState([
+    { label: "Flats", path: "/?type=apartment", icon: "🏢" },
+    { label: "Houses", path: "/?type=house", icon: "🏠" },
+    { label: "Builder floors", path: "/?type=builder_floor", icon: "🏬" },
+    { label: "Plots", path: "/plots", icon: "🏞️" },
+    { label: "Villas", path: "/?type=villa", icon: "🏡" },
+    { label: "Commercial properties", path: "/commercial", icon: "🏪" },
+  ]);
+
+  const [popularAreasBuy, setPopularAreasBuy] = useState([
+    "Thane West",
+    "Borivali West",
+    "Mira Road East",
+    "Kurla West",
+    "Kurla East",
+    "Santacruz East",
+  ]);
+
+  const [searchByBHKBuy, setSearchByBHKBuy] = useState([
+    "1 RK for Sale in Mumbai",
+    "1 BHK for Sale in Mumbai",
+    "2 BHK for Sale in Mumbai",
+    "3 BHK for Sale in Mumbai",
+    "1 BHK Houses",
+    "2 BHK Houses",
+  ]);
+
+  const [popularSearchesBuy, setPopularSearchesBuy] = useState([
+    "Flats without brokerage",
+    "Under construction flats",
+    "Affordable projects for sale",
+    "Ready to move-in projects",
+    "New residential projects",
+    "Resale properties",
+  ]);
+
+  const [propertyTypesRent, setPropertyTypesRent] = useState([
+    { label: "Flats", path: "/rent?type=apartment", icon: "🏢" },
+    { label: "Houses", path: "/rent?type=house", icon: "🏠" },
+    { label: "PG / Co-living", path: "/pg-co-living", icon: "👥" },
+    { label: "Builder floors", path: "/rent?type=builder_floor", icon: "🏬" },
+    { label: "Villas", path: "/rent?type=villa", icon: "🏡" },
+    { label: "Commercial properties", path: "/commercial", icon: "🏪" },
+  ]);
+
+  const [popularAreasRent, setPopularAreasRent] = useState([
+    "Thane West",
+    "Borivali West",
+    "Mira Road East",
+    "Kurla West",
+    "Kurla East",
+    "Santacruz East",
+  ]);
+
+  const [searchByBHKRent, setSearchByBHKRent] = useState([
+    "1 RK for Rent in Mumbai",
+    "1 BHK for Rent in Mumbai",
+    "2 BHK for Rent in Mumbai",
+    "3 BHK for Rent in Mumbai",
+    "1 BHK Houses for Rent",
+    "2 BHK Houses for Rent",
+  ]);
+
+  const [popularSearchesRent, setPopularSearchesRent] = useState([
+    "Flats without brokerage",
+    "Fully furnished flats",
+    "Bachelor friendly flats",
+    "Family friendly flats",
+    "Pet friendly flats",
+    "Flats near metro",
+  ]);
+
+  // Load live dropdown configurations from MongoDB Atlas
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/nav-menus`)
+      .then((res) => {
+        const menus = res.data?.menus || [];
+        const buyersMenu = menus.find((m) => m.menuKey === "buyers");
+        if (buyersMenu) {
+          if (buyersMenu.propertyTypes?.length > 0) setPropertyTypesBuy(buyersMenu.propertyTypes);
+          if (buyersMenu.popularAreas?.length > 0) setPopularAreasBuy(buyersMenu.popularAreas);
+          if (buyersMenu.searchByBHK?.length > 0) setSearchByBHKBuy(buyersMenu.searchByBHK);
+          if (buyersMenu.popularSearches?.length > 0) setPopularSearchesBuy(buyersMenu.popularSearches);
+        }
+        const tenantsMenu = menus.find((m) => m.menuKey === "tenants");
+        if (tenantsMenu) {
+          if (tenantsMenu.propertyTypes?.length > 0) setPropertyTypesRent(tenantsMenu.propertyTypes);
+          if (tenantsMenu.popularAreas?.length > 0) setPopularAreasRent(tenantsMenu.popularAreas);
+          if (tenantsMenu.searchByBHK?.length > 0) setSearchByBHKRent(tenantsMenu.searchByBHK);
+          if (tenantsMenu.popularSearches?.length > 0) setPopularSearchesRent(tenantsMenu.popularSearches);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const navRef = useRef(null);
   const timeoutRef = useRef(null);
 
@@ -123,79 +220,6 @@ const Header = () => {
     setSelectedCity(city);
     setOpenMenu(null);
   };
-
-  // ── Dropdown Data matching Images 2 & 3 ──
-  const propertyTypesBuy = [
-    { label: "Flats", path: "/?type=apartment", icon: "🏢" },
-    { label: "Houses", path: "/?type=house", icon: "🏠" },
-    { label: "Builder floors", path: "/?type=builder_floor", icon: "🏬" },
-    { label: "Plots", path: "/plots", icon: "🏞️" },
-    { label: "Villas", path: "/?type=villa", icon: "🏡" },
-    { label: "Commercial properties", path: "/commercial", icon: "🏪" },
-  ];
-
-  const popularAreasBuy = [
-    "Thane West",
-    "Borivali West",
-    "Mira Road East",
-    "Kurla West",
-    "Kurla East",
-    "Santacruz East",
-  ];
-
-  const searchByBHKBuy = [
-    "1 RK for Sale in Mumbai",
-    "1 BHK for Sale in Mumbai",
-    "2 BHK for Sale in Mumbai",
-    "3 BHK for Sale in Mumbai",
-    "1 BHK Houses",
-    "2 BHK Houses",
-  ];
-
-  const popularSearchesBuy = [
-    "Flats without brokerage",
-    "Under construction flats",
-    "Affordable projects for sale",
-    "Ready to move-in projects",
-    "New residential projects",
-    "Resale properties",
-  ];
-
-  const propertyTypesRent = [
-    { label: "Flats", path: "/rent?type=apartment", icon: "🏢" },
-    { label: "Houses", path: "/rent?type=house", icon: "🏠" },
-    { label: "PG / Co-living", path: "/pg-co-living", icon: "👥" },
-    { label: "Builder floors", path: "/rent?type=builder_floor", icon: "🏬" },
-    { label: "Villas", path: "/rent?type=villa", icon: "🏡" },
-    { label: "Commercial properties", path: "/commercial", icon: "🏪" },
-  ];
-
-  const popularAreasRent = [
-    "Thane West",
-    "Borivali West",
-    "Mira Road East",
-    "Kurla West",
-    "Kurla East",
-    "Santacruz East",
-  ];
-
-  const searchByBHKRent = [
-    "1 RK for Rent in Mumbai",
-    "1 BHK for Rent in Mumbai",
-    "2 BHK for Rent in Mumbai",
-    "3 BHK for Rent in Mumbai",
-    "1 BHK Houses for Rent",
-    "2 BHK Houses for Rent",
-  ];
-
-  const popularSearchesRent = [
-    "Flats without brokerage",
-    "Fully furnished flats",
-    "Bachelor friendly flats",
-    "Family friendly flats",
-    "Pet friendly flats",
-    "Flats near metro",
-  ];
 
   const sellersMenu = [
     { title: "Developers", desc: "Launch or sell homes with high visibility", link: "/post-property" },

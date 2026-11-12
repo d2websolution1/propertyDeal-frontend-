@@ -45,6 +45,8 @@ const Footer = () => {
               <li><Link to="/plots" className="hover:text-white transition-colors">Residential Plots & Land</Link></li>
               <li><Link to="/pg-co-living" className="hover:text-white transition-colors">PG & Co-Living Spaces</Link></li>
               <li><Link to="/blogs" className="hover:text-white transition-colors">Latest News & Blogs</Link></li>
+              <li><Link to="/about-us" className="hover:text-white transition-colors font-medium">About Us</Link></li>
+              <li><Link to="/contact-us" className="hover:text-white transition-colors font-medium">Contact & Support</Link></li>
               <li><Link to="/post-property" className="text-[#f59e0b] hover:underline font-bold">Post Property for FREE →</Link></li>
             </ul>
           </div>
@@ -98,10 +100,11 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748b]">
           <p>© {new Date().getFullYear()} Property Adda. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white">Terms of Use</Link>
-            <Link to="/sitemap" className="hover:text-white">Sitemap</Link>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link to="/about-us" className="hover:text-white transition-colors">About Us</Link>
+            <Link to="/contact-us" className="hover:text-white transition-colors">Contact</Link>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms-and-conditions" className="hover:text-white transition-colors">Terms of Use</Link>
             <Link to="/admin/login" className="hover:text-white transition-colors text-slate-500 hover:text-slate-300">Admin Portal</Link>
           </div>
         </div>

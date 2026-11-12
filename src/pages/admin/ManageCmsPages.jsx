@@ -96,6 +96,16 @@ const ManageCmsPages = () => {
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${page.isPublished ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"}`}>
                   {page.isPublished ? "Published" : "Draft"}
                 </span>
+                <a
+                  href={`/${page.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold px-3 py-1.5 rounded inline-flex items-center gap-1"
+                  title="View live page on frontend"
+                >
+                  <i className="fas fa-external-link-alt text-[10px]"></i>
+                  <span>View</span>
+                </a>
                 <button onClick={() => openEdit(page)} className="bg-gray-50 hover:bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded">Edit</button>
                 <button onClick={() => remove(page)} className="bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold px-3 py-1.5 rounded">Delete</button>
               </div>

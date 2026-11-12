@@ -22,8 +22,10 @@ import Pgpage from './pages/public/Pgpage';
 import Plotspage from './pages/public/Plotspage';
 import BlogsPage from './pages/public/BlogsPage';
 import BlogDetailPage from './pages/public/BlogDetailPage';
+import CmsViewPage from './pages/public/CmsViewPage';
 
 // Content & Marketing admin pages
+import ManageNavMenus from './pages/admin/ManageNavMenus';
 import ManageBlogs from './pages/admin/ManageBlogs';
 import ManageSeo from './pages/admin/ManageSeo';
 import ManageAdvertisements from './pages/admin/ManageAdvertisements';
@@ -105,6 +107,16 @@ function AppContent() {
         <Route path="/my-listings" element={<MyListingsPage />} />
         <Route path="/post-property" element={<PostPropertyPage />} />
 
+        {/* Dynamic CMS Pages (Managed from Admin Panel) */}
+        <Route path="/about-us" element={<CmsViewPage defaultSlug="about-us" />} />
+        <Route path="/terms-and-conditions" element={<CmsViewPage defaultSlug="terms-and-conditions" />} />
+        <Route path="/terms" element={<CmsViewPage defaultSlug="terms-and-conditions" />} />
+        <Route path="/privacy-policy" element={<CmsViewPage defaultSlug="privacy-policy" />} />
+        <Route path="/contact-us" element={<CmsViewPage defaultSlug="contact-us" />} />
+        <Route path="/contact" element={<CmsViewPage defaultSlug="contact-us" />} />
+        <Route path="/pages/:slug" element={<CmsViewPage />} />
+        <Route path="/page/:slug" element={<CmsViewPage />} />
+
         {/* Admin Login & Aliases (Handles /%20admin/login, / admin/login, /admin-login) */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/%20admin/login" element={<AdminLogin />} />
@@ -139,6 +151,7 @@ function AppContent() {
 
           {/* Content & Marketing */}
           <Route path="content" element={<ManageHomeContent />} />
+          <Route path="navigation" element={<ManageNavMenus />} />
           <Route path="blogs" element={<ManageBlogs />} />
           <Route path="seo" element={<ManageSeo />} />
           <Route path="advertisements" element={<ManageAdvertisements />} />

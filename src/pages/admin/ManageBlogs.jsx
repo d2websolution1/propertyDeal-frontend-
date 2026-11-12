@@ -24,6 +24,25 @@ const ManageBlogs = () => {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [imageInputMode, setImageInputMode] = useState("upload");
+
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file (PNG, JPG, WEBP, etc.)");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      alert("Image size should be less than 8MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm((f) => ({ ...f, coverImage: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
@@ -205,12 +224,80 @@ const ManageBlogs = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Cover Image URL</label>
-                <input
-                  value={form.coverImage}
-                  onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Cover Image</label>
+                  <div className="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-[11px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("upload")}
+                      className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                        imageInputMode === "upload" ? "bg-white text-purple-700 shadow-xs" : "text-gray-500 hover:text-gray-800"
+                      }`}
+                    >
+                      <i className="fas fa-upload mr-1 text-[10px]"></i>Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode("url")}
+                      className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                        imageInputMode === "url" ? "bg-white text-purple-700 shadow-xs" : "text-gray-500 hover:text-gray-800"
+                      }`}
+                    >
+                      <i className="fas fa-link mr-1 text-[10px]"></i>Image URL
+                    </button>
+                  </div>
+                </div>
+
+                {imageInputMode === "upload" ? (
+                  <div className="space-y-2">
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 hover:border-purple-400 rounded-xl p-4 bg-gray-50/50 hover:bg-purple-50/20 cursor-pointer transition-all">
+                      <i className="fas fa-cloud-upload-alt text-2xl text-purple-500 mb-1"></i>
+                      <span className="text-xs font-semibold text-gray-700">Click to upload cover image from device</span>
+                      <span className="text-[10px] text-gray-400">PNG, JPG, WEBP, JPEG up to 8MB</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/photo-..."
+                    value={form.coverImage}
+                    onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  />
+                )}
+
+                {form.coverImage && (
+                  <div className="mt-2 relative rounded-lg overflow-hidden border border-gray-200 group bg-gray-100 max-h-36 flex items-center justify-center">
+                    <img
+                      src={form.coverImage}
+                      alt="Cover Preview"
+                      className="w-full h-36 object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600";
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <label className="bg-white/90 hover:bg-white text-gray-800 text-[11px] font-bold px-2.5 py-1 rounded cursor-pointer shadow">
+                        <i className="fas fa-camera mr-1"></i>Change
+                        <input type="file" accept="image/*" onChange={handleImageFileChange} className="hidden" />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, coverImage: "" }))}
+                        className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1 rounded shadow cursor-pointer"
+                      >
+                        <i className="fas fa-trash-alt mr-1"></i>Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
