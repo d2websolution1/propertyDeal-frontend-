@@ -21,7 +21,23 @@ Key Highlights:
 • Over 71,000+ verified listings across Delhi NCR, Jaipur, Mumbai, Bengaluru and major Indian cities.
 • Zero brokerage direct communication between property owners and genuine buyers.
 • Verified badge certification conducted by our field inspection and document verification team.
-• 24x7 customer support desk and relationship assistance.`,
+• 24x7 customer support desk and relationship assistance.
+
+──────────────────────────────────────────
+Privacy Policy & User Data Protection:
+At Property Adda, protecting your personal data, contact confidentiality, and maintaining customer trust is our highest priority.
+
+1. 256-Bit SSL Data Encryption:
+All user accounts, password credentials, property postings, and monetary transactions are secured with bank-grade 256-bit SSL encryption.
+
+2. Confidential Contact Sharing:
+Phone numbers and email addresses provided during registration or property inquiries are strictly used to connect genuine buyers and verified sellers. We never sell, rent, or lease your private information to third-party telemarketers or external advertising networks.
+
+3. Instant Verification & Fraud Prevention:
+User accounts and property listings undergo automated OTP authentication and manual editorial verification to eliminate spam, misleading prices, and fake listings.
+
+4. Account Management & Right to Data Deletion:
+You retain full control over your profile and posted properties. You can edit your listings from your user dashboard anytime or request complete deletion of your account and records by emailing info@property-adda.com.`,
   },
   'terms-and-conditions': {
     title: 'Terms & Conditions',
@@ -45,21 +61,24 @@ Property Adda acts as a discovery and marketplace portal. Buyers and tenants are
     title: 'Privacy Policy',
     metaTitle: 'Privacy Policy - Property Adda',
     metaDescription: 'How Property Adda safeguards your personal and transactional information.',
-    content: `At Property Adda, protecting your personal data and maintaining customer trust is our top priority.
+    content: `At Property Adda, protecting your personal data, privacy, and maintaining customer trust is our top priority.
 
 1. Information We Collect:
-When you register, post properties, or submit inquiries, we may collect your name, email address, phone number, and location preferences.
+When you register, post properties, or submit inquiries, we may collect your name, email address, phone number, and location preferences. All login credentials and OTP authentications are secured through encrypted protocols.
 
 2. How We Use Your Data:
-• To connect genuine property seekers directly with verified owners and agents.
-• To deliver real-time WhatsApp and SMS alerts regarding your property inquiries.
-• To authenticate logins securely via OTP or Google Single Sign-On.
+• To connect genuine property seekers directly with verified property owners and certified agents.
+• To deliver real-time WhatsApp and SMS alerts regarding inquiries on your listed properties.
+• To verify listing authenticity and eliminate spam, fraudulent ads, or duplicate listings.
 
-3. Data Security & Storage:
-All user records and payment logs are encrypted using industry-standard 256-bit SSL protocols. We never sell or rent your personal contact information to third-party marketing companies.
+3. 256-Bit SSL Data Security:
+All user records, passwords, and transaction audits are encrypted using industry-standard 256-bit SSL protocols. We strictly maintain a ZERO DATA SELLING policy. We never rent, trade, or distribute your phone number or email to external marketing or telemarketing agencies.
 
-4. Contact Our Privacy Officer:
-If you have any questions regarding your data or wish to delete your account, reach out to info@property-adda.com.`,
+4. Account Management & Data Rights:
+You have complete control over your account. You can edit your listings, deactivate properties, or request permanent deletion of your profile and data by emailing info@property-adda.com or calling +91 9672 056 670.
+
+5. Policy Updates:
+Any updates to our privacy policies will be transparently posted on this page and communicated via our platform announcements.`,
   },
   'contact-us': {
     title: 'Contact Support & Helpdesk',
@@ -211,6 +230,67 @@ const CmsViewPage = ({ defaultSlug }) => {
               <p className="text-gray-400">Loading page content...</p>
             )}
           </div>
+
+          {/* If About Page: Dedicated Privacy Policy & Trust Guarantee Section */}
+          {isAboutPage && (
+            <div className="mt-10 pt-8 border-t border-gray-100">
+              <div className="bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-2xl p-6 sm:p-8 shadow-md">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30 mb-2">
+                      🛡️ Data Protection & Privacy Commitment
+                    </span>
+                    <h3 className="text-lg sm:text-2xl font-bold text-white">
+                      Privacy Policy & User Security at Property Adda
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-2xl">
+                      We treat your privacy with highest confidentiality. Your contact information is never sold to third-party telemarketers.
+                    </p>
+                  </div>
+                  <Link
+                    to="/privacy-policy"
+                    className="flex-shrink-0 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-sm"
+                  >
+                    Read Detailed Privacy Policy →
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <span className="text-xl block mb-2">🔐</span>
+                    <h4 className="font-bold text-sm text-white mb-1">256-Bit SSL Protection</h4>
+                    <p className="text-xs text-gray-300">
+                      Bank-grade SSL encryption for all listings, messages, and monetary transactions.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <span className="text-xl block mb-2">🚫</span>
+                    <h4 className="font-bold text-sm text-white mb-1">Zero Spam Policy</h4>
+                    <p className="text-xs text-gray-300">
+                      We strictly never sell, lease, or rent customer numbers to telemarketing databases.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <span className="text-xl block mb-2">👥</span>
+                    <h4 className="font-bold text-sm text-white mb-1">Direct Verified Match</h4>
+                    <p className="text-xs text-gray-300">
+                      Contact details are shared only between genuine buyers and verified property owners.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <span className="text-xl block mb-2">🗑️</span>
+                    <h4 className="font-bold text-sm text-white mb-1">Right to Delete</h4>
+                    <p className="text-xs text-gray-300">
+                      Users can update details or request complete account erasure anytime at info@property-adda.com.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* If Contact Page: Interactive Contact Form & Help Desk Cards */}
           {isContactPage && (

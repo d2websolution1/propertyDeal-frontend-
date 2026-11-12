@@ -662,21 +662,24 @@ const Header = () => {
             )}
           </div>
 
-          {/* 5. NEWS & GUIDE */}
+          {/* 5. LATEST NEWS & BLOGS */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter("news")}
             onMouseLeave={handleMouseLeave}
           >
             <button
-              onClick={() => setOpenMenu(openMenu === "news" ? null : "news")}
-              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
-                openMenu === "news"
+              onClick={() => {
+                navigate("/blogs");
+                setOpenMenu(null);
+              }}
+              className={`px-2.5 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors whitespace-nowrap ${
+                openMenu === "news" || location.pathname.startsWith("/blogs")
                   ? "bg-[#eff6ff] text-[#2563eb]"
                   : "text-[#1e293b] hover:text-[#2563eb]"
               }`}
             >
-              <span>News & Guide</span>
+              <span>Latest News & Blogs</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M6 9l6 6 6-6" />
               </svg>
@@ -684,9 +687,18 @@ const Header = () => {
 
             {openMenu === "news" && (
               <div className="absolute left-0 mt-2 w-72 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-4 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
-                <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-2.5">
-                  Property Market Guide
-                </h4>
+                <div className="flex items-center justify-between mb-2.5">
+                  <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
+                    Property Market Guide
+                  </h4>
+                  <Link
+                    to="/blogs"
+                    onClick={() => setOpenMenu(null)}
+                    className="text-[11px] text-[#2563eb] font-bold hover:underline"
+                  >
+                    All Blogs →
+                  </Link>
+                </div>
                 <div className="space-y-2">
                   {newsMenu.map((item) => (
                     <Link
@@ -703,6 +715,33 @@ const Header = () => {
               </div>
             )}
           </div>
+
+          {/* 6. ABOUT US */}
+          <Link
+            to="/about-us"
+            onClick={() => setOpenMenu(null)}
+            className={`px-2.5 py-2 text-xs xl:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap ${
+              location.pathname === "/about-us"
+                ? "bg-[#eff6ff] text-[#2563eb]"
+                : "text-[#1e293b] hover:text-[#2563eb]"
+            }`}
+          >
+            About Us
+          </Link>
+
+          {/* 7. CONTACT SUPPORT */}
+          <Link
+            to="/contact-us"
+            onClick={() => setOpenMenu(null)}
+            className={`px-2.5 py-2 text-xs xl:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+              location.pathname === "/contact-us" || location.pathname === "/contact"
+                ? "bg-[#eff6ff] text-[#2563eb]"
+                : "text-[#1e293b] hover:text-[#2563eb]"
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse hidden xl:inline-block"></span>
+            <span>Contact Support</span>
+          </Link>
         </nav>
 
         {/* Right: Actions */}
@@ -1089,7 +1128,7 @@ const Header = () => {
                     )}
                   </div>
 
-                  {/* News & Guides Accordion */}
+                  {/* Latest News & Blogs Accordion */}
                   <div className="rounded-xl border border-[#e2e8f0] overflow-hidden bg-white">
                     <button
                       type="button"
@@ -1098,7 +1137,7 @@ const Header = () => {
                     >
                       <span className="flex items-center gap-2">
                         <span>📰</span>
-                        <span>News & Guides</span>
+                        <span>Latest News & Blogs</span>
                       </span>
                       <svg
                         width="14"
@@ -1114,6 +1153,13 @@ const Header = () => {
                     </button>
                     {expandedAccordion === "news" && (
                       <div className="px-3 pb-3 pt-1 border-t border-[#f1f5f9] bg-[#f8fafc] space-y-2 animate-hw-fade">
+                        <Link
+                          to="/blogs"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block p-2 rounded-lg bg-blue-50 border border-blue-200 text-xs font-bold text-[#2563eb] text-center"
+                        >
+                          Explore All Latest News & Blogs →
+                        </Link>
                         {newsMenu.map((item) => (
                           <Link
                             key={item.title}
@@ -1133,9 +1179,33 @@ const Header = () => {
                 {/* 4. Quick Direct Links Grid */}
                 <div>
                   <span className="text-[10px] font-black text-[#64748b] uppercase tracking-wider block mb-2">
-                    Direct Categories
+                    Quick Navigation
                   </span>
                   <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+                    <Link
+                      to="/about-us"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
+                    >
+                      <span>ℹ️ About Us</span>
+                      <span>→</span>
+                    </Link>
+                    <Link
+                      to="/contact-us"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
+                    >
+                      <span>📞 Contact Support</span>
+                      <span>→</span>
+                    </Link>
+                    <Link
+                      to="/privacy-policy"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
+                    >
+                      <span>🔒 Privacy Policy</span>
+                      <span>→</span>
+                    </Link>
                     <Link
                       to="/commercial"
                       onClick={() => setMobileMenuOpen(false)}
@@ -1150,14 +1220,6 @@ const Header = () => {
                       className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
                     >
                       <span>🧭 Plots & Land</span>
-                      <span>→</span>
-                    </Link>
-                    <Link
-                      to="/pg-co-living"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
-                    >
-                      <span>👥 PG / Co-Living</span>
                       <span>→</span>
                     </Link>
                     <Link
