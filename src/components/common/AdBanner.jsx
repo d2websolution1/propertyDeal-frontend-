@@ -100,3 +100,4 @@ const AdBanner = ({ position = 'header', className = '' }) => {
 };
 
 export default AdBanner;
+

@@ -60,7 +60,11 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       console.error("Failed to load real dashboard stats:", err);
-      setError("Unable to load real-time stats from database. Check server connection.");
+      if (err.response?.status === 401) {
+        setError("Admin authorization session expired. Please re-login.");
+      } else {
+        setError("Unable to load real-time stats from database. Check server connection.");
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -175,18 +179,26 @@ const AdminDashboard = () => {
       </div>
 
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <span>⚠️</span>
             <span>{error}</span>
           </div>
-          <button
-            type="button"
-            onClick={() => fetchStats()}
-            className="text-xs font-bold underline hover:text-rose-900 cursor-pointer"
-          >
-            Retry
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fetchStats()}
+              className="px-3 py-1 bg-white hover:bg-rose-100 rounded-lg border border-rose-200 text-xs font-bold text-rose-800 transition-colors cursor-pointer"
+            >
+              Retry
+            </button>
+            <Link
+              to="/admin/login"
+              className="px-3 py-1 bg-rose-600 hover:bg-rose-700 rounded-lg text-white text-xs font-bold transition-colors shadow-2xs"
+            >
+              Admin Login →
+            </Link>
+          </div>
         </div>
       )}
 
