@@ -138,7 +138,7 @@ export default function PostPropertyPage() {
   const [otherPropertyType, setOtherPropertyType] = useState('');
 
   // 2. Size & Dimensions
-  const [sizeType, setSizeType] = useState('super built-up area'); // 'carpet area' | 'super built-up area' | 'plot area'
+  const [sizeType, setSizeType] = useState('Super Built-up Area'); // 'Carpet Area' | 'Super Built-up Area' | 'Plot Area'
   const [sizeValue, setSizeValue] = useState('');
   const [sizeUnit, setSizeUnit] = useState('sqft'); // 'sqft' | 'sq yard' | 'acre'
   const [plotFrontFt, setPlotFrontFt] = useState('');
@@ -679,9 +679,9 @@ export default function PostPropertyPage() {
                   onChange={(e) => setSizeType(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs font-semibold outline-none focus:border-[#2563eb]"
                 >
-                  <option value="super built-up area">Super Built-up Area</option>
-                  <option value="carpet area">Carpet Area</option>
-                  <option value="plot area">Plot Area</option>
+                  <option value="Super Built-up Area">Super Built-up Area</option>
+                  <option value="Carpet Area">Carpet Area</option>
+                  <option value="Plot Area">Plot Area</option>
                 </select>
               </div>
 
