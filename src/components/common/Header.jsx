@@ -662,86 +662,110 @@ const Header = () => {
             )}
           </div>
 
-          {/* 5. LATEST NEWS & BLOGS */}
+          {/* 5. LATEST NEWS, ABOUT US & CONTACT SUPPORT (COMBINED DROPDOWN) */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter("news")}
             onMouseLeave={handleMouseLeave}
           >
             <button
-              onClick={() => {
-                navigate("/blogs");
-                setOpenMenu(null);
-              }}
-              className={`px-2.5 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors whitespace-nowrap ${
-                openMenu === "news" || location.pathname.startsWith("/blogs")
+              onClick={() => setOpenMenu(openMenu === "news" ? null : "news")}
+              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap ${
+                openMenu === "news" ||
+                location.pathname.startsWith("/blogs") ||
+                location.pathname === "/about-us" ||
+                location.pathname === "/contact-us" ||
+                location.pathname === "/contact"
                   ? "bg-[#eff6ff] text-[#2563eb]"
                   : "text-[#1e293b] hover:text-[#2563eb]"
               }`}
             >
-              <span>Latest News & Blogs</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <span>Latest News & Support</span>
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className={`transition-transform duration-200 ${openMenu === "news" ? "rotate-180 text-[#2563eb]" : ""}`}
+              >
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
 
             {openMenu === "news" && (
-              <div className="absolute left-0 mt-2 w-72 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-4 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
-                <div className="flex items-center justify-between mb-2.5">
-                  <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
-                    Property Market Guide
-                  </h4>
+              <div className="absolute right-0 lg:left-0 mt-2 w-80 sm:w-88 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-3.5 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="space-y-1.5">
+                  {/* 1. Latest News & Blogs */}
                   <Link
                     to="/blogs"
                     onClick={() => setOpenMenu(null)}
-                    className="text-[11px] text-[#2563eb] font-bold hover:underline"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors group/item"
                   >
-                    All Blogs →
+                    <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm flex-shrink-0 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                      📰
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <strong className="block text-xs font-bold text-[#0f172a] group-hover/item:text-[#2563eb] transition-colors">
+                          Latest News & Blogs
+                        </strong>
+                        <span className="text-[10px] text-[#2563eb] font-bold">Explore →</span>
+                      </div>
+                      <span className="text-[11px] text-[#64748b] leading-tight block mt-0.5">
+                        Real estate market news, price trends & homebuyer guides
+                      </span>
+                    </div>
                   </Link>
-                </div>
-                <div className="space-y-2">
-                  {newsMenu.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.link}
-                      onClick={() => setOpenMenu(null)}
-                      className="block p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors"
-                    >
-                      <strong className="block text-xs font-bold text-[#0f172a]">{item.title}</strong>
-                      <span className="text-[11px] text-[#64748b] leading-tight block">{item.desc}</span>
-                    </Link>
-                  ))}
+
+                  {/* 2. About Us */}
+                  <Link
+                    to="/about-us"
+                    onClick={() => setOpenMenu(null)}
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors group/item border-t border-[#f1f5f9]"
+                  >
+                    <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm flex-shrink-0 group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                      ℹ️
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <strong className="block text-xs font-bold text-[#0f172a] group-hover/item:text-[#2563eb] transition-colors">
+                          About Us
+                        </strong>
+                        <span className="text-[10px] text-[#2563eb] font-bold">Read →</span>
+                      </div>
+                      <span className="text-[11px] text-[#64748b] leading-tight block mt-0.5">
+                        Learn about Property Adda, 100% verified listings & privacy policy
+                      </span>
+                    </div>
+                  </Link>
+
+                  {/* 3. Contact Support */}
+                  <Link
+                    to="/contact-us"
+                    onClick={() => setOpenMenu(null)}
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors group/item border-t border-[#f1f5f9]"
+                  >
+                    <span className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm flex-shrink-0 group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                      📞
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <strong className="block text-xs font-bold text-[#0f172a] group-hover/item:text-[#2563eb] transition-colors">
+                          Contact Support
+                        </strong>
+                        <span className="text-[10px] text-emerald-600 font-bold">Live Desk →</span>
+                      </div>
+                      <span className="text-[11px] text-[#64748b] leading-tight block mt-0.5">
+                        +91 9672 056 670 • WhatsApp chat & instant inquiries desk
+                      </span>
+                    </div>
+                  </Link>
                 </div>
               </div>
             )}
           </div>
-
-          {/* 6. ABOUT US */}
-          <Link
-            to="/about-us"
-            onClick={() => setOpenMenu(null)}
-            className={`px-2.5 py-2 text-xs xl:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap ${
-              location.pathname === "/about-us"
-                ? "bg-[#eff6ff] text-[#2563eb]"
-                : "text-[#1e293b] hover:text-[#2563eb]"
-            }`}
-          >
-            About Us
-          </Link>
-
-          {/* 7. CONTACT SUPPORT */}
-          <Link
-            to="/contact-us"
-            onClick={() => setOpenMenu(null)}
-            className={`px-2.5 py-2 text-xs xl:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-              location.pathname === "/contact-us" || location.pathname === "/contact"
-                ? "bg-[#eff6ff] text-[#2563eb]"
-                : "text-[#1e293b] hover:text-[#2563eb]"
-            }`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse hidden xl:inline-block"></span>
-            <span>Contact Support</span>
-          </Link>
         </nav>
 
         {/* Right: Actions */}
@@ -1128,7 +1152,7 @@ const Header = () => {
                     )}
                   </div>
 
-                  {/* Latest News & Blogs Accordion */}
+                  {/* Latest News, About Us & Support Accordion */}
                   <div className="rounded-xl border border-[#e2e8f0] overflow-hidden bg-white">
                     <button
                       type="button"
@@ -1137,7 +1161,7 @@ const Header = () => {
                     >
                       <span className="flex items-center gap-2">
                         <span>📰</span>
-                        <span>Latest News & Blogs</span>
+                        <span>News, About & Support</span>
                       </span>
                       <svg
                         width="14"
@@ -1156,21 +1180,38 @@ const Header = () => {
                         <Link
                           to="/blogs"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="block p-2 rounded-lg bg-blue-50 border border-blue-200 text-xs font-bold text-[#2563eb] text-center"
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-[#e2e8f0] text-xs font-bold text-[#0f172a] hover:text-[#2563eb]"
                         >
-                          Explore All Latest News & Blogs →
+                          <span className="flex items-center gap-2">
+                            <span>📰</span>
+                            <span>Latest News & Blogs</span>
+                          </span>
+                          <span className="text-[11px] text-[#2563eb]">Explore →</span>
                         </Link>
-                        {newsMenu.map((item) => (
-                          <Link
-                            key={item.title}
-                            to={item.link}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="block p-2 rounded-lg bg-white border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a] hover:text-[#2563eb]"
-                          >
-                            <p className="font-bold">{item.title}</p>
-                            <p className="text-[10px] text-[#64748b] leading-tight">{item.desc}</p>
-                          </Link>
-                        ))}
+
+                        <Link
+                          to="/about-us"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-[#e2e8f0] text-xs font-bold text-[#0f172a] hover:text-[#2563eb]"
+                        >
+                          <span className="flex items-center gap-2">
+                            <span>ℹ️</span>
+                            <span>About Us (Property Adda)</span>
+                          </span>
+                          <span className="text-[11px] text-[#2563eb]">Read →</span>
+                        </Link>
+
+                        <Link
+                          to="/contact-us"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-[#e2e8f0] text-xs font-bold text-[#0f172a] hover:text-[#2563eb]"
+                        >
+                          <span className="flex items-center gap-2">
+                            <span>📞</span>
+                            <span>Contact Support Desk</span>
+                          </span>
+                          <span className="text-[11px] text-emerald-600">Live →</span>
+                        </Link>
                       </div>
                     )}
                   </div>
