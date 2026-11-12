@@ -38,7 +38,6 @@ const NAV_GROUPS = [
     label: "Settings",
     items: [
       { label: "General Settings", icon: "fa-cog", path: "/admin/settings" },
-      { label: "Active Sessions", icon: "fa-laptop", path: "/admin/settings/sessions" },
     ],
   },
 ];
