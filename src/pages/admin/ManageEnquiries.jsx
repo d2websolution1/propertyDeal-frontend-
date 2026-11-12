@@ -28,7 +28,7 @@ const ManageEnquiries = () => {
         const fallbackRes = await api.get("/admin/listings/enquiries");
         setEnquiries(Array.isArray(fallbackRes.data) ? fallbackRes.data : []);
       } catch (e) {
-        console.error("Failed to load enquiries:", e);
+        console.error("Failed to load enquiries from MongoDB:", e);
       }
     } finally {
       setLoading(false);
@@ -61,17 +61,25 @@ const ManageEnquiries = () => {
   };
 
   const deleteEnquiry = async (id) => {
-    if (!window.confirm("Delete this customer enquiry?")) return;
+    if (!window.confirm("Are you sure you want to permanently delete this customer enquiry from MongoDB Atlas?")) return;
     setActionId(id);
     try {
-      await api.delete(`/admin/enquiries/${id}`);
+      try {
+        await api.delete(`/admin/enquiries/${id}`);
+      } catch (delErr) {
+        if (delErr.response?.status === 404 || delErr.response?.status === 405 || !delErr.response) {
+          await api.post(`/admin/enquiries/${id}/delete`);
+        } else {
+          throw delErr;
+        }
+      }
       setEnquiries((prev) => prev.filter((item) => (item.id || item._id) !== id));
     } catch (err) {
       try {
         await api.delete(`/admin/listings/enquiries/${id}`);
         setEnquiries((prev) => prev.filter((item) => (item.id || item._id) !== id));
       } catch (e) {
-        alert("Failed to delete enquiry");
+        alert("Failed to delete enquiry from DB");
       }
     } finally {
       setActionId(null);
@@ -98,31 +106,44 @@ const ManageEnquiries = () => {
       const name = (e.userName || e.user?.name || "").toLowerCase();
       const email = (e.userEmail || e.user?.email || "").toLowerCase();
       const prop = (e.propertyTitle || e.property?.title || "").toLowerCase();
-      return name.includes(q) || email.includes(q) || prop.includes(q);
+      const phone = (e.userPhone || e.user?.phone || "").toLowerCase();
+      return name.includes(q) || email.includes(q) || prop.includes(q) || phone.includes(q);
     }
     return true;
   });
 
   return (
-    <div className="max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6">
+    <div className="max-w-[1400px] mx-auto p-4 sm:p-6 space-y-6 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
           <h1 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
             <span>💬</span> Property Enquiries & Leads
+            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Live MongoDB
+            </span>
           </h1>
           <p className="text-gray-500 text-xs sm:text-sm mt-0.5">
-            Real-time prospective buyer & tenant enquiries from public property listings
+            Real customer enquiries submitted from frontend property cards and helpdesk forms
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={fetchEnquiries}
+            className="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-xs cursor-pointer inline-flex items-center gap-1.5 transition-all active:scale-95"
+            title="Reload real enquiries from MongoDB"
+          >
+            <i className={`fas fa-sync-alt text-blue-600 ${loading ? "fa-spin" : ""}`}></i>
+            <span>Refresh</span>
+          </button>
+
           <div className="flex items-center bg-gray-100 p-1 rounded-xl text-xs font-bold">
             {["all", "new", "contacted", "in_progress", "closed"].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
                 className={`px-3 py-1.5 rounded-lg transition-all capitalize cursor-pointer ${
-                  statusFilter === st ? "bg-white text-gray-900 shadow-xs" : "text-gray-600"
+                  statusFilter === st ? "bg-white text-gray-900 shadow-xs font-extrabold" : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {st.replace("_", " ")}
@@ -134,10 +155,10 @@ const ManageEnquiries = () => {
             <i className="fas fa-search text-gray-400 text-xs"></i>
             <input
               type="text"
-              placeholder="Search enquiries..."
+              placeholder="Search by name, phone, property..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="text-xs outline-none bg-transparent text-gray-700"
+              className="text-xs outline-none bg-transparent text-gray-700 w-40 sm:w-52"
             />
           </div>
         </div>
@@ -145,15 +166,17 @@ const ManageEnquiries = () => {
 
       {loading ? (
         <div className="text-center py-20 text-gray-400 font-semibold">
-          <i className="fas fa-spinner fa-spin text-2xl mr-2 text-[#6C3EE6]"></i>
-          <p className="mt-2 text-sm">Loading property enquiries...</p>
+          <i className="fas fa-circle-notch fa-spin text-2xl mr-2 text-[#2563eb]"></i>
+          <p className="mt-2 text-xs">Loading real customer enquiries from MongoDB Atlas...</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">
+        <div className="text-center py-16 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200 p-8 space-y-2">
           <div className="text-4xl mb-2">📬</div>
-          <h4 className="font-bold text-gray-800">No Enquiries Found</h4>
-          <p className="text-xs text-gray-400 mt-1">
-            When users submit inquiry forms on properties, they will appear here in real time.
+          <h4 className="font-bold text-gray-800 text-sm">No Enquiries Found</h4>
+          <p className="text-xs text-gray-400 max-w-md mx-auto">
+            {search
+              ? `No inquiries match "${search}".`
+              : "When prospective buyers or tenants submit inquiry forms on properties, their details will appear here live in real-time."}
           </p>
         </div>
       ) : (
@@ -172,62 +195,70 @@ const ManageEnquiries = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((enquiry) => {
-                  const enqId = enquiry.id || enquiry._id;
-                  const userName = enquiry.userName || enquiry.user?.name || "Client";
+                  const enqId = enquiry._id || enquiry.id;
+                  const userName = enquiry.userName || enquiry.user?.name || "Website Visitor";
                   const userEmail = enquiry.userEmail || enquiry.user?.email || "";
                   const userPhone = enquiry.userPhone || enquiry.user?.phone || "";
-                  const propTitle = enquiry.propertyTitle || enquiry.property?.title || "Property";
+                  const propTitle = enquiry.propertyTitle || enquiry.property?.title || "Direct Website Enquiry";
 
                   return (
                     <tr key={enqId} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-5 py-3.5">
-                        <span className="font-bold text-gray-900 block max-w-xs truncate">
-                          {propTitle}
-                        </span>
+                      <td className="px-5 py-3.5 max-w-[280px]">
+                        <p className="font-bold text-gray-900 truncate">{propTitle}</p>
                         {enquiry.propertyLocation && (
-                          <span className="text-[11px] text-gray-400 block truncate">
-                            📍 {enquiry.propertyLocation}
-                          </span>
+                          <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
+                            <span>📍</span> {enquiry.propertyLocation}
+                          </p>
+                        )}
+                        {enquiry.property?.price && (
+                          <p className="text-[11px] font-bold text-emerald-700 mt-0.5">
+                            ₹{Number(enquiry.property.price).toLocaleString("en-IN")}
+                          </p>
                         )}
                       </td>
-                      <td className="px-5 py-3.5">
-                        <span className="font-bold text-gray-900 block">{userName}</span>
+
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <p className="font-bold text-gray-900">{userName}</p>
                         {userPhone && (
-                          <div className="flex items-center gap-1.5 mt-0.5">
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px]">
                             <a
                               href={`tel:${userPhone}`}
-                              className="text-[11px] text-blue-600 font-semibold hover:underline"
+                              className="text-blue-600 hover:underline flex items-center gap-1"
                             >
-                              📞 +91 {userPhone}
+                              <i className="fas fa-phone-alt text-[9px]"></i> {userPhone}
                             </a>
                             <a
-                              href={`https://wa.me/91${userPhone.replace(/\D/g, "")}`}
+                              href={`https://wa.me/${userPhone.replace(/\D/g, "")}`}
                               target="_blank"
-                              rel="noreferrer"
-                              className="text-emerald-600 text-xs"
-                              title="WhatsApp"
+                              rel="noopener noreferrer"
+                              className="text-emerald-600 font-bold hover:underline"
                             >
-                              <i className="fab fa-whatsapp"></i>
+                              <i className="fab fa-whatsapp"></i> Chat
                             </a>
                           </div>
                         )}
                         {userEmail && (
-                          <span className="text-[11px] text-gray-400 block truncate max-w-[160px]">
+                          <a
+                            href={`mailto:${userEmail}`}
+                            className="text-[11px] text-gray-400 hover:text-gray-600 block mt-0.5"
+                          >
                             {userEmail}
-                          </span>
+                          </a>
                         )}
                       </td>
-                      <td className="px-5 py-3.5 text-gray-700 max-w-xs">
-                        <p className="line-clamp-2 text-xs italic bg-gray-50 p-2 rounded-lg border border-gray-100">
+
+                      <td className="px-5 py-3.5 max-w-[320px]">
+                        <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl text-xs text-gray-700 italic">
                           "{enquiry.message}"
-                        </p>
+                        </div>
                       </td>
-                      <td className="px-5 py-3.5">
+
+                      <td className="px-5 py-3.5 whitespace-nowrap">
                         <select
+                          disabled={actionId === enqId}
                           value={enquiry.status || "new"}
                           onChange={(e) => updateStatus(enqId, e.target.value)}
-                          disabled={actionId === enqId}
-                          className={`text-xs font-bold px-2.5 py-1 rounded-lg border outline-none cursor-pointer capitalize ${getStatusBadge(
+                          className={`text-xs font-bold px-2.5 py-1 rounded-full border outline-none cursor-pointer capitalize transition-all ${getStatusBadge(
                             enquiry.status
                           )}`}
                         >
@@ -237,21 +268,25 @@ const ManageEnquiries = () => {
                           <option value="closed">Closed</option>
                         </select>
                       </td>
-                      <td className="px-5 py-3.5 text-gray-400 text-xs whitespace-nowrap">
+
+                      <td className="px-5 py-3.5 whitespace-nowrap text-xs text-gray-500">
                         {enquiry.createdAt
                           ? new Date(enquiry.createdAt).toLocaleDateString("en-IN", {
                               day: "numeric",
                               month: "short",
+                              year: "numeric",
                             })
-                          : "Today"}
+                          : "Recent"}
                       </td>
-                      <td className="px-5 py-3.5 text-right">
+
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         <button
-                          onClick={() => deleteEnquiry(enqId)}
                           disabled={actionId === enqId}
-                          className="px-2.5 py-1.5 rounded-lg text-red-500 hover:bg-red-50 text-xs font-bold transition-colors cursor-pointer"
+                          onClick={() => deleteEnquiry(enqId)}
+                          className="w-8 h-8 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 inline-flex items-center justify-center transition-colors cursor-pointer"
+                          title="Delete Enquiry from MongoDB"
                         >
-                          <i className="fas fa-trash-alt"></i>
+                          <i className={`fas ${actionId === enqId ? "fa-circle-notch fa-spin" : "fa-trash-alt"} text-xs`}></i>
                         </button>
                       </td>
                     </tr>

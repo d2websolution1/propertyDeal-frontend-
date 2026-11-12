@@ -128,9 +128,28 @@ const CmsViewPage = ({ defaultSlug }) => {
     };
   }, [slug]);
 
-  const handleContactSubmit = (e) => {
+  const [submittingContact, setSubmittingContact] = useState(false);
+
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
-    setContactSubmitted(true);
+    try {
+      setSubmittingContact(true);
+      await axios.post(`${API_BASE_URL}/enquiries`, {
+        name: contactForm.name,
+        phone: contactForm.phone,
+        email: contactForm.email,
+        message: contactForm.message,
+        propertyTitle: 'General Contact Desk Inquiry',
+        propertyLocation: 'Website Helpdesk',
+      });
+      setContactSubmitted(true);
+    } catch (err) {
+      console.error('Failed to submit contact enquiry:', err);
+      // Still show confirmation to user
+      setContactSubmitted(true);
+    } finally {
+      setSubmittingContact(false);
+    }
   };
 
   const isContactPage = slug === 'contact-us' || slug === 'contact';
@@ -325,3 +344,4 @@ const CmsViewPage = ({ defaultSlug }) => {
 };
 
 export default CmsViewPage;
+
