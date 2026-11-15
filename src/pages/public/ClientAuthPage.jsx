@@ -30,7 +30,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
   const [otpStep, setOtpStep] = useState('input'); // 'input' | 'otp'
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(30);
-  const [devOtpPreview, setDevOtpPreview] = useState('');
 
   // Status
   const [loading, setLoading] = useState(false);
@@ -93,7 +92,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
 
       setOtpStep('otp');
       setTimer(30);
-      setDevOtpPreview(res?.previewOtp || '');
       setSuccessMsg(res?.message || `6-digit verification code sent to ${cleanEmail}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send OTP code. Please try again.');
@@ -157,7 +155,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
         userType: userType || 'Owner',
       });
       setTimer(30);
-      setDevOtpPreview(res?.previewOtp || '');
       setSuccessMsg(`New OTP resent to ${cleanEmail}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend OTP.');
@@ -235,7 +232,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
       });
       setOtpStep('otp');
       setTimer(30);
-      setDevOtpPreview(res?.previewOtp || '');
       setSuccessMsg(`Verification code sent to ${targetEmail}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send OTP code.');
@@ -374,20 +370,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
             <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
               <span className="text-base">🎉</span>
               <span>{successMsg}</span>
-            </div>
-          )}
-
-          {/* Dev OTP Preview */}
-          {devOtpPreview && otpStep === 'otp' && (
-            <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs flex items-center justify-between">
-              <span>Code received: <strong className="font-mono text-sm tracking-wider text-[#142D4E]">{devOtpPreview}</strong></span>
-              <button
-                type="button"
-                onClick={() => setOtp(devOtpPreview)}
-                className="text-[11px] font-bold text-[#D62839] underline cursor-pointer"
-              >
-                Auto-fill
-              </button>
             </div>
           )}
 

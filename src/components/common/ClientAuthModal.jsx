@@ -22,7 +22,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
   const [otpStep, setOtpStep] = useState('input'); // 'input' | 'otp'
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(30);
-  const [devOtpPreview, setDevOtpPreview] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,7 +35,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
     setShowPasswordLogin(false);
     setOtpStep('input');
     setOtp('');
-    setDevOtpPreview('');
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -104,7 +102,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
 
       setOtpStep('otp');
       setTimer(30);
-      setDevOtpPreview(res?.previewOtp || '');
       setSuccessMsg(res?.message || `6-digit verification code sent to ${cleanEmail}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send verification code. Please try again.');
@@ -169,7 +166,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         userType: userType || 'Owner',
       });
       setTimer(30);
-      setDevOtpPreview(res?.previewOtp || '');
       setSuccessMsg(`New 6-digit OTP sent to ${cleanEmail}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend OTP.');
@@ -197,7 +193,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
       });
       setOtpStep('otp');
       setTimer(30);
-      setDevOtpPreview(res?.previewOtp || '');
       setSuccessMsg(`Verification code sent to ${targetEmail}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send OTP code.');
@@ -406,20 +401,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
               <span>🎉</span>
               <span>{successMsg}</span>
-            </div>
-          )}
-
-          {/* Development OTP Preview Helper */}
-          {devOtpPreview && otpStep === 'otp' && (
-            <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs flex items-center justify-between">
-              <span>Code received: <strong className="font-mono text-sm tracking-wider text-[#142D4E]">{devOtpPreview}</strong></span>
-              <button
-                type="button"
-                onClick={() => setOtp(devOtpPreview)}
-                className="text-[11px] font-bold text-[#D62839] underline cursor-pointer"
-              >
-                Auto-fill
-              </button>
             </div>
           )}
 
