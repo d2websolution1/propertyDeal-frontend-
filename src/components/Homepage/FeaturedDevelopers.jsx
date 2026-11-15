@@ -46,7 +46,7 @@ const FeaturedDevelopers = () => {
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       {/* Heading */}
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           {loading ? "Loading..." : section.title}
         </h2>
         {section?.subtitle && (
@@ -80,7 +80,7 @@ const FeaturedDevelopers = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-[#0b1a2e] font-bold text-base leading-snug mb-1">
+                      <h3 className="text-[#142D4E] font-bold text-base leading-snug mb-1">
                         {dev.title}
                       </h3>
                       {dev.badge && (
@@ -107,7 +107,7 @@ const FeaturedDevelopers = () => {
                       </span>
                     )}
                     {dev.price && (
-                      <span className="text-[#0b1a2e] font-bold text-sm">
+                      <span className="text-[#142D4E] font-bold text-sm">
                         {dev.price}
                       </span>
                     )}
@@ -119,7 +119,7 @@ const FeaturedDevelopers = () => {
 
           <button
             onClick={scrollNext}
-            className="hidden md:flex absolute top-[110px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#0b1a2e] items-center justify-center transition-shadow z-10"
+            className="hidden md:flex absolute top-[110px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#142D4E] items-center justify-center transition-shadow z-10"
             aria-label="See more developers"
           >
             <i className="fas fa-arrow-right"></i>

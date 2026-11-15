@@ -551,7 +551,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
   };
 
   return (
-    <section className="relative bg-[#f8fafc] overflow-hidden pt-4 pb-8">
+    <section className="relative bg-[#F3F5F8] overflow-hidden pt-4 pb-8">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         {/* ── 1. Top Featured Carousel Banner (Category-Specific) ── */}
         <div
@@ -573,12 +573,12 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                   className="w-full h-full object-cover"
                   loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/90 via-[#0f172a]/60 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#142D4E]/95 via-[#142D4E]/65 to-transparent"></div>
 
                 {/* Slide text */}
                 <div className="absolute inset-0 p-4 sm:p-8 md:p-12 flex flex-col justify-between max-w-2xl text-white">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#f59e0b] text-[#0f172a] text-[10px] sm:text-[11px] font-black tracking-wider uppercase mb-1.5 sm:mb-2">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#f59e0b] text-[#142D4E] text-[10px] sm:text-[11px] font-black tracking-wider uppercase mb-1.5 sm:mb-2">
                       <span>{slide.tag}</span>
                     </div>
                     <span className="block text-xs sm:text-sm font-medium text-blue-200 tracking-wide mb-1">
@@ -602,7 +602,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
                     <Link
                       to={slide.link}
-                      className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
                     >
                       <span>Explore Now</span>
                       <span>→</span>
@@ -639,7 +639,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                 type="button"
                 onClick={() => setCurrentSlide(idx)}
                 className={`h-2 rounded-full transition-all cursor-pointer ${
-                  idx === currentSlide ? 'w-6 bg-[#f59e0b]' : 'w-2 bg-white/50 hover:bg-white'
+                  idx === currentSlide ? 'w-6 bg-[#D62839]' : 'w-2 bg-white/50 hover:bg-white'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
@@ -662,8 +662,8 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                   to={tab.path}
                   className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#2563eb] text-white shadow-sm'
-                      : 'text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]'
+                      ? 'bg-[#D62839] text-white shadow-sm'
+                      : 'text-[#64748B] hover:text-[#142D4E] hover:bg-[#F3F5F8]'
                   }`}
                 >
                   {tab.label}
@@ -673,10 +673,10 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             <Link
               to="/post-property"
-              className="ml-auto hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[#2563eb] hover:text-[#1d4ed8] px-3 py-1.5 rounded-lg bg-[#eff6ff]"
+              className="ml-auto hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[#D62839] hover:text-[#b81d2c] px-3 py-1.5 rounded-lg bg-[#fff1f2]"
             >
               <span>Post Property</span>
-              <span className="text-[9.5px] bg-[#ef4444] text-white px-1.5 py-0.2 rounded font-black">
+              <span className="text-[9.5px] bg-[#D62839] text-white px-1.5 py-0.2 rounded font-black">
                 FREE
               </span>
             </Link>
@@ -686,13 +686,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
           <form onSubmit={handleSearch} className="pt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5 items-end">
             {/* 1. Purpose Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
                 Purpose
               </label>
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
               >
                 <option value="all">All (Buy / Rent)</option>
                 <option value="sale">Buy / Sale</option>
@@ -702,13 +702,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             {/* 2. Category Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
                 Category
               </label>
               <select
                 value={propertyCategory}
                 onChange={(e) => setPropertyCategory(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
               >
                 <option value="all">All Categories</option>
                 <option value="Residential">Residential</option>
@@ -718,13 +718,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             {/* 3. Property Type Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
                 Property Type
               </label>
               <select
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
               >
                 <option value="">All Types</option>
                 <option value="Flat">Flat / Apartment</option>
@@ -743,13 +743,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             {/* 4. City Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
                 City
               </label>
               <select
                 value={searchCity}
                 onChange={(e) => setSearchCity(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
               >
                 <option value="">All Cities</option>
                 {availableCities.map((c) => (
@@ -760,13 +760,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             {/* 5. Budget Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#475569] uppercase tracking-wider mb-1">
+              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
                 Budget
               </label>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] text-xs font-bold text-[#0f172a] outline-none focus:border-[#2563eb] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
               >
                 <option value="">Any Budget</option>
                 {purpose === 'rent' ? (
@@ -793,7 +793,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
             <div className="w-full col-span-2 sm:col-span-1">
               <button
                 type="submit"
-                className="w-full py-2.5 px-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-black text-xs sm:text-sm shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-black text-xs sm:text-sm shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Search</span>
                 <span>→</span>
@@ -804,7 +804,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
         {/* ── 3. Page Context Headline ── */}
         <div className="mt-7 text-center max-w-2xl mx-auto">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0f172a] tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#142D4E] tracking-tight">
             {dbHeadline ? (
               dbHeadline.toLowerCase().includes(city.toLowerCase())
                 ? dbHeadline
@@ -813,9 +813,9 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
               `${data.headline} in ${city} & Across India`
             )}
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#64748b]">
+          <p className="mt-1.5 text-xs sm:text-sm text-[#64748B]">
             {dbSlogan || data.slogan}{' '}
-            <Link to="/post-property" className="text-[#2563eb] font-bold hover:underline">
+            <Link to="/post-property" className="text-[#D62839] font-bold hover:underline">
               Post your property free →
             </Link>
           </p>
@@ -834,7 +834,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                 alt={tile.title || 'Property Tile'}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/95 via-[#0f172a]/40 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#142D4E]/95 via-[#142D4E]/40 to-transparent"></div>
               <div className="relative z-10">
                 <span className="text-lg sm:text-xl font-black text-[#fde047] leading-none block mb-1">
                   {tile.badge || tile.tag || ''}

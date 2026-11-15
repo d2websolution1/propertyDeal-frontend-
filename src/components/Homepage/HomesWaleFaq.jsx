@@ -61,10 +61,10 @@ const HomesWaleFaq = () => {
         {/* Trust Pillars */}
         <div className="mb-14">
           <div className="text-center max-w-xl mx-auto mb-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#2563eb] block mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#D62839] block mb-1">
               THE PROPERTY ADDA ADVANTAGE
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a]">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#142D4E]">
               Why Choose Property Adda?
             </h2>
             <p className="text-xs sm:text-sm text-[#64748b] mt-1">
@@ -81,7 +81,7 @@ const HomesWaleFaq = () => {
                 <div className="w-12 h-12 rounded-xl bg-[#eff6ff] flex items-center justify-center text-2xl mb-4">
                   {tp.icon}
                 </div>
-                <h3 className="text-base font-extrabold text-[#0f172a] mb-2">{tp.title}</h3>
+                <h3 className="text-base font-extrabold text-[#142D4E] mb-2">{tp.title}</h3>
                 <p className="text-xs text-[#64748b] leading-relaxed">{tp.desc}</p>
               </div>
             ))}
@@ -91,10 +91,10 @@ const HomesWaleFaq = () => {
         {/* FAQs */}
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#2563eb] block mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#D62839] block mb-1">
               QUESTIONS & ANSWERS
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a]">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#142D4E]">
               Frequently Asked Questions
             </h2>
           </div>
@@ -110,10 +110,10 @@ const HomesWaleFaq = () => {
                   <button
                     type="button"
                     onClick={() => setOpenIdx(isOpen ? -1 : index)}
-                    className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-[#0f172a] hover:text-[#2563eb] transition-colors"
+                    className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-sm sm:text-base text-[#142D4E] hover:text-[#D62839] transition-colors"
                   >
                     <span>{faq.question}</span>
-                    <span className="text-xl font-bold text-[#2563eb] flex-shrink-0">
+                    <span className="text-xl font-bold text-[#D62839] flex-shrink-0">
                       {isOpen ? '−' : '+'}
                     </span>
                   </button>

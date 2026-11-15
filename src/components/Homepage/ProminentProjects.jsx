@@ -73,7 +73,7 @@ const ProminentProjects = () => {
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       {/* Heading */}
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           {title}
         </h2>
         <p className="text-gray-500 text-sm">{subtitle}</p>
@@ -112,7 +112,7 @@ const ProminentProjects = () => {
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-[#0b1a2e] font-bold text-base leading-snug">
+                      <h3 className="text-[#142D4E] font-bold text-base leading-snug">
                         {projectTitle}
                       </h3>
                       {projectBuilder && (
@@ -123,7 +123,7 @@ const ProminentProjects = () => {
                     </div>
                     {projectPrice && (
                       <div className="text-right flex-shrink-0">
-                        <p className="text-[#0b1a2e] font-bold text-base leading-snug text-[#2563eb]">
+                        <p className="text-[#142D4E] font-bold text-base leading-snug text-[#D62839]">
                           {projectPrice}
                         </p>
                         <p className="text-gray-400 text-xs mt-0.5">Price</p>
@@ -133,7 +133,7 @@ const ProminentProjects = () => {
 
                   <div className="mt-4 flex items-center justify-between">
                     <div>
-                      <p className="text-[#0b1a2e] font-bold text-sm">
+                      <p className="text-[#142D4E] font-bold text-sm">
                         {projectType}
                       </p>
                       {projectLocation && (
@@ -145,7 +145,7 @@ const ProminentProjects = () => {
                     {project.link && (
                       <a
                         href={project.link}
-                        className="text-xs font-bold text-[#2563eb] hover:underline"
+                        className="text-xs font-bold text-[#D62839] hover:underline"
                       >
                         Explore →
                       </a>
@@ -160,7 +160,7 @@ const ProminentProjects = () => {
         {/* Next arrow */}
         <button
           onClick={scrollNext}
-          className="hidden md:flex absolute top-[140px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#0b1a2e] items-center justify-center transition-shadow z-10 cursor-pointer"
+          className="hidden md:flex absolute top-[140px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#142D4E] items-center justify-center transition-shadow z-10 cursor-pointer"
           aria-label="See more projects"
         >
           <i className="fas fa-arrow-right"></i>

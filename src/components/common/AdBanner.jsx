@@ -80,14 +80,14 @@ const AdBanner = ({ position = 'header', className = '' }) => {
             {/* Banner Title & Call to Action Footer */}
             <div className="p-3 sm:p-3.5 flex items-center justify-between gap-2 bg-gradient-to-r from-slate-50 to-white">
               <div className="min-w-0">
-                <h4 className="text-xs sm:text-sm font-bold text-[#0f172a] truncate group-hover:text-[#2563eb] transition-colors">
+                <h4 className="text-xs sm:text-sm font-bold text-[#142D4E] truncate group-hover:text-[#D62839] transition-colors">
                   {ad.title}
                 </h4>
-                <p className="text-[11px] text-[#64748b] truncate mt-0.5">
+                <p className="text-[11px] text-[#64748B] truncate mt-0.5">
                   Verified Real Estate Partner
                 </p>
               </div>
-              <span className="flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-extrabold text-[#2563eb] bg-blue-50 group-hover:bg-[#2563eb] group-hover:text-white px-2.5 py-1 rounded-lg transition-colors shadow-2xs">
+              <span className="flex-shrink-0 inline-flex items-center gap-1 text-[11px] font-extrabold text-[#D62839] bg-[#fff1f2] group-hover:bg-[#D62839] group-hover:text-white px-2.5 py-1 rounded-lg transition-colors shadow-2xs">
                 <span>View</span>
                 <span>→</span>
               </span>

@@ -55,7 +55,7 @@ const ManageLanguageSettings = () => {
                 </td>
                 <td className="px-5 py-3">
                   {lang.default && (
-                    <span className="text-xs font-bold text-[#6C3EE6]">Default</span>
+                    <span className="text-xs font-bold text-[#D62839]">Default</span>
                   )}
                 </td>
                 <td className="px-5 py-3 text-right">
@@ -72,7 +72,7 @@ const ManageLanguageSettings = () => {
                   {!lang.default && lang.active && (
                     <button
                       onClick={() => setDefault(lang.code)}
-                      className="text-sm font-medium text-[#6C3EE6] hover:underline"
+                      className="text-sm font-medium text-[#D62839] hover:underline"
                     >
                       Set Default
                     </button>

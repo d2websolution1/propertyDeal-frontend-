@@ -90,7 +90,7 @@ const ManageBanners = () => {
           <h1 className="text-2xl font-bold text-gray-800">Pop-up Banners</h1>
           <p className="text-gray-500 text-sm mt-0.5">Site load hote hi dikhne wale promotional pop-ups manage karein</p>
         </div>
-        <button onClick={openCreate} className="bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold px-4 py-2.5 rounded-lg">
+        <button onClick={openCreate} className="bg-[#D62839] hover:bg-[#b81d2c] text-white text-sm font-semibold px-4 py-2.5 rounded-lg">
           <i className="fas fa-plus mr-1.5"></i>New Banner
         </button>
       </div>
@@ -138,15 +138,15 @@ const ManageBanners = () => {
             <div className="flex flex-col gap-3">
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Title</label>
-                <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Image URL</label>
-                <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                <input value={form.image} onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Link URL (optional)</label>
-                <input value={form.link} onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                <input value={form.link} onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Show On Pages</label>
@@ -157,7 +157,7 @@ const ManageBanners = () => {
                       type="button"
                       onClick={() => togglePage(p)}
                       className={`text-xs px-3 py-1.5 rounded-full border ${
-                        form.showOnPages.includes(p) ? "bg-[#6C3EE6] text-white border-[#6C3EE6]" : "bg-white text-gray-500 border-gray-200"
+                        form.showOnPages.includes(p) ? "bg-[#D62839] text-white border-[#D62839]" : "bg-white text-gray-500 border-gray-200"
                       }`}
                     >
                       {p}
@@ -167,22 +167,22 @@ const ManageBanners = () => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Delay (seconds before showing)</label>
-                <input type="number" value={form.delaySeconds} onChange={(e) => setForm((f) => ({ ...f, delaySeconds: Number(e.target.value) }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                <input type="number" value={form.delaySeconds} onChange={(e) => setForm((f) => ({ ...f, delaySeconds: Number(e.target.value) }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Start Date</label>
-                  <input type="date" value={form.startDate} onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                  <input type="date" value={form.startDate} onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">End Date</label>
-                  <input type="date" value={form.endDate} onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                  <input type="date" value={form.endDate} onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3 mt-5">
               <button onClick={() => setModal(null)} className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button onClick={save} className="flex-1 bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold py-2.5 rounded-lg">Save</button>
+              <button onClick={save} className="flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-sm font-semibold py-2.5 rounded-lg">Save</button>
             </div>
           </div>
         </div>

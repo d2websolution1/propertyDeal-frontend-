@@ -79,13 +79,13 @@ const ManageEmailTemplates = () => {
             <div className="flex flex-col gap-3">
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Subject</label>
-                <input value={form.subject} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+                <input value={form.subject} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
                   Body (HTML supported — {"{{"}variable{"}}"} use kar sakte hain)
                 </label>
-                <textarea rows={8} value={form.body} onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6] font-mono" />
+                <textarea rows={8} value={form.body} onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839] font-mono" />
               </div>
               <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input type="checkbox" checked={form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
@@ -94,7 +94,7 @@ const ManageEmailTemplates = () => {
             </div>
             <div className="flex items-center gap-3 mt-5">
               <button onClick={() => setModal(null)} className="flex-1 border border-gray-200 text-gray-600 text-sm font-semibold py-2.5 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button onClick={save} className="flex-1 bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold py-2.5 rounded-lg">Save</button>
+              <button onClick={save} className="flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-sm font-semibold py-2.5 rounded-lg">Save</button>
             </div>
           </div>
         </div>

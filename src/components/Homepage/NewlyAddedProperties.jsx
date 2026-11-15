@@ -46,7 +46,7 @@ const NewlyAddedProperties = ({ sectionKey = "newly_added_properties" }) => {
   return (
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           {loading ? "Loading..." : section.title}
         </h2>
         {section?.subtitle && <p className="text-gray-500 text-sm">{section.subtitle}</p>}
@@ -74,7 +74,7 @@ const NewlyAddedProperties = ({ sectionKey = "newly_added_properties" }) => {
                 </div>
 
                 <div className="pt-3">
-                  <h3 className="text-[#0b1a2e] font-bold text-base leading-snug">
+                  <h3 className="text-[#142D4E] font-bold text-base leading-snug">
                     {property.title}
                   </h3>
                   {property.subtitle && (
@@ -93,7 +93,7 @@ const NewlyAddedProperties = ({ sectionKey = "newly_added_properties" }) => {
 
           <button
             onClick={scrollNext}
-            className="hidden md:flex absolute top-[90px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#0b1a2e] items-center justify-center transition-shadow z-10"
+            className="hidden md:flex absolute top-[90px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#142D4E] items-center justify-center transition-shadow z-10"
             aria-label="See more properties"
           >
             <i className="fas fa-arrow-right"></i>

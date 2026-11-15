@@ -126,7 +126,7 @@ const ManageBlogs = () => {
         </div>
         <button
           onClick={openCreate}
-          className="bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold px-4 py-2.5 rounded-lg"
+          className="bg-[#D62839] hover:bg-[#b81d2c] text-white text-sm font-semibold px-4 py-2.5 rounded-lg"
         >
           <i className="fas fa-plus mr-1.5"></i>
           New Post
@@ -172,7 +172,7 @@ const ManageBlogs = () => {
                   <td className="px-5 py-3 text-right">
                     <button
                       onClick={() => openEdit(blog)}
-                      className="text-gray-500 hover:text-[#6C3EE6] mr-3"
+                      className="text-gray-500 hover:text-[#D62839] mr-3"
                     >
                       <i className="fas fa-pen text-xs"></i>
                     </button>
@@ -203,7 +203,7 @@ const ManageBlogs = () => {
                 <input
                   value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -211,7 +211,7 @@ const ManageBlogs = () => {
                 <input
                   value={form.excerpt}
                   onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -220,7 +220,7 @@ const ManageBlogs = () => {
                   rows={6}
                   value={form.content}
                   onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -268,7 +268,7 @@ const ManageBlogs = () => {
                     placeholder="https://images.unsplash.com/photo-..."
                     value={form.coverImage}
                     onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                   />
                 )}
 
@@ -305,7 +305,7 @@ const ManageBlogs = () => {
                   <input
                     value={form.category}
                     onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
                 <div>
@@ -313,7 +313,7 @@ const ManageBlogs = () => {
                   <select
                     value={form.status}
                     onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
@@ -331,7 +331,7 @@ const ManageBlogs = () => {
               </button>
               <button
                 onClick={save}
-                className="flex-1 bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold py-2.5 rounded-lg"
+                className="flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-sm font-semibold py-2.5 rounded-lg"
               >
                 Save
               </button>

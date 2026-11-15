@@ -11,7 +11,7 @@ const ProtectedAdminRoute = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <i className="fas fa-spinner fa-spin text-2xl text-[#6C3EE6]"></i>
+        <i className="fas fa-spinner fa-spin text-2xl text-[#D62839]"></i>
       </div>
     );
   }

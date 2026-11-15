@@ -1,18 +1,34 @@
 @import "tailwindcss";
 
+@theme {
+  --color-navy: #142D4E;
+  --color-navy-dark: #0e213b;
+  --color-brand-red: #D62839;
+  --color-brand-red-dark: #b81d2c;
+  --color-pure-white: #FFFFFF;
+  --color-light-grey: #F3F5F8;
+  --color-slate-grey: #64748B;
+}
+
 @layer base {
   :root {
-    --ink: #0f172a;
-    --muted: #64748b;
-    --bg: #f8fafc;
-    --card: #ffffff;
+    --navy: #142D4E;
+    --brand-red: #D62839;
+    --brand-red-hover: #b81d2c;
+    --pure-white: #FFFFFF;
+    --light-grey: #F3F5F8;
+    --slate-grey: #64748B;
+    --ink: #142D4E;
+    --muted: #64748B;
+    --bg: #F3F5F8;
+    --card: #FFFFFF;
     --line: #e2e8f0;
-    --brand: #2563eb;
-    --brand-dark: #1d4ed8;
-    --brand-light: #3b82f6;
-    --accent: #f59e0b;
-    --accent-light: #fbbf24;
-    --soft: #eff6ff;
+    --brand: #D62839;
+    --brand-dark: #b81d2c;
+    --brand-light: #e04856;
+    --accent: #142D4E;
+    --accent-light: #1e3a61;
+    --soft: #fff1f2;
     --soft-amber: #fef3c7;
     --radius: 14px;
     --radius-lg: 20px;
@@ -51,22 +67,34 @@
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2563eb;
+    background: #D62839;
   }
 }
 
-/* ── Property Adda Custom Utility & Animation Classes ── */
+/* ── Property Adda Brand Utility & Animation Classes ── */
+.bg-navy { background-color: #142D4E !important; }
+.text-navy { color: #142D4E !important; }
+.border-navy { border-color: #142D4E !important; }
+
+.bg-brand-red { background-color: #D62839 !important; }
+.bg-brand-red:hover { background-color: #b81d2c !important; }
+.text-brand-red { color: #D62839 !important; }
+.border-brand-red { border-color: #D62839 !important; }
+
+.bg-light-grey { background-color: #F3F5F8 !important; }
+.text-slate-grey { color: #64748B !important; }
+.bg-pure-white { background-color: #FFFFFF !important; }
 
 .hw-bg-canvas {
   background-color: var(--bg);
 }
 
 .hw-brand-gradient {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  background: linear-gradient(135deg, #142D4E 0%, #0e213b 100%);
 }
 
 .hw-card-shadow {
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px -2px rgba(20, 45, 78, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
 }
 
 .hw-card-hover {
@@ -74,7 +102,7 @@
 }
 .hw-card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 16px 32px -8px rgba(214, 40, 57, 0.15);
 }
 
 /* Animations */
@@ -110,7 +138,7 @@
 
 /* Range input slider styling */
 input[type="range"] {
-  accent-color: #2563eb;
+  accent-color: #D62839;
 }
 
 /* Glassmorphism */

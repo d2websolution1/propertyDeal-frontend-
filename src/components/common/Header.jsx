@@ -279,11 +279,11 @@ const Header = () => {
               }}
               className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11.5px] sm:text-xs font-semibold transition-colors border ${
                 openMenu === "city"
-                  ? "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]"
-                  : "bg-[#f8fafc] text-[#334155] border-[#e2e8f0] hover:bg-[#f1f5f9]"
+                  ? "bg-[#fff1f2] text-[#D62839] border-[#fecdd3]"
+                  : "bg-[#F3F5F8] text-[#142D4E] border-[#e2e8f0] hover:bg-[#e2e8f0]"
               }`}
             >
-              <span className="text-[#2563eb]">📍</span>
+              <span className="text-[#D62839]">📍</span>
               <span className="max-w-[70px] sm:max-w-none truncate">{selectedCity}</span>
               <svg
                 width="12"
@@ -308,7 +308,7 @@ const Header = () => {
                     placeholder="Search for city..."
                     value={citySearch}
                     onChange={(e) => setCitySearch(e.target.value)}
-                    className="w-full pl-8 pr-3 py-2 text-xs border border-[#e2e8f0] rounded-xl outline-none focus:border-[#2563eb] bg-[#f8fafc]"
+                    className="w-full pl-8 pr-3 py-2 text-xs border border-[#e2e8f0] rounded-xl outline-none focus:border-[#D62839] bg-[#F3F5F8]"
                   />
                   <svg
                     className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400"
@@ -321,16 +321,16 @@ const Header = () => {
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
                 </div>
-                <div className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider mb-2">
+                <div className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-2">
                   Popular Cities
                 </div>
                 <div className="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto">
                   <button
                     onClick={() => handleCitySelect("All India")}
-                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer ${
                       selectedCity === "All India"
-                        ? "bg-[#2563eb] text-white"
-                        : "hover:bg-[#f8fafc] text-[#0f172a]"
+                        ? "bg-[#D62839] text-white"
+                        : "hover:bg-[#F3F5F8] text-[#142D4E]"
                     }`}
                   >
                     🇮🇳 All India
@@ -339,10 +339,10 @@ const Header = () => {
                     <button
                       key={c}
                       onClick={() => handleCitySelect(c)}
-                      className={`text-left px-3 py-2 rounded-lg text-xs font-medium truncate ${
+                      className={`text-left px-3 py-2 rounded-lg text-xs font-medium truncate cursor-pointer ${
                         selectedCity === c
-                          ? "bg-[#2563eb] text-white font-semibold"
-                          : "hover:bg-[#f8fafc] text-[#0f172a]"
+                          ? "bg-[#D62839] text-white font-semibold"
+                          : "hover:bg-[#F3F5F8] text-[#142D4E]"
                       }`}
                     >
                       {c}
@@ -773,10 +773,10 @@ const Header = () => {
           {/* Post Property Quick Button for sm+ */}
           <Link
             to="/post-property"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] shadow-xs transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] shadow-xs transition-all active:scale-95"
           >
             <span>Post Property</span>
-            <span className="bg-[#ef4444] text-white text-[9.5px] px-1.5 py-0.2 rounded font-black">
+            <span className="bg-white/20 text-white text-[9.5px] px-1.5 py-0.2 rounded font-black">
               FREE
             </span>
           </Link>
@@ -784,40 +784,40 @@ const Header = () => {
           {/* User Auth state */}
           {isAuthenticated ? (
             <div className="relative group">
-              <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full border border-[#cbd5e1] bg-white hover:border-[#005744] shadow-2xs transition-all cursor-pointer">
-                <div className="w-7 h-7 rounded-full overflow-hidden bg-[#005744] text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+              <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full border border-[#cbd5e1] bg-white hover:border-[#142D4E] shadow-2xs transition-all cursor-pointer">
+                <div className="w-7 h-7 rounded-full overflow-hidden bg-[#142D4E] text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
                   {user?.avatar ? (
                     <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <span>{user?.firstName?.charAt(0) || user?.name?.charAt(0)?.toUpperCase() || "U"}</span>
                   )}
                 </div>
-                <span className="text-xs font-semibold text-[#0f172a] max-w-[90px] truncate">
+                <span className="text-xs font-semibold text-[#142D4E] max-w-[90px] truncate">
                   {user?.firstName || user?.name?.split(" ")[0] || "Prince"}
                 </span>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#64748b]">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#64748B]">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               <div className="absolute right-0 mt-1 w-52 bg-white border border-[#e2e8f0] rounded-2xl shadow-xl p-2 hidden group-hover:block z-50 animate-fade-in">
                 <div className="px-3 py-2 border-b border-[#f1f5f9]">
-                  <p className="text-xs font-bold text-[#0f172a] truncate">{user?.name || "Client"}</p>
-                  <p className="text-[10px] text-[#64748b] truncate">{user?.email}</p>
-                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecfdf5] text-[#005744]">
+                  <p className="text-xs font-bold text-[#142D4E] truncate">{user?.name || "Client"}</p>
+                  <p className="text-[10px] text-[#64748B] truncate">{user?.email}</p>
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fff1f2] text-[#D62839]">
                     {user?.userType || "Owner"}
                   </span>
                 </div>
                 <div className="py-1 space-y-0.5">
                   <Link
                     to="/profile"
-                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#334155] hover:bg-[#f8fafc] hover:text-[#005744] rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#142D4E] hover:bg-[#F3F5F8] hover:text-[#D62839] rounded-lg transition-colors"
                   >
                     <span>👤</span>
                     <span>My Profile</span>
                   </Link>
                   <Link
                     to="/my-listings"
-                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#334155] hover:bg-[#f8fafc] hover:text-[#005744] rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#142D4E] hover:bg-[#F3F5F8] hover:text-[#D62839] rounded-lg transition-colors"
                   >
                     <span>📑</span>
                     <span>My Listings</span>
@@ -825,7 +825,7 @@ const Header = () => {
                   {user?.role === "admin" ? (
                     <Link
                       to="/admin"
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#2563eb] hover:bg-[#eff6ff] rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#D62839] hover:bg-[#fff1f2] rounded-lg transition-colors"
                     >
                       <span>🛡️</span>
                       <span>Admin Dashboard</span>
@@ -833,7 +833,7 @@ const Header = () => {
                   ) : (
                     <Link
                       to="/admin/login"
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#64748b] hover:bg-[#f8fafc] hover:text-[#2563eb] rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F3F5F8] hover:text-[#142D4E] rounded-lg transition-colors"
                     >
                       <span>🛡️</span>
                       <span>Admin Portal</span>
@@ -857,7 +857,7 @@ const Header = () => {
                 setClientAuthModalOpen(true);
                 setAuthInitialMode("login");
               }}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#2563eb] hover:bg-[#1d4ed8] shadow-xs transition-colors cursor-pointer"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-[#142D4E] hover:text-[#D62839] hover:bg-slate-100 transition-colors cursor-pointer"
             >
               Login
             </button>
@@ -1280,15 +1280,15 @@ const Header = () => {
                 <Link
                   to="/post-property"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow-md transition-all active:scale-98"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-bold text-sm shadow-md transition-all active:scale-98"
                 >
                   <span>Post Property</span>
-                  <span className="bg-[#ef4444] text-white text-[10px] px-1.5 py-0.5 rounded font-black">
+                  <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.5 rounded font-black">
                     FREE
                   </span>
                 </Link>
-                <div className="flex items-center justify-center gap-3 text-[11px] font-semibold text-[#64748b]">
-                  <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#2563eb]">
+                <div className="flex items-center justify-center gap-3 text-[11px] font-semibold text-[#64748B]">
+                  <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#D62839]">
                     📞 Need Help? Contact Us
                   </Link>
                   <span>•</span>
@@ -1314,7 +1314,7 @@ const Header = () => {
             {/* Modal Dialog */}
             <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl border border-[#e2e8f0] p-5 animate-hw-fade">
               <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9]">
-                <h3 className="font-extrabold text-base text-[#0f172a] flex items-center gap-1.5">
+                <h3 className="font-extrabold text-base text-[#142D4E] flex items-center gap-1.5">
                   <span>📍 Select City</span>
                 </h3>
                 <button
@@ -1362,8 +1362,8 @@ const Header = () => {
                     }}
                     className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                       selectedCity === "All India"
-                        ? "bg-[#2563eb] text-white shadow-xs"
-                        : "bg-[#f8fafc] text-[#0f172a] hover:bg-[#eff6ff] hover:text-[#2563eb]"
+                        ? "bg-[#D62839] text-white shadow-xs"
+                        : "bg-[#F3F5F8] text-[#142D4E] hover:bg-[#fff1f2] hover:text-[#D62839]"
                     }`}
                   >
                     <span>🇮🇳 All India</span>
@@ -1379,8 +1379,8 @@ const Header = () => {
                       }}
                       className={`text-left px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between cursor-pointer ${
                         selectedCity === c
-                          ? "bg-[#2563eb] text-white shadow-xs"
-                          : "bg-[#f8fafc] text-[#0f172a] hover:bg-[#eff6ff] hover:text-[#2563eb]"
+                          ? "bg-[#D62839] text-white shadow-xs"
+                          : "bg-[#F3F5F8] text-[#142D4E] hover:bg-[#fff1f2] hover:text-[#D62839]"
                       }`}
                     >
                       <span className="truncate">{c}</span>

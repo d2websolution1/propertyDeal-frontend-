@@ -58,7 +58,7 @@ const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
       {/* Heading row */}
       <div className="flex items-start justify-between mb-5 gap-4">
         <div>
-          <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+          <h2 className="text-2xl font-extrabold text-[#142D4E]">
             {loading ? "Loading..." : section?.title || "News & Articles"}
           </h2>
           {section?.subtitle && (
@@ -67,7 +67,7 @@ const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
         </div>
         <Link
           to="/blogs"
-          className="hidden sm:flex items-center border border-[#005744] text-[#005744] font-semibold text-sm px-4 py-2 rounded-md hover:bg-[#005744] hover:text-white transition-colors flex-shrink-0 whitespace-nowrap"
+          className="hidden sm:flex items-center border border-[#142D4E] text-[#142D4E] font-semibold text-sm px-4 py-2 rounded-md hover:bg-[#142D4E] hover:text-white transition-colors flex-shrink-0 whitespace-nowrap"
         >
           See all news and articles <span className="ml-1">›</span>
         </Link>
@@ -90,7 +90,7 @@ const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
                   />
                 </div>
 
-                <h3 className="text-[#0b1a2e] font-bold text-base leading-snug mb-2 group-hover:text-[#005744] transition-colors line-clamp-2">
+                <h3 className="text-[#142D4E] font-bold text-base leading-snug mb-2 group-hover:text-[#142D4E] transition-colors line-clamp-2">
                   {article.title}
                 </h3>
 
@@ -102,7 +102,7 @@ const NewsAndArticles = ({ sectionKey = "news_articles" }) => {
 
                 {article.badge && (
                   <div className="border-t border-gray-200 pt-2 flex items-center justify-between">
-                    <span className="text-[#005744] font-extrabold text-xs uppercase">{article.badge}</span>
+                    <span className="text-[#142D4E] font-extrabold text-xs uppercase">{article.badge}</span>
                     <span className="text-gray-400 text-xs font-bold">Read article →</span>
                   </div>
                 )}

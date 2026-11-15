@@ -270,7 +270,7 @@ const ManageHomeContent = () => {
 
           <button
             onClick={openCreateSection}
-            className="px-4 py-2 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span>➕ New Section</span>
           </button>
@@ -293,7 +293,7 @@ const ManageHomeContent = () => {
                 onClick={() => setActivePageTab(tab.key)}
                 className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? "bg-[#2563eb] text-white shadow-sm"
+                    ? "bg-[#D62839] text-white shadow-sm"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
@@ -304,11 +304,11 @@ const ManageHomeContent = () => {
         </div>
 
         <div className="flex items-center gap-2 px-2 text-xs text-gray-500">
-          <button onClick={expandAll} className="hover:text-[#2563eb] font-semibold cursor-pointer">
+          <button onClick={expandAll} className="hover:text-[#D62839] font-semibold cursor-pointer">
             Expand All
           </button>
           <span>•</span>
-          <button onClick={collapseAll} className="hover:text-[#2563eb] font-semibold cursor-pointer">
+          <button onClick={collapseAll} className="hover:text-[#D62839] font-semibold cursor-pointer">
             Collapse All
           </button>
         </div>
@@ -328,7 +328,7 @@ const ManageHomeContent = () => {
           </p>
           <button
             onClick={handleRestoreDefaults}
-            className="px-4 py-2 bg-[#2563eb] text-white text-xs font-bold rounded-xl shadow-md hover:bg-[#1d4ed8]"
+            className="px-4 py-2 bg-[#D62839] text-white text-xs font-bold rounded-xl shadow-md hover:bg-[#b81d2c]"
           >
             ⚡ Restore Standard Sections
           </button>
@@ -361,7 +361,7 @@ const ManageHomeContent = () => {
                         <h3 className="font-extrabold text-[#0f172a] text-base leading-snug">
                           {section.title}
                         </h3>
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-[#2563eb] border border-blue-200">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-[#D62839] border border-blue-200">
                           {items.length} {items.length === 1 ? "Card" : "Cards"}
                         </span>
                         <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
@@ -430,7 +430,7 @@ const ManageHomeContent = () => {
                       <button
                         type="button"
                         onClick={() => openAddItem(section)}
-                        className="text-[#2563eb] hover:underline font-extrabold flex items-center gap-1 cursor-pointer"
+                        className="text-[#D62839] hover:underline font-extrabold flex items-center gap-1 cursor-pointer"
                       >
                         <span>➕ Add New Card Here</span>
                       </button>
@@ -442,7 +442,7 @@ const ManageHomeContent = () => {
                         <button
                           type="button"
                           onClick={() => openAddItem(section)}
-                          className="px-3 py-1.5 bg-[#2563eb] text-white text-xs font-bold rounded-lg hover:bg-[#1d4ed8]"
+                          className="px-3 py-1.5 bg-[#D62839] text-white text-xs font-bold rounded-lg hover:bg-[#b81d2c]"
                         >
                           ➕ Add First Card
                         </button>
@@ -488,7 +488,7 @@ const ManageHomeContent = () => {
                                   )}
 
                                   {item.price && (
-                                    <p className="text-[#2563eb] font-black text-xs mt-1">
+                                    <p className="text-[#D62839] font-black text-xs mt-1">
                                       {item.price}
                                     </p>
                                   )}
@@ -564,7 +564,7 @@ const ManageHomeContent = () => {
                       setSectionForm((f) => ({ ...f, sectionKey: e.target.value.toLowerCase().replace(/\s+/g, '_') }))
                     }
                     placeholder="e.g. trending_villas"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
               )}
@@ -577,7 +577,7 @@ const ManageHomeContent = () => {
                   value={sectionForm.title}
                   onChange={(e) => setSectionForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="e.g. Properties to Buy in Mumbai"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
 
@@ -589,7 +589,7 @@ const ManageHomeContent = () => {
                   value={sectionForm.subtitle}
                   onChange={(e) => setSectionForm((f) => ({ ...f, subtitle: e.target.value }))}
                   placeholder="e.g. 7,000+ verified listings added daily directly from owners"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
 
@@ -599,7 +599,7 @@ const ManageHomeContent = () => {
                   <select
                     value={sectionForm.page || "homepage"}
                     onChange={(e) => setSectionForm((f) => ({ ...f, page: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   >
                     <option value="homepage">Homepage</option>
                     <option value="rent">Rent Page</option>
@@ -615,7 +615,7 @@ const ManageHomeContent = () => {
                     type="number"
                     value={sectionForm.displayOrder}
                     onChange={(e) => setSectionForm((f) => ({ ...f, displayOrder: Number(e.target.value) }))}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
               </div>
@@ -632,7 +632,7 @@ const ManageHomeContent = () => {
               <button
                 type="button"
                 onClick={saveSection}
-                className="flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl shadow-md cursor-pointer"
+                className="flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl shadow-md cursor-pointer"
               >
                 Save Section
               </button>
@@ -670,7 +670,7 @@ const ManageHomeContent = () => {
                   value={itemForm.title}
                   onChange={(e) => setItemForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="e.g. Owner Properties or Jains Central Park"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
 
@@ -683,7 +683,7 @@ const ManageHomeContent = () => {
                     value={itemForm.badge}
                     onChange={(e) => setItemForm((f) => ({ ...f, badge: e.target.value }))}
                     placeholder="e.g. 0% Brokerage, New Launch"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
 
@@ -695,7 +695,7 @@ const ManageHomeContent = () => {
                     value={itemForm.subtitle}
                     onChange={(e) => setItemForm((f) => ({ ...f, subtitle: e.target.value }))}
                     placeholder="e.g. by Jain Constructions"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
               </div>
@@ -707,7 +707,7 @@ const ManageHomeContent = () => {
                     value={itemForm.price}
                     onChange={(e) => setItemForm((f) => ({ ...f, price: e.target.value }))}
                     placeholder="e.g. ₹1.22 Cr - 1.42 Cr or Under ₹50 L"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
 
@@ -717,7 +717,7 @@ const ManageHomeContent = () => {
                     value={itemForm.location}
                     onChange={(e) => setItemForm((f) => ({ ...f, location: e.target.value }))}
                     placeholder="e.g. Narapally, Hyderabad"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                   />
                 </div>
               </div>
@@ -731,7 +731,7 @@ const ManageHomeContent = () => {
                   value={itemForm.description}
                   onChange={(e) => setItemForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="e.g. Direct owner deals →"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
 
@@ -741,7 +741,7 @@ const ManageHomeContent = () => {
                   value={itemForm.image}
                   onChange={(e) => setItemForm((f) => ({ ...f, image: e.target.value }))}
                   placeholder="https://images.unsplash.com/photo-..."
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                 />
                 {itemForm.image && (
                   <div className="mt-2 h-24 w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
@@ -763,7 +763,7 @@ const ManageHomeContent = () => {
                   value={itemForm.link}
                   onChange={(e) => setItemForm((f) => ({ ...f, link: e.target.value }))}
                   placeholder="e.g. /commercial or /?filter=owner"
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#2563eb]"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
             </div>
@@ -779,7 +779,7 @@ const ManageHomeContent = () => {
               <button
                 type="button"
                 onClick={saveItem}
-                className="flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl shadow-md cursor-pointer"
+                className="flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold py-2.5 rounded-xl shadow-md cursor-pointer"
               >
                 {itemModal.mode === "create" ? "Add Card" : "Save Changes"}
               </button>

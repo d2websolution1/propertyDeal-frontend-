@@ -61,7 +61,7 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
   };
 
   const sidebarContent = (
-    <div className="h-full flex flex-col bg-[#0f172a] text-white select-none">
+    <div className="h-full flex flex-col bg-[#142D4E] text-white select-none">
       {/* Logo Header */}
       <div className="h-16 flex items-center gap-2.5 px-4 border-b border-white/10 flex-shrink-0">
         <img
@@ -71,8 +71,8 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
         />
         {!collapsed && (
           <span className="font-extrabold text-base tracking-tight whitespace-nowrap text-white">
-            Property<span className="text-[#3b82f6]">Adda</span>
-            <span className="text-[10px] font-normal uppercase tracking-wider text-slate-400 ml-1.5 bg-white/10 px-1.5 py-0.5 rounded">ADMIN</span>
+            Property<span className="text-[#D62839]">Adda</span>
+            <span className="text-[10px] font-normal uppercase tracking-wider text-slate-300 ml-1.5 bg-white/10 px-1.5 py-0.5 rounded">ADMIN</span>
           </span>
         )}
       </div>
@@ -85,7 +85,7 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
               <button
                 type="button"
                 onClick={() => toggleGroup(group.label)}
-                className="w-full flex items-center justify-between px-2 py-2 text-[11px] font-bold tracking-wider text-white/40 uppercase hover:text-white/60 transition-colors"
+                className="w-full flex items-center justify-between px-2 py-2 text-[11px] font-bold tracking-wider text-white/50 uppercase hover:text-white/80 transition-colors cursor-pointer"
               >
                 {group.label}
                 <i
@@ -107,8 +107,8 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm transition-colors ${
                         isActive
-                          ? "bg-[#2563eb] text-white font-bold shadow-xs"
-                          : "text-white/70 hover:bg-white/5 hover:text-white"
+                          ? "bg-[#D62839] text-white font-bold shadow-xs"
+                          : "text-slate-200 hover:bg-white/10 hover:text-white"
                       } ${collapsed ? "justify-center" : ""}`
                     }
                     title={collapsed ? item.label : undefined}
@@ -124,17 +124,17 @@ const AdminSidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       </nav>
 
       {/* User Info & Direct Logout Button */}
-      <div className="p-3 border-t border-white/10 flex-shrink-0 bg-[#0b1120]">
+      <div className="p-3 border-t border-white/10 flex-shrink-0 bg-[#0c1e34]">
         {!collapsed && user && (
           <div className="mb-2 px-1">
             <p className="text-xs font-bold text-white truncate">{user.name || "Administrator"}</p>
-            <p className="text-[10px] text-white/40 truncate">{user.email || "admin@property-adda.com"}</p>
+            <p className="text-[10px] text-white/50 truncate">{user.email || "admin@property-adda.com"}</p>
           </div>
         )}
         <button
           type="button"
           onClick={handleLogout}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-red-300 hover:text-white bg-red-500/10 hover:bg-red-600 transition-all cursor-pointer ${
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-red-300 hover:text-white bg-red-500/10 hover:bg-[#D62839] transition-all cursor-pointer ${
             collapsed ? "justify-center" : ""
           }`}
           title="Logout Admin"

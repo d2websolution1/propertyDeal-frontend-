@@ -87,20 +87,20 @@ const AdminLogin = () => {
               alt="Property Adda"
               className="w-12 h-12 object-contain rounded-2xl shadow-xs"
             />
-            <span className="font-black text-2xl tracking-tight text-[#0f172a]">
-              Property<span className="text-[#2563eb]">Adda</span>
+            <span className="font-black text-2xl tracking-tight text-[#142D4E]">
+              Property<span className="text-[#D62839]">Adda</span>
             </span>
           </div>
-          <span className="mt-2.5 text-[10.5px] font-black uppercase tracking-widest text-[#2563eb] bg-[#eff6ff] px-2.5 py-0.5 rounded-full border border-[#bfdbfe]">
+          <span className="mt-2.5 text-[10.5px] font-black uppercase tracking-widest text-[#D62839] bg-[#fff1f2] px-2.5 py-0.5 rounded-full border border-[#fecdd3]">
             SECURE ADMIN PORTAL
           </span>
         </div>
 
         <div className="text-center mb-6">
-          <h1 className="text-xl sm:text-2xl font-black text-[#0f172a] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-[#142D4E] tracking-tight">
             Administrator Sign In
           </h1>
-          <p className="text-xs text-[#64748b] mt-1">
+          <p className="text-xs text-[#64748B] mt-1">
             Enter your credentials to access the administrative control dashboard.
           </p>
         </div>
@@ -128,13 +128,13 @@ const AdminLogin = () => {
             <button
               type="button"
               onClick={() => handleQuickFill('admin@property-adda.com', 'admin123')}
-              className="text-[#2563eb] hover:underline font-bold text-[11px] cursor-pointer bg-[#eff6ff] px-2 py-0.5 rounded-md border border-[#bfdbfe]"
+              className="text-[#D62839] hover:underline font-bold text-[11px] cursor-pointer bg-[#fff1f2] px-2 py-0.5 rounded-md border border-[#fecdd3]"
             >
               🔑 Auto-fill Admin Credentials
             </button>
           </div>
           <div>
-            <label className="block text-xs font-bold text-[#0f172a] mb-1.5">
+            <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
               Admin Email
             </label>
             <input
@@ -144,12 +144,12 @@ const AdminLogin = () => {
               required
               autoComplete="username"
               placeholder="admin@property-adda.com"
-              className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-xs sm:text-sm outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 transition-all bg-[#f8fafc]"
+              className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-xs sm:text-sm outline-none focus:border-[#D62839] focus:ring-2 focus:ring-[#D62839]/10 transition-all bg-[#F3F5F8]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#0f172a] mb-1.5">
+            <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
               Password
             </label>
             <input
@@ -159,14 +159,14 @@ const AdminLogin = () => {
               required
               autoComplete="current-password"
               placeholder="••••••••"
-              className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-xs sm:text-sm outline-none focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 transition-all bg-[#f8fafc]"
+              className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-xs sm:text-sm outline-none focus:border-[#D62839] focus:ring-2 focus:ring-[#D62839]/10 transition-all bg-[#F3F5F8]"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold py-3.5 rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 mt-2 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-[#D62839] hover:bg-[#b81d2c] text-white font-extrabold py-3.5 rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 mt-2 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? (
               <>

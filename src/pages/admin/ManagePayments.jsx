@@ -210,7 +210,7 @@ const ManagePayments = () => {
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] shadow-xs cursor-pointer inline-flex items-center gap-2 transition-all active:scale-95"
+            className="px-3.5 py-2 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] shadow-xs cursor-pointer inline-flex items-center gap-2 transition-all active:scale-95"
           >
             <i className="fas fa-plus"></i>
             <span>Record New Payment</span>
@@ -607,7 +607,7 @@ const ManagePayments = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] disabled:opacity-60 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] disabled:opacity-60 cursor-pointer"
                 >
                   {submitting ? "Saving to DB..." : "Save Record in MongoDB"}
                 </button>

@@ -106,13 +106,13 @@ const GenericListPage = ({
                     value={form[field.key] ?? ""}
                     onChange={(e) => setForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
                     rows={field.rows || 4}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                   />
                 ) : field.type === "select" ? (
                   <select
                     value={form[field.key] ?? ""}
                     onChange={(e) => setForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                   >
                     {field.options?.map((option) => (
                       <option key={option} value={option}>
@@ -125,7 +125,7 @@ const GenericListPage = ({
                     type={field.type || "text"}
                     value={form[field.key] ?? ""}
                     onChange={(e) => setForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                   />
                 )}
               </div>
@@ -133,7 +133,7 @@ const GenericListPage = ({
           </div>
 
           <div className="mt-5 flex gap-2">
-            <button type="submit" className="rounded-lg bg-[#6C3EE6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#5b34c9]">
+            <button type="submit" className="rounded-lg bg-[#D62839] px-4 py-2 text-sm font-semibold text-white hover:bg-[#b81d2c]">
               {editingId ? "Save changes" : "Add item"}
             </button>
             <button type="button" onClick={resetForm} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">

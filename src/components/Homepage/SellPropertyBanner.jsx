@@ -6,7 +6,7 @@ const SellPropertyBanner = () => {
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       {/* Heading */}
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           Have a property to sell?
         </h2>
       </div>
@@ -47,7 +47,7 @@ const SellPropertyBanner = () => {
 
           {/* Center content */}
           <div className="flex-1 text-center">
-            <p className="text-[#0b1a2e] font-bold text-base md:text-xl mb-4">
+            <p className="text-[#142D4E] font-bold text-base md:text-xl mb-4">
               List your property &amp; connect with clients faster!
             </p>
             <button className="border-2 border-[#6C3EE6] text-[#6C3EE6] font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-[#6C3EE6] hover:text-white transition-colors">
@@ -63,8 +63,8 @@ const SellPropertyBanner = () => {
               <circle cx="120" cy="40" r="14" fill="#8B4E2C" />
               <path d="M100 60 q20 -16 40 0 v50 h-40 z" fill="#1E293B" />
               <rect x="30" y="120" width="150" height="28" rx="8" fill="#6C3EE6" />
-              <circle cx="60" cy="150" r="10" fill="#0b1a2e" />
-              <circle cx="150" cy="150" r="10" fill="#0b1a2e" />
+              <circle cx="60" cy="150" r="10" fill="#142D4E" />
+              <circle cx="150" cy="150" r="10" fill="#142D4E" />
               <rect x="45" y="100" width="60" height="24" rx="4" fill="#8B5CF6" />
             </svg>
           </div>

@@ -122,7 +122,7 @@ const HomeLoanEmiCalculator = () => {
               <span className="text-[11px] uppercase tracking-wider font-bold text-[#5b6662] block mb-1">
                 MONTHLY PAYOUT
               </span>
-              <div className="text-3xl sm:text-4xl font-black text-[#2563eb] mb-6">
+              <div className="text-3xl sm:text-4xl font-black text-[#D62839] mb-6">
                 ₹{Math.round(emi).toLocaleString('en-IN')}
                 <span className="text-xs text-[#64748b] font-normal ml-1">/month</span>
               </div>
@@ -131,7 +131,7 @@ const HomeLoanEmiCalculator = () => {
               <div className="w-full h-3 rounded-full overflow-hidden flex bg-gray-200 mb-4">
                 <div
                   style={{ width: `${principalPercent}%` }}
-                  className="bg-[#2563eb] transition-all duration-300"
+                  className="bg-[#D62839] transition-all duration-300"
                   title={`Principal: ${principalPercent}%`}
                 ></div>
                 <div
@@ -145,10 +145,10 @@ const HomeLoanEmiCalculator = () => {
               <div className="space-y-3 text-xs sm:text-sm pt-2">
                 <div className="flex justify-between items-center text-[#64748b]">
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-[#2563eb]"></span>
+                    <span className="w-3 h-3 rounded-full bg-[#D62839]"></span>
                     Principal Amount:
                   </span>
-                  <strong className="text-[#0f172a]">
+                  <strong className="text-[#142D4E]">
                     ₹{loanAmount.toLocaleString('en-IN')}
                   </strong>
                 </div>
@@ -158,14 +158,14 @@ const HomeLoanEmiCalculator = () => {
                     <span className="w-3 h-3 rounded-full bg-[#f59e0b]"></span>
                     Total Interest Payable:
                   </span>
-                  <strong className="text-[#0f172a]">
+                  <strong className="text-[#142D4E]">
                     ₹{Math.round(totalInterest).toLocaleString('en-IN')}
                   </strong>
                 </div>
 
-                <div className="flex justify-between items-center pt-2 border-t border-[#f1f5f9] font-bold text-sm sm:text-base text-[#0f172a]">
+                <div className="flex justify-between items-center pt-2 border-t border-[#f1f5f9] font-bold text-sm sm:text-base text-[#142D4E]">
                   <span>Total Payment:</span>
-                  <span className="text-[#2563eb]">
+                  <span className="text-[#D62839]">
                     ₹{Math.round(totalPayment).toLocaleString('en-IN')}
                   </span>
                 </div>
@@ -177,7 +177,7 @@ const HomeLoanEmiCalculator = () => {
                 href="https://wa.me/919509505892?text=Hi%20Property%20Adda,%20I%20want%20to%20apply%20for%20a%20home%20loan%20at%20lowest%20interest%20rates"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
+                className="w-full py-3 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
               >
                 <span>Get Bank Loan Assistance (SBI, HDFC, ICICI)</span>
                 <span>→</span>

@@ -19,12 +19,12 @@ const ResearchAndInsights = () => {
             strokeLinejoin="round"
           />
           <circle cx="125" cy="55" r="4" fill="#6C3EE6" />
-          <rect x="55" y="95" width="50" height="35" rx="3" fill="#0b1a2e" />
+          <rect x="55" y="95" width="50" height="35" rx="3" fill="#142D4E" />
           <rect x="60" y="100" width="40" height="6" rx="2" fill="#6C3EE6" />
           <circle cx="85" cy="80" r="14" fill="#FCD9B8" />
           <path d="M71 92 q14 -10 28 0 v14 h-28 z" fill="#6C3EE6" />
           <circle cx="120" cy="82" r="13" fill="#F7B8C4" />
-          <path d="M107 93 q13 -9 26 0 v13 h-26 z" fill="#0b1a2e" />
+          <path d="M107 93 q13 -9 26 0 v13 h-26 z" fill="#142D4E" />
         </svg>
       ),
     },
@@ -40,8 +40,8 @@ const ResearchAndInsights = () => {
           <rect x="131" y="55" width="24" height="75" fill="#D9CFF7" />
           <circle cx="125" cy="70" r="13" fill="#F7B8C4" />
           <path d="M112 82 q13 -9 26 0 v40 h-26 z" fill="#6C3EE6" />
-          <circle cx="80" cy="90" r="6" fill="#0b1a2e" />
-          <path d="M74 98 q6 -4 12 0 v20 h-12 z" fill="#0b1a2e" />
+          <circle cx="80" cy="90" r="6" fill="#142D4E" />
+          <path d="M74 98 q6 -4 12 0 v20 h-12 z" fill="#142D4E" />
           <ellipse cx="65" cy="128" rx="14" ry="8" fill="#FCD9B8" />
         </svg>
       ),
@@ -76,7 +76,7 @@ const ResearchAndInsights = () => {
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       {/* Heading */}
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           Research and Insights
         </h2>
         <p className="text-gray-500 text-sm">Explore useful real estate insights</p>
@@ -90,7 +90,7 @@ const ResearchAndInsights = () => {
             className="border border-gray-200 rounded-lg p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow bg-white"
           >
             <div className="w-[160px] h-[140px]">{item.illustration}</div>
-            <h3 className="text-[#0b1a2e] font-bold text-lg mt-4">
+            <h3 className="text-[#142D4E] font-bold text-lg mt-4">
               {item.title}
             </h3>
             <p className="text-gray-500 text-sm mt-1">{item.subtitle}</p>

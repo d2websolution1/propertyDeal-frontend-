@@ -184,7 +184,7 @@ const ManageAdvertisements = () => {
           )}
           <button
             onClick={openCreate}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+            className="bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
           >
             <i className="fas fa-plus"></i>
             <span>New Ad</span>
@@ -200,7 +200,7 @@ const ManageAdvertisements = () => {
           <p className="text-xs text-gray-400 mb-4">Pehla sponsored ad banakar website par live karein.</p>
           <button
             onClick={openCreate}
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold px-4 py-2 rounded-lg"
+            className="bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-bold px-4 py-2 rounded-lg cursor-pointer"
           >
             + Create First Ad
           </button>
@@ -424,7 +424,7 @@ const ManageAdvertisements = () => {
                 type="button"
                 onClick={save}
                 disabled={saving}
-                className={`flex-1 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-2 ${
+                className={`flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-2 ${
                   saving ? "opacity-60 cursor-not-allowed" : ""
                 }`}
               >

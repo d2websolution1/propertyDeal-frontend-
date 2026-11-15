@@ -101,7 +101,7 @@ const ManageSeo = () => {
                 <input
                   value={form.metaTitle}
                   onChange={(e) => setForm((f) => ({ ...f, metaTitle: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -110,7 +110,7 @@ const ManageSeo = () => {
                   rows={3}
                   value={form.metaDescription}
                   onChange={(e) => setForm((f) => ({ ...f, metaDescription: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -118,7 +118,7 @@ const ManageSeo = () => {
                 <input
                   value={form.metaKeywords}
                   onChange={(e) => setForm((f) => ({ ...f, metaKeywords: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -126,7 +126,7 @@ const ManageSeo = () => {
                 <input
                   value={form.ogImage}
                   onChange={(e) => setForm((f) => ({ ...f, ogImage: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
               <div>
@@ -134,7 +134,7 @@ const ManageSeo = () => {
                 <input
                   value={form.canonicalUrl}
                   onChange={(e) => setForm((f) => ({ ...f, canonicalUrl: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]"
                 />
               </div>
             </div>
@@ -148,7 +148,7 @@ const ManageSeo = () => {
               </button>
               <button
                 onClick={save}
-                className="flex-1 bg-[#6C3EE6] hover:bg-[#5b34c9] text-white text-sm font-semibold py-2.5 rounded-lg"
+                className="flex-1 bg-[#D62839] hover:bg-[#b81d2c] text-white text-sm font-semibold py-2.5 rounded-lg"
               >
                 Save
               </button>

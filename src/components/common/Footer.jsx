@@ -16,19 +16,19 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[#0f172a] text-[#94a3b8] pt-14 pb-8 border-t border-[#1e293b] relative">
+    <footer className="bg-[#142D4E] text-slate-300 pt-14 pb-8 border-t border-[#1e3a61] relative">
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6">
         {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-[#1e293b]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-[#1e3a61]">
           {/* Brand Col */}
           <div className="space-y-4">
             <div className="bg-white px-3.5 py-1.5 rounded-xl inline-block shadow-sm">
               <PropertyDealLogo height={38} className="h-9 w-auto" />
             </div>
-            <p className="text-xs text-[#94a3b8] leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               Real estate at one place - India's trusted property marketplace. Buy, sell, or rent flats, builder floors, plots, and commercial properties directly from owners and verified agents.
             </p>
-            <div className="text-xs text-[#cbd5e1] font-semibold">
+            <div className="text-xs text-slate-200 font-semibold">
               Over 71,000+ verified listings across Delhi NCR, Jaipur, Mumbai & major Indian cities.
             </div>
           </div>
@@ -47,7 +47,7 @@ const Footer = () => {
               <li><Link to="/blogs" className="hover:text-white transition-colors">Latest News & Blogs</Link></li>
               <li><Link to="/about-us" className="hover:text-white transition-colors font-medium">About Us</Link></li>
               <li><Link to="/contact-us" className="hover:text-white transition-colors font-medium">Contact & Support</Link></li>
-              <li><Link to="/post-property" className="text-[#f59e0b] hover:underline font-bold">Post Property for FREE →</Link></li>
+              <li><Link to="/post-property" className="text-[#D62839] hover:text-[#ff4d5e] font-extrabold">Post Property for FREE →</Link></li>
             </ul>
           </div>
 
@@ -74,23 +74,23 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2.5 text-xs">
               <li className="flex items-center gap-2">
-                <i className="fas fa-phone-alt text-[#2563eb] text-xs"></i>
+                <i className="fas fa-phone-alt text-[#D62839] text-xs"></i>
                 <a href="tel:+919672056670" className="hover:text-white">+91 9672 056 670</a>
               </li>
               <li className="flex items-center gap-2">
-                <i className="fas fa-phone-alt text-[#2563eb] text-xs"></i>
+                <i className="fas fa-phone-alt text-[#D62839] text-xs"></i>
                 <a href="tel:+919509505892" className="hover:text-white">+91 9509 505 892</a>
               </li>
               <li className="flex items-center gap-2">
-                <i className="fas fa-envelope text-[#2563eb] text-xs"></i>
+                <i className="fas fa-envelope text-[#D62839] text-xs"></i>
                 <a href="mailto:info@property-adda.com" className="hover:text-white">info@property-adda.com</a>
               </li>
-              <li className="pt-2 text-[11px] text-[#94a3b8] flex items-center gap-2">
-                <i className="fas fa-clock text-[#2563eb] text-xs"></i>
+              <li className="pt-2 text-[11px] text-slate-300 flex items-center gap-2">
+                <i className="fas fa-clock text-[#D62839] text-xs"></i>
                 <span>Mon - Sat: 9:00 AM – 7:00 PM</span>
               </li>
-              <li className="text-[11px] text-[#94a3b8] flex items-center gap-2">
-                <i className="fas fa-map-marker-alt text-[#2563eb] text-xs"></i>
+              <li className="text-[11px] text-slate-300 flex items-center gap-2">
+                <i className="fas fa-map-marker-alt text-[#D62839] text-xs"></i>
                 <span>Jaipur & Delhi NCR, India</span>
               </li>
             </ul>
@@ -98,14 +98,14 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748b]">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p>© {new Date().getFullYear()} Property Adda. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4">
             <Link to="/about-us" className="hover:text-white transition-colors">About Us</Link>
             <Link to="/contact-us" className="hover:text-white transition-colors">Contact</Link>
             <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link to="/terms-and-conditions" className="hover:text-white transition-colors">Terms of Use</Link>
-            <Link to="/admin/login" className="hover:text-white transition-colors text-slate-500 hover:text-slate-300">Admin Portal</Link>
+            <Link to="/admin/login" className="hover:text-white transition-colors text-slate-400 hover:text-slate-200">Admin Portal</Link>
           </div>
         </div>
       </div>

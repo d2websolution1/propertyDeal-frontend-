@@ -85,7 +85,7 @@ const PropertyResearchTools = () => {
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       {/* Heading */}
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           User property research tools
         </h2>
         <p className="text-gray-500 text-sm">

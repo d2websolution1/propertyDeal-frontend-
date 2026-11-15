@@ -89,7 +89,7 @@ const BulkMessaging = () => {
               key={c}
               onClick={() => setChannel(c)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize ${
-                channel === c ? "bg-[#6C3EE6] text-white" : "bg-gray-50 text-gray-500"
+                channel === c ? "bg-[#D62839] text-white" : "bg-gray-50 text-gray-500"
               }`}
             >
               {c}
@@ -100,7 +100,7 @@ const BulkMessaging = () => {
         <div className="flex flex-col gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Audience</label>
-            <select value={audience} onChange={(e) => setAudience(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]">
+            <select value={audience} onChange={(e) => setAudience(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]">
               {AUDIENCE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
@@ -113,19 +113,19 @@ const BulkMessaging = () => {
           {channel === "email" && (
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Subject</label>
-              <input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+              <input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
             </div>
           )}
 
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Message</label>
-            <textarea rows={5} value={message} onChange={(e) => setMessage(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#6C3EE6]" />
+            <textarea rows={5} value={message} onChange={(e) => setMessage(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#D62839]" />
           </div>
 
           <button
             onClick={send}
             disabled={sending}
-            className="bg-[#6C3EE6] hover:bg-[#5b34c9] disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-lg"
+            className="bg-[#D62839] hover:bg-[#b81d2c] disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-lg"
           >
             {sending ? "Sending..." : `Send ${channel}`}
           </button>

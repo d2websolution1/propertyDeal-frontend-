@@ -63,7 +63,7 @@ const AdminTopbar = ({ onToggleSidebar, onOpenMobileSidebar }) => {
             onClick={() => setProfileOpen((o) => !o)}
             className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-[#6C3EE6] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#142D4E] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
               {user?.name?.charAt(0)?.toUpperCase() || "A"}
             </div>
             <span className="hidden md:block text-sm font-medium text-gray-700">

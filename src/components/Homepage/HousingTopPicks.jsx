@@ -75,7 +75,7 @@ const HousingTopPicks = () => {
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       {/* Heading */}
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           {loading ? "Loading..." : section.title}
         </h2>
         {section?.subtitle && (
@@ -109,7 +109,7 @@ const HousingTopPicks = () => {
                 <p
                   className={`text-xs mt-1 truncate ${
                     index === activeIndex
-                      ? "text-[#0b1a2e] font-semibold"
+                      ? "text-[#142D4E] font-semibold"
                       : "text-gray-500"
                   }`}
                 >
@@ -144,12 +144,12 @@ const HousingTopPicks = () => {
                       <div className="w-[300px] flex-shrink-0 bg-gradient-to-br from-[#f3ecff] via-[#fbe8f0] to-[#fff1e8] p-6 flex flex-col justify-between">
                         <div>
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-md text-white flex items-center justify-center font-bold text-lg bg-[#0b1a2e] flex-shrink-0">
+                            <div className="w-10 h-10 rounded-md text-white flex items-center justify-center font-bold text-lg bg-[#142D4E] flex-shrink-0">
                               {logoLetter}
                             </div>
                             <div className="min-w-0">
                               {companyName && (
-                                <p className="font-bold text-[#0b1a2e] leading-tight text-sm truncate">
+                                <p className="font-bold text-[#142D4E] leading-tight text-sm truncate">
                                   {companyName}
                                 </p>
                               )}
@@ -162,7 +162,7 @@ const HousingTopPicks = () => {
                             </div>
                           </div>
 
-                          <h3 className="text-lg font-bold text-[#0b1a2e] mb-1">
+                          <h3 className="text-lg font-bold text-[#142D4E] mb-1">
                             {property.title}
                           </h3>
                           {property.location && (
@@ -228,7 +228,7 @@ const HousingTopPicks = () => {
               <>
                 <button
                   onClick={goPrev}
-                  className="absolute top-1/2 -translate-y-1/2 left-2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#0b1a2e] flex items-center justify-center transition-shadow z-20"
+                  className="absolute top-1/2 -translate-y-1/2 left-2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#142D4E] flex items-center justify-center transition-shadow z-20"
                   aria-label="Previous property"
                 >
                   <i className="fas fa-chevron-left"></i>
@@ -236,7 +236,7 @@ const HousingTopPicks = () => {
 
                 <button
                   onClick={goNext}
-                  className="absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#0b1a2e] flex items-center justify-center transition-shadow z-20"
+                  className="absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#142D4E] flex items-center justify-center transition-shadow z-20"
                   style={{ right: `${Math.max(PEEK - 20, 8)}px` }}
                   aria-label="Next property"
                 >

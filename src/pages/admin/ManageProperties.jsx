@@ -263,7 +263,7 @@ const ManageProperties = () => {
                   }}
                   className={`px-4 py-2 rounded-lg transition-all cursor-pointer ${
                     status === tab.key
-                      ? "bg-white text-[#6C3EE6] shadow-xs font-black"
+                      ? "bg-white text-[#D62839] shadow-xs font-black"
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
@@ -282,7 +282,7 @@ const ManageProperties = () => {
                 setPage(1);
                 setUserType(e.target.value);
               }}
-              className="bg-gray-50 border border-gray-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none text-gray-700 cursor-pointer focus:border-[#6C3EE6]"
+              className="bg-gray-50 border border-gray-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none text-gray-700 cursor-pointer focus:border-[#D62839]"
             >
               {USER_ROLES.map((role) => (
                 <option key={role.key} value={role.key}>
@@ -317,7 +317,7 @@ const ManageProperties = () => {
       {/* Properties Cards Grid */}
       {loading ? (
         <div className="text-center py-24 text-gray-400">
-          <i className="fas fa-spinner fa-spin text-2xl mr-2 text-[#6C3EE6]"></i>
+          <i className="fas fa-spinner fa-spin text-2xl mr-2 text-[#D62839]"></i>
           <p className="mt-2 text-sm font-semibold">Loading listings & poster details...</p>
         </div>
       ) : properties.length === 0 ? (
@@ -402,7 +402,7 @@ const ManageProperties = () => {
                         <h3 className="font-bold text-gray-900 text-base line-clamp-1">
                           {property.title}
                         </h3>
-                        <span className="text-[#6C3EE6] font-black text-base flex-shrink-0">
+                        <span className="text-[#D62839] font-black text-base flex-shrink-0">
                           {formatIndianPrice(property.price, property.listingType)}
                         </span>
                       </div>
@@ -435,7 +435,7 @@ const ManageProperties = () => {
                       </div>
 
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-[#6C3EE6]/10 text-[#6C3EE6] font-black text-xs flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-[#D62839]/10 text-[#D62839] font-black text-xs flex items-center justify-center flex-shrink-0">
                           {posterName.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">

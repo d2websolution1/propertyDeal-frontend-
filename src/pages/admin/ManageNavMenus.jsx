@@ -187,7 +187,7 @@ const ManageNavMenus = () => {
           <button
             onClick={handleSaveMenu}
             disabled={saving}
-            className="px-4 py-2 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold shadow-xs cursor-pointer inline-flex items-center gap-2 transition-all active:scale-95 disabled:opacity-60"
+            className="px-4 py-2 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-bold shadow-xs cursor-pointer inline-flex items-center gap-2 transition-all active:scale-95 disabled:opacity-60"
           >
             <i className={`fas ${saving ? "fa-circle-notch fa-spin" : saveSuccess ? "fa-check" : "fa-save"}`}></i>
             <span>{saving ? "Saving to DB..." : saveSuccess ? "Saved Successfully!" : "Save Changes to MongoDB"}</span>
@@ -201,7 +201,7 @@ const ManageNavMenus = () => {
           onClick={() => setActiveTab("buyers")}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === "buyers"
-              ? "bg-[#2563eb] text-white shadow-xs"
+              ? "bg-[#D62839] text-white shadow-xs"
               : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
           }`}
         >
@@ -214,7 +214,7 @@ const ManageNavMenus = () => {
           onClick={() => setActiveTab("tenants")}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === "tenants"
-              ? "bg-[#2563eb] text-white shadow-xs"
+              ? "bg-[#D62839] text-white shadow-xs"
               : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
           }`}
         >
@@ -297,7 +297,7 @@ const ManageNavMenus = () => {
               <button
                 type="button"
                 onClick={handleAddArea}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] cursor-pointer"
               >
                 + Add
               </button>
@@ -345,7 +345,7 @@ const ManageNavMenus = () => {
               <button
                 type="button"
                 onClick={handleAddBhk}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] cursor-pointer"
               >
                 + Add
               </button>
@@ -393,7 +393,7 @@ const ManageNavMenus = () => {
               <button
                 type="button"
                 onClick={handleAddSearch}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] cursor-pointer"
               >
                 + Add
               </button>
@@ -482,7 +482,7 @@ const ManageNavMenus = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700"
+                  className="px-4 py-1.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c]"
                 >
                   Add Type
                 </button>

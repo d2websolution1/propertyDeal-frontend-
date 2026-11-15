@@ -191,7 +191,7 @@ const ManageSubscriptions = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={openCreate}
-            className="px-4 py-2.5 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] shadow-xs cursor-pointer inline-flex items-center gap-2 transition-all active:scale-95"
+            className="px-4 py-2.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] shadow-xs cursor-pointer inline-flex items-center gap-2 transition-all active:scale-95"
           >
             <i className="fas fa-plus"></i>
             <span>Add New Tier</span>
@@ -311,7 +311,7 @@ const ManageSubscriptions = () => {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. Dealer Pro Boost"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#D62839]"
                 />
               </div>
 
@@ -321,7 +321,7 @@ const ManageSubscriptions = () => {
                   <select
                     value={form.targetAudience}
                     onChange={(e) => setForm({ ...form, targetAudience: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb] bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#D62839] bg-white"
                   >
                     <option value="All">All Roles</option>
                     <option value="Owner">Owner</option>
@@ -336,7 +336,7 @@ const ManageSubscriptions = () => {
                     value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
                     placeholder="4999"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#D62839]"
                   />
                 </div>
               </div>
@@ -347,7 +347,7 @@ const ManageSubscriptions = () => {
                   <select
                     value={form.billingCycle}
                     onChange={(e) => setForm({ ...form, billingCycle: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb] bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#D62839] bg-white"
                   >
                     <option value="one-time">One-Time</option>
                     <option value="monthly">Monthly</option>
@@ -362,7 +362,7 @@ const ManageSubscriptions = () => {
                     value={form.listingLimit}
                     onChange={(e) => setForm({ ...form, listingLimit: e.target.value })}
                     placeholder="25"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#D62839]"
                   />
                 </div>
               </div>
@@ -374,7 +374,7 @@ const ManageSubscriptions = () => {
                   value={form.features}
                   onChange={(e) => setForm({ ...form, features: e.target.value })}
                   placeholder="30 listings, Verified badge, Priority inquiries, CRM dashboard"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#2563eb]"
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-[#D62839]"
                 ></textarea>
               </div>
 
@@ -389,7 +389,7 @@ const ManageSubscriptions = () => {
                 <button
                   type="button"
                   onClick={save}
-                  className="px-4 py-2 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8]"
+                  className="px-4 py-2 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c]"
                 >
                   Save in MongoDB Atlas
                 </button>

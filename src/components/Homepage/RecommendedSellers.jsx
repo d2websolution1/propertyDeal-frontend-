@@ -44,7 +44,7 @@ const RecommendedSellers = ({ sectionKey = "recommended_sellers" }) => {
   return (
     <section className="max-w-[1200px] mx-auto px-4 py-8">
       <div className="mb-5">
-        <h2 className="text-2xl font-extrabold text-[#0b1a2e]">
+        <h2 className="text-2xl font-extrabold text-[#142D4E]">
           {loading ? "Loading..." : section.title}
         </h2>
         {section?.subtitle && <p className="text-gray-500 text-sm">{section.subtitle}</p>}
@@ -64,7 +64,7 @@ const RecommendedSellers = ({ sectionKey = "recommended_sellers" }) => {
                 className="snap-start flex-shrink-0 w-[260px] rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow bg-white"
               >
                 {/* Header */}
-                <div className="bg-[#0b1a2e] px-4 py-3.5 flex items-center gap-2.5">
+                <div className="bg-[#142D4E] px-4 py-3.5 flex items-center gap-2.5">
                   {seller.image && (
                     <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0">
                       <img
@@ -110,7 +110,7 @@ const RecommendedSellers = ({ sectionKey = "recommended_sellers" }) => {
 
           <button
             onClick={scrollNext}
-            className="hidden md:flex absolute top-[80px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#0b1a2e] items-center justify-center transition-shadow z-10"
+            className="hidden md:flex absolute top-[80px] right-0 translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg text-[#142D4E] items-center justify-center transition-shadow z-10"
             aria-label="See more sellers"
           >
             <i className="fas fa-arrow-right"></i>

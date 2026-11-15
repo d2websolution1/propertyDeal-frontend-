@@ -51,7 +51,7 @@ const ManageSecuritySettings = () => {
             type="number"
             value={settings.sessionTimeout}
             onChange={(e) => setSettings({...settings, sessionTimeout: parseInt(e.target.value)})}
-            className="w-32 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-[#6C3EE6]"
+            className="w-32 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-[#D62839]"
           />
         </div>
 
@@ -61,7 +61,7 @@ const ManageSecuritySettings = () => {
             type="number"
             value={settings.maxLoginAttempts}
             onChange={(e) => setSettings({...settings, maxLoginAttempts: parseInt(e.target.value)})}
-            className="w-32 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-[#6C3EE6]"
+            className="w-32 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-[#D62839]"
           />
         </div>
 
@@ -70,7 +70,7 @@ const ManageSecuritySettings = () => {
           <select
             value={settings.passwordPolicy}
             onChange={(e) => setSettings({...settings, passwordPolicy: e.target.value})}
-            className="w-full border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-[#6C3EE6]"
+            className="w-full border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-[#D62839]"
           >
             <option value="weak">Weak - Only letters</option>
             <option value="medium">Medium - Letters & numbers</option>
@@ -78,7 +78,7 @@ const ManageSecuritySettings = () => {
           </select>
         </div>
 
-        <button className="mt-4 bg-[#6C3EE6] hover:bg-[#5b34c9] text-white font-semibold px-6 py-2.5 rounded-lg">
+        <button className="mt-4 bg-[#D62839] hover:bg-[#b81d2c] text-white font-semibold px-6 py-2.5 rounded-lg">
           Save Settings
         </button>
       </div>
