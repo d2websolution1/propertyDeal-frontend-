@@ -385,7 +385,9 @@ export default function PropertyDetailPage() {
                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Bedrooms / BHK</span>
                   <span className="text-base font-extrabold text-[#142D4E] mt-0.5 block">
-                    {property.bhk || (property.bedrooms ? `${property.bedrooms} BHK` : 'N/A')}
+                    {property.propertyType?.toLowerCase().includes('plot') || property.category?.toLowerCase().includes('plot')
+                      ? 'N/A (Plot)'
+                      : (property.bhk || (property.bedrooms && property.bedrooms !== '0' ? `${property.bedrooms} BHK` : '0'))}
                   </span>
                 </div>
 
@@ -406,14 +408,14 @@ export default function PropertyDetailPage() {
                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Status</span>
                   <span className="text-base font-extrabold text-emerald-600 mt-0.5 block capitalize">
-                    {property.constructionStatus || 'Ready to Move'}
+                    {property.constructionStatus || (property.propertyType?.toLowerCase().includes('plot') ? 'Ready for Possession' : 'Ready to Move')}
                   </span>
                 </div>
 
                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Furnishing</span>
                   <span className="text-sm font-bold text-[#142D4E] mt-0.5 block capitalize">
-                    {property.furnishing || 'Semi-furnished'}
+                    {property.propertyType?.toLowerCase().includes('plot') ? 'N/A (Plot)' : (property.furnishing || 'Semi-furnished')}
                   </span>
                 </div>
 
@@ -427,7 +429,9 @@ export default function PropertyDetailPage() {
                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Bathrooms</span>
                   <span className="text-sm font-bold text-[#142D4E] mt-0.5 block">
-                    {property.bathrooms || '2'}
+                    {property.propertyType?.toLowerCase().includes('plot') || property.category?.toLowerCase().includes('plot')
+                      ? '0 (Plot)'
+                      : (property.bathrooms !== undefined && property.bathrooms !== null && property.bathrooms !== '' ? property.bathrooms : '0')}
                   </span>
                 </div>
 

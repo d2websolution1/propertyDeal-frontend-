@@ -356,7 +356,7 @@ const Header = () => {
 
         {/* Center: Desktop Navigation Dropdowns */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-          {/* 1. FOR BUYERS (Image 2) */}
+          {/* 1. FOR BUYERS */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter("buyers")}
@@ -377,8 +377,8 @@ const Header = () => {
             </button>
 
             {openMenu === "buyers" && (
-              <div className="absolute left-0 mt-2 w-[780px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-6 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
-                <div className="grid grid-cols-4 gap-6 text-xs">
+              <div className="absolute left-0 mt-2 w-[520px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-6 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="grid grid-cols-2 gap-6 text-xs">
                   {/* Col 1: Property type */}
                   <div>
                     <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
@@ -419,52 +419,12 @@ const Header = () => {
                       ))}
                     </ul>
                   </div>
-
-                  {/* Col 3: Search by BHK */}
-                  <div>
-                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
-                      Search by BHK
-                    </h4>
-                    <ul className="space-y-2">
-                      {searchByBHKBuy.map((bhk) => (
-                        <li key={bhk}>
-                          <Link
-                            to={`/?q=${encodeURIComponent(bhk)}`}
-                            onClick={() => setOpenMenu(null)}
-                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
-                          >
-                            {bhk}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Col 4: Popular searches */}
-                  <div>
-                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
-                      Popular searches
-                    </h4>
-                    <ul className="space-y-2">
-                      {popularSearchesBuy.map((item) => (
-                        <li key={item}>
-                          <Link
-                            to={`/?q=${encodeURIComponent(item)}`}
-                            onClick={() => setOpenMenu(null)}
-                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
-                          >
-                            {item}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* 2. FOR TENANTS (Image 3) */}
+          {/* 2. FOR TENANTS */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter("tenants")}
@@ -485,8 +445,8 @@ const Header = () => {
             </button>
 
             {openMenu === "tenants" && (
-              <div className="absolute left-0 mt-2 w-[780px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-6 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
-                <div className="grid grid-cols-4 gap-6 text-xs">
+              <div className="absolute left-0 mt-2 w-[520px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-6 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
+                <div className="grid grid-cols-2 gap-6 text-xs">
                   {/* Col 1: Property type */}
                   <div>
                     <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
@@ -527,142 +487,12 @@ const Header = () => {
                       ))}
                     </ul>
                   </div>
-
-                  {/* Col 3: Search by BHK */}
-                  <div>
-                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
-                      Search by BHK
-                    </h4>
-                    <ul className="space-y-2">
-                      {searchByBHKRent.map((bhk) => (
-                        <li key={bhk}>
-                          <Link
-                            to={`/rent?q=${encodeURIComponent(bhk)}`}
-                            onClick={() => setOpenMenu(null)}
-                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
-                          >
-                            {bhk}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Col 4: Popular searches */}
-                  <div>
-                    <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-3">
-                      Popular searches
-                    </h4>
-                    <ul className="space-y-2">
-                      {popularSearchesRent.map((item) => (
-                        <li key={item}>
-                          <Link
-                            to={`/rent?q=${encodeURIComponent(item)}`}
-                            onClick={() => setOpenMenu(null)}
-                            className="text-[#334155] hover:text-[#2563eb] block py-0.5 transition-colors"
-                          >
-                            {item}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* 3. FOR SELLERS */}
-          <div
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("sellers")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              onClick={() => setOpenMenu(openMenu === "sellers" ? null : "sellers")}
-              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
-                openMenu === "sellers"
-                  ? "bg-[#eff6ff] text-[#2563eb]"
-                  : "text-[#1e293b] hover:text-[#2563eb]"
-              }`}
-            >
-              <span>For Sellers</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-
-            {openMenu === "sellers" && (
-              <div className="absolute left-0 mt-2 w-72 bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-4 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
-                <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-2.5">
-                  Packages for
-                </h4>
-                <div className="space-y-2">
-                  {sellersMenu.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.link}
-                      onClick={() => setOpenMenu(null)}
-                      className="block p-2.5 rounded-xl hover:bg-[#f8fafc] transition-colors"
-                    >
-                      <strong className="block text-xs font-bold text-[#0f172a]">{item.title}</strong>
-                      <span className="text-[11px] text-[#64748b] leading-tight block">{item.desc}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 4. SERVICES */}
-          <div
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("services")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button
-              onClick={() => setOpenMenu(openMenu === "services" ? null : "services")}
-              className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1 transition-colors ${
-                openMenu === "services"
-                  ? "bg-[#eff6ff] text-[#2563eb]"
-                  : "text-[#1e293b] hover:text-[#2563eb]"
-              }`}
-            >
-              <span>Services</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-
-            {openMenu === "services" && (
-              <div className="absolute left-0 mt-2 w-[420px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-5 z-50 animate-hw-fade before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2">
-                <div className="grid grid-cols-2 gap-5 text-xs">
-                  {Object.entries(servicesMenu).map(([group, links]) => (
-                    <div key={group}>
-                      <h4 className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider mb-2.5">
-                        {group}
-                      </h4>
-                      <ul className="space-y-2">
-                        {links.map((link) => (
-                          <li key={link.name}>
-                            <Link
-                              to={link.path}
-                              onClick={() => setOpenMenu(null)}
-                              className="text-[#334155] hover:text-[#2563eb] block py-0.5"
-                            >
-                              {link.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 5. LATEST NEWS, ABOUT US & CONTACT SUPPORT (COMBINED DROPDOWN) */}
+          {/* LATEST NEWS, ABOUT US & CONTACT SUPPORT (COMBINED DROPDOWN) */}
           <div
             className="relative"
             onMouseEnter={() => handleMouseEnter("news")}
@@ -1026,23 +856,6 @@ const Header = () => {
                             ))}
                           </div>
                         </div>
-                        <div>
-                          <span className="text-[10px] font-black text-[#64748b] uppercase tracking-wider block mb-1.5">
-                            Search by BHK
-                          </span>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {["1 BHK", "2 BHK", "3 BHK", "4+ BHK"].map((bhk) => (
-                              <Link
-                                key={bhk}
-                                to={`/?bhk=${encodeURIComponent(bhk)}`}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="p-1.5 text-center rounded-lg bg-white border border-[#e2e8f0] text-[11px] font-medium text-[#334155] hover:text-[#2563eb]"
-                              >
-                                {bhk}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
                       </div>
                     )}
                   </div>
@@ -1090,56 +903,6 @@ const Header = () => {
                             ))}
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Services & Tools Accordion */}
-                  <div className="rounded-xl border border-[#e2e8f0] overflow-hidden bg-white">
-                    <button
-                      type="button"
-                      onClick={() => setExpandedAccordion(expandedAccordion === "services" ? null : "services")}
-                      className="w-full flex items-center justify-between p-3 text-xs font-bold text-[#0f172a] hover:bg-[#f8fafc] transition-colors cursor-pointer"
-                    >
-                      <span className="flex items-center gap-2">
-                        <span>🛠️</span>
-                        <span>Services & Calculators</span>
-                      </span>
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        className={`transition-transform duration-200 ${expandedAccordion === "services" ? "rotate-180 text-[#2563eb]" : "text-[#64748b]"}`}
-                      >
-                        <path d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
-                    {expandedAccordion === "services" && (
-                      <div className="px-3 pb-3 pt-1 border-t border-[#f1f5f9] bg-[#f8fafc] space-y-2 animate-hw-fade">
-                        <Link
-                          to="/#emi-calculator"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block p-2 rounded-lg bg-white border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a] hover:text-[#2563eb]"
-                        >
-                          🏦 Home Loan EMI Calculator
-                        </Link>
-                        <Link
-                          to="/contact"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block p-2 rounded-lg bg-white border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a] hover:text-[#2563eb]"
-                        >
-                          📜 Property Legal Verification
-                        </Link>
-                        <Link
-                          to="/rent"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block p-2 rounded-lg bg-white border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a] hover:text-[#2563eb]"
-                        >
-                          🧾 Rent Receipt Generator
-                        </Link>
                       </div>
                     )}
                   </div>

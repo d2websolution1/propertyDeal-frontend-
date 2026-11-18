@@ -174,13 +174,13 @@ export default function PostPropertyPage() {
   const [facilities, setFacilities] = useState(['Gated society', 'Security', 'Lift']);
   const [amenities, setAmenities] = useState(['Fan', 'Lights', 'Modular kitchen', 'RO water']);
 
-  // 5. Room counts
-  const [bedrooms, setBedrooms] = useState('2');
-  const [bathrooms, setBathrooms] = useState('2');
-  const [hall, setHall] = useState('1');
-  const [kitchen, setKitchen] = useState('1');
-  const [balcony, setBalcony] = useState('1');
-  const [parking, setParking] = useState('Car');
+  // 5. Room counts (defaults to 0 for plots and new listings)
+  const [bedrooms, setBedrooms] = useState('0');
+  const [bathrooms, setBathrooms] = useState('0');
+  const [hall, setHall] = useState('0');
+  const [kitchen, setKitchen] = useState('0');
+  const [balcony, setBalcony] = useState('0');
+  const [parking, setParking] = useState('None');
 
   // 6. Location
   const [state, setState] = useState('Rajasthan');
@@ -833,7 +833,18 @@ export default function PostPropertyPage() {
                 </label>
                 <select
                   value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
+                  onChange={(e) => {
+                    const newType = e.target.value;
+                    setPropertyType(newType);
+                    if (newType === 'Plot') {
+                      setBedrooms('0');
+                      setBathrooms('0');
+                      setHall('0');
+                      setKitchen('0');
+                      setBalcony('0');
+                      setParking('None');
+                    }
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] bg-white text-xs font-semibold text-[#0f172a] outline-none focus:border-[#2563eb]"
                 >
                   {PROPERTY_TYPES.map((pt) => (
@@ -1177,9 +1188,16 @@ export default function PostPropertyPage() {
 
             {/* Room details dropdowns */}
             <div className="pt-2">
-              <label className="block text-xs font-bold text-[#334155] mb-2">
-                Room & Parking Details (Dropdowns)
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-bold text-[#334155]">
+                  Room & Parking Details (Starts from 0)
+                </label>
+                {propertyType === 'Plot' && (
+                  <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                    ℹ️ Plots / Land have 0 bedrooms & bathrooms
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <div>
                   <span className="text-[11px] text-[#64748b] block mb-1">Bedrooms</span>
@@ -1188,7 +1206,7 @@ export default function PostPropertyPage() {
                     onChange={(e) => setBedrooms(e.target.value)}
                     className="w-full px-2.5 py-2 rounded-xl border border-[#cbd5e1] text-xs font-bold"
                   >
-                    {['1', '2', '3', '4', '4+'].map((v) => (
+                    {['0', '1', '2', '3', '4', '4+'].map((v) => (
                       <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
@@ -1201,7 +1219,7 @@ export default function PostPropertyPage() {
                     onChange={(e) => setBathrooms(e.target.value)}
                     className="w-full px-2.5 py-2 rounded-xl border border-[#cbd5e1] text-xs font-bold"
                   >
-                    {['1', '2', '3', '3+'].map((v) => (
+                    {['0', '1', '2', '3', '3+'].map((v) => (
                       <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
@@ -1214,7 +1232,7 @@ export default function PostPropertyPage() {
                     onChange={(e) => setHall(e.target.value)}
                     className="w-full px-2.5 py-2 rounded-xl border border-[#cbd5e1] text-xs font-bold"
                   >
-                    {['1', '2', '2+'].map((v) => (
+                    {['0', '1', '2', '2+'].map((v) => (
                       <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
@@ -1227,7 +1245,7 @@ export default function PostPropertyPage() {
                     onChange={(e) => setKitchen(e.target.value)}
                     className="w-full px-2.5 py-2 rounded-xl border border-[#cbd5e1] text-xs font-bold"
                   >
-                    {['1', '2', '2+'].map((v) => (
+                    {['0', '1', '2', '2+'].map((v) => (
                       <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
@@ -1240,7 +1258,7 @@ export default function PostPropertyPage() {
                     onChange={(e) => setBalcony(e.target.value)}
                     className="w-full px-2.5 py-2 rounded-xl border border-[#cbd5e1] text-xs font-bold"
                   >
-                    {['1', '2', '3', '3+'].map((v) => (
+                    {['0', '1', '2', '3', '3+'].map((v) => (
                       <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
@@ -1253,10 +1271,10 @@ export default function PostPropertyPage() {
                     onChange={(e) => setParking(e.target.value)}
                     className="w-full px-2.5 py-2 rounded-xl border border-[#cbd5e1] text-xs font-bold"
                   >
+                    <option value="None">None (0)</option>
                     <option value="Car">Car</option>
                     <option value="Bike">Bike</option>
                     <option value="Car & Bike">Car & Bike</option>
-                    <option value="None">None</option>
                   </select>
                 </div>
               </div>
