@@ -1,6 +1,6 @@
 // frontend/src/pages/public/PostPropertyPage.jsx
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 import ClientAuthModal from '../../components/common/ClientAuthModal';
@@ -124,8 +124,15 @@ const compressPhoto = (file, maxWidth = 1000, maxHeight = 1000, quality = 0.8) =
 
 export default function PostPropertyPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const fileInputRef = useRef(null);
+
+  // Edit Mode Query Handling
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const editId = searchParams.get('edit');
+  const isEditMode = Boolean(editId);
+  const [loadingEdit, setLoadingEdit] = useState(false);
 
   // Pre-post Auth Gate States
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -133,7 +140,7 @@ export default function PostPropertyPage() {
   const [selectedRole, setSelectedRole] = useState('Owner');
 
   // Auto-generated Property ID (display preview)
-  const [autoPropertyId] = useState(() => 'PA-' + Math.floor(100000 + Math.random() * 900000));
+  const [autoPropertyId, setAutoPropertyId] = useState(() => 'PA-' + Math.floor(100000 + Math.random() * 900000));
 
   // 1. Basic Details
   const [title, setTitle] = useState('');
@@ -228,6 +235,86 @@ export default function PostPropertyPage() {
   const [successData, setSuccessData] = useState(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [availablePlans, setAvailablePlans] = useState([]);
+
+  // Fetch property details for Edit Mode
+  useEffect(() => {
+    if (!editId) return;
+    let isMounted = true;
+    setLoadingEdit(true);
+
+    axios
+      .get(`${API_BASE_URL}/properties/${editId}`)
+      .then((res) => {
+        if (!isMounted) return;
+        const p = res.data?.property;
+        if (p) {
+          if (p.uniqueCode) setAutoPropertyId(p.uniqueCode);
+          setTitle(p.title || '');
+          setDescription(p.description || '');
+          setPurpose(p.purpose === 'rent' || p.listingType === 'rent' ? 'Rent' : 'Sale');
+          setPropertyCategory(p.propertyCategory || 'Residential');
+          setPropertyType(p.propertyType || 'Flat');
+          setOtherPropertyType(p.otherPropertyType || '');
+          setSizeType(p.sizeType || 'Super Built-up Area');
+          setSizeValue(p.size || p.areaSqft ? String(p.size || p.areaSqft) : '');
+          setSizeUnit(p.sizeUnit || 'sqft');
+          setPlotFrontFt(p.plotFrontFt ? String(p.plotFrontFt) : '');
+          setPlotDepthFt(p.plotDepthFt ? String(p.plotDepthFt) : '');
+          setFrontRoadFt(p.frontRoadFt ? String(p.frontRoadFt) : '');
+          setIsCorner(Boolean(p.isCorner));
+          setIsParkFacing(Boolean(p.isParkFacing));
+          setIsTwoSideOpen(Boolean(p.isTwoSideOpen));
+          if (Array.isArray(p.facing) && p.facing.length > 0) setFacing(p.facing);
+          setExpectedPrice(p.price ? String(p.price) : '');
+          setBookingAmount(p.bookingAmount ? String(p.bookingAmount) : '');
+          setMaintenanceCharges(p.maintenanceCharges ? String(p.maintenanceCharges) : '');
+          setIsNegotiable(Boolean(p.isNegotiable));
+          setConstructionStatus(p.constructionStatus || 'Ready to move');
+          setFurnishing(p.furnishing || 'Semi-furnished');
+          if (Array.isArray(p.facilities)) setFacilities(p.facilities);
+          if (Array.isArray(p.amenities)) setAmenities(p.amenities);
+          if (p.bedrooms) setBedrooms(String(p.bedrooms));
+          if (p.bathrooms) setBathrooms(String(p.bathrooms));
+          if (p.hall) setHall(String(p.hall));
+          if (p.kitchen) setKitchen(String(p.kitchen));
+          if (p.balcony) setBalcony(String(p.balcony));
+          if (Array.isArray(p.parking) && p.parking[0]) setParking(p.parking[0]);
+          else if (typeof p.parking === 'string') setParking(p.parking);
+          if (p.state) setState(p.state);
+          if (p.city) setCity(p.city);
+          if (Array.isArray(p.areas) && p.areas.length > 0) setSelectedAreas(p.areas);
+          else if (p.locality) setSelectedAreas([p.locality]);
+          if (Array.isArray(p.subAreas)) setSubAreas(p.subAreas.join(', '));
+          if (p.projectName) setProjectName(p.projectName);
+          if (p.address) setAddress(p.address);
+          if (p.pincode) setPincode(p.pincode);
+          if (p.contactName) setContactName(p.contactName);
+          if (p.contactPhone) setContactPhone(p.contactPhone);
+          if (p.contactEmail) setContactEmail(p.contactEmail);
+          if (p.reraNumber) setReraNumber(p.reraNumber);
+          if (Array.isArray(p.images) && p.images.length > 0) {
+            setPhotos(
+              p.images.map((img, idx) => ({
+                url: img,
+                category: 'Exterior view',
+                isFeatured: img === p.featuredImage || idx === 0,
+              }))
+            );
+          }
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load property for editing:', err);
+        setSubmitError('Failed to load property details for editing.');
+      })
+      .finally(() => {
+        if (isMounted) setLoadingEdit(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [editId]);
 
   // Fetch subscription plans if needed
   useEffect(() => {
@@ -408,6 +495,13 @@ export default function PostPropertyPage() {
         ownerEmail: contactEmail.trim() || user?.email || '',
         postedByType: user?.userType || 'Owner',
       };
+
+      if (isEditMode) {
+        await axios.put(`${API_BASE_URL}/properties/user/${editId}`, payload, { headers });
+        alert('Property listing updated successfully!');
+        navigate('/my-listings');
+        return;
+      }
 
       const res = await axios.post(`${API_BASE_URL}/properties`, payload, { headers });
       setSuccessData(res.data.property || { uniqueCode: autoPropertyId, status: 'pending' });
@@ -650,14 +744,16 @@ export default function PostPropertyPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0f172a]">
-                Post Property on Property Adda
+                {isEditMode ? 'Edit Property Listing' : 'Post Property on Property Adda'}
               </h1>
               <span className="bg-[#2563eb] text-white text-[11px] font-black px-2 py-0.5 rounded-md tracking-wide">
-                FREE
+                {isEditMode ? 'EDIT' : 'FREE'}
               </span>
             </div>
             <p className="text-xs sm:text-sm text-[#64748b] mt-1">
-              Reach thousands of verified buyers & tenants with zero brokerage.
+              {isEditMode
+                ? 'Update property details, photos, dimensions, amenities, or pricing.'
+                : 'Reach thousands of verified buyers & tenants with zero brokerage.'}
             </p>
           </div>
 
@@ -1554,13 +1650,13 @@ export default function PostPropertyPage() {
           <div className="pt-2">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || loadingEdit}
               className="w-full py-4 px-6 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-base shadow-lg transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {submitting ? (
-                <span>Publishing Property Listing...</span>
+                <span>{isEditMode ? 'Saving Changes...' : 'Publishing Property Listing...'}</span>
               ) : (
-                <span>Post Property Listing Now →</span>
+                <span>{isEditMode ? 'Save & Update Property Listing →' : 'Post Property Listing Now →'}</span>
               )}
             </button>
           </div>

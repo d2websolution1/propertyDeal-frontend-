@@ -490,12 +490,12 @@ export default function MyListingsPage() {
                   <h3 className="text-lg font-bold text-[#0f172a]">
                     {activeTab === 'all' && 'All Listings'}
                     {activeTab === 'active' && 'Active Properties (Live on Website)'}
-                    {activeTab === 'pending' && 'Under Review (Awaiting Admin Permission)'}
+                    {activeTab === 'pending' && 'Under Review (Verification in Progress)'}
                     {activeTab === 'rejected' && 'Rejected Listings'}
                   </h3>
                   <p className="text-xs text-[#64748b] mt-0.5">
                     {activeTab === 'pending'
-                      ? 'These properties are undergoing verification by the admin team before appearing live.'
+                      ? 'These properties are undergoing verification before appearing live.'
                       : 'Manage, review status, and view inquiries for all properties listed under your account.'}
                   </p>
                 </div>
@@ -605,17 +605,28 @@ export default function MyListingsPage() {
                         </div>
 
                         <div className="p-4 pt-0 border-t border-slate-100 flex items-center justify-between gap-2 mt-2">
-                          <span className="text-[11px] text-slate-500">
-                            {prop.viewsCount || 0} Views
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            👁️ {prop.viewsCount || 0} Views
                           </span>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteListing(prop)}
-                            disabled={deletingId === (prop.id || prop._id)}
-                            className="px-3 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors cursor-pointer"
-                          >
-                            {deletingId === (prop.id || prop._id) ? 'Deleting...' : 'Delete'}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/post-property?edit=${prop.id || prop._id}`}
+                              className="px-3 py-1.5 rounded-lg border border-blue-200 text-[#2563eb] hover:bg-blue-50 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1 shadow-xs"
+                              title="Edit Property"
+                            >
+                              <span>✏️</span>
+                              <span>Edit</span>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteListing(prop)}
+                              disabled={deletingId === (prop.id || prop._id)}
+                              className="px-3 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1 shadow-xs"
+                            >
+                              <span>🗑️</span>
+                              <span>{deletingId === (prop.id || prop._id) ? 'Deleting...' : 'Delete'}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -854,7 +865,7 @@ export default function MyListingsPage() {
                 <span className="text-3xl">⏳</span>
                 <h4 className="text-base font-bold text-amber-900">Agent Upgrade Request Under Review</h4>
                 <p className="text-xs text-amber-700 max-w-md mx-auto">
-                  Your registration request as Real Estate Agent / Project Owner is submitted and currently being reviewed by Property Adda administrators.
+                  Your registration request as Real Estate Agent / Project Owner is submitted and currently being reviewed by Property Adda team.
                 </p>
               </div>
             ) : (

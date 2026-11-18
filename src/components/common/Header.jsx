@@ -822,21 +822,13 @@ const Header = () => {
                     <span>📑</span>
                     <span>My Listings</span>
                   </Link>
-                  {user?.role === "admin" ? (
+                  {user?.role === "admin" && (
                     <Link
                       to="/admin"
                       className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#D62839] hover:bg-[#fff1f2] rounded-lg transition-colors"
                     >
                       <span>🛡️</span>
                       <span>Admin Dashboard</span>
-                    </Link>
-                  ) : (
-                    <Link
-                      to="/admin/login"
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F3F5F8] hover:text-[#142D4E] rounded-lg transition-colors"
-                    >
-                      <span>🛡️</span>
-                      <span>Admin Portal</span>
                     </Link>
                   )}
                 </div>
@@ -1263,14 +1255,16 @@ const Header = () => {
                       <span>🧭 Plots & Land</span>
                       <span>→</span>
                     </Link>
-                    <Link
-                      to="/admin/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] flex items-center justify-between hover:bg-blue-100 transition-colors"
-                    >
-                      <span>🛡️ Admin Portal</span>
-                      <span>🔑</span>
-                    </Link>
+                    {user?.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-3 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] flex items-center justify-between hover:bg-blue-100 transition-colors"
+                      >
+                        <span>🛡️ Admin Dashboard</span>
+                        <span>🔑</span>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

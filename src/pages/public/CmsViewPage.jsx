@@ -200,28 +200,6 @@ const CmsViewPage = ({ defaultSlug }) => {
       {/* Main Container */}
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 -mt-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200/80 p-6 sm:p-10">
-          {/* If About Page: Show Stat Badges */}
-          {isAboutPage && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 pb-8 border-b border-gray-100">
-              <div className="bg-blue-50/60 p-4 rounded-xl text-center border border-blue-100">
-                <p className="text-2xl sm:text-3xl font-black text-[#2563eb]">71,000+</p>
-                <p className="text-xs text-gray-600 font-bold uppercase mt-1">Verified Listings</p>
-              </div>
-              <div className="bg-emerald-50/60 p-4 rounded-xl text-center border border-emerald-100">
-                <p className="text-2xl sm:text-3xl font-black text-emerald-600">0%</p>
-                <p className="text-xs text-gray-600 font-bold uppercase mt-1">Direct Brokerage</p>
-              </div>
-              <div className="bg-purple-50/60 p-4 rounded-xl text-center border border-purple-100">
-                <p className="text-2xl sm:text-3xl font-black text-purple-600">15+</p>
-                <p className="text-xs text-gray-600 font-bold uppercase mt-1">Major Indian Cities</p>
-              </div>
-              <div className="bg-amber-50/60 p-4 rounded-xl text-center border border-amber-100">
-                <p className="text-2xl sm:text-3xl font-black text-amber-600">100%</p>
-                <p className="text-xs text-gray-600 font-bold uppercase mt-1">Verified Sellers</p>
-              </div>
-            </div>
-          )}
-
           {/* Formatted Content */}
           <div className="prose prose-slate max-w-none text-sm sm:text-base leading-relaxed text-gray-700 whitespace-pre-line space-y-4">
             {page?.content ? (
