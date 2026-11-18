@@ -1,5 +1,6 @@
 // frontend/src/pages/admin/ManageProperties.jsx
 import React, { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
@@ -399,12 +400,22 @@ const ManageProperties = () => {
                   <div className="p-4 space-y-3">
                     <div>
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-gray-900 text-base line-clamp-1">
+                        <Link
+                          to={`/property/${property.uniqueCode || property._id || property.id}`}
+                          className="font-bold text-gray-900 text-base line-clamp-1 hover:text-[#D62839] transition-colors"
+                        >
                           {property.title}
-                        </h3>
-                        <span className="text-[#D62839] font-black text-base flex-shrink-0">
-                          {formatIndianPrice(property.price, property.listingType)}
-                        </span>
+                        </Link>
+                        <div className="text-right flex-shrink-0">
+                          <span className="text-[#D62839] font-black text-base block">
+                            {formatIndianPrice(property.price, property.listingType)}
+                          </span>
+                          {(property.pricePerSqft || (property.price && (property.areaSqft || property.size))) && (
+                            <span className="text-[10.5px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                              ₹{(property.pricePerSqft || Math.round(Number(property.price) / Number(property.areaSqft || property.size))).toLocaleString('en-IN')}/sq.ft
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <p className="text-gray-500 text-xs mt-1 flex items-center gap-1">

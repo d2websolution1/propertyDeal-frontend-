@@ -39,6 +39,11 @@ export default function MyListingsPage() {
   const [favorites, setFavorites] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState(false);
 
+  // Enquiries / Leads state (User Requirement: leads for Dealer & Owner)
+  const [enquiries, setEnquiries] = useState([]);
+  const [loadingEnquiries, setLoadingEnquiries] = useState(false);
+  const [enquiryError, setEnquiryError] = useState('');
+
   // Subscription state
   const [plans, setPlans] = useState([]);
   const [subscribingPlanId, setSubscribingPlanId] = useState(null);
@@ -115,16 +120,41 @@ export default function MyListingsPage() {
     }
   }, []);
 
+  // 4. Fetch My Enquiries / Leads (User Requirement)
+  const fetchMyEnquiries = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      setLoadingEnquiries(true);
+      setEnquiryError('');
+      const res = await axios.get(`${API_BASE_URL}/enquiries/my-enquiries`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data?.success) {
+        setEnquiries(res.data.enquiries || []);
+      }
+    } catch (err) {
+      console.error('Failed to load my enquiries:', err);
+      setEnquiryError(err.response?.data?.message || 'Could not load buyer enquiries.');
+    } finally {
+      setLoadingEnquiries(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchMyListings();
     fetchPlans();
-  }, [fetchMyListings, fetchPlans]);
+    fetchMyEnquiries();
+  }, [fetchMyListings, fetchPlans, fetchMyEnquiries]);
 
   useEffect(() => {
     if (navTab === 'favorites') {
       fetchFavorites();
+    } else if (navTab === 'enquiries') {
+      fetchMyEnquiries();
     }
-  }, [navTab, fetchFavorites]);
+  }, [navTab, fetchFavorites, fetchMyEnquiries]);
 
   // Remove property from favorites
   const handleRemoveFavorite = async (propId) => {
@@ -341,6 +371,22 @@ export default function MyListingsPage() {
             <span>❤️ Favorites</span>
             {favorites.length > 0 && (
               <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full">{favorites.length}</span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setNavTab('enquiries')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              navTab === 'enquiries'
+                ? 'bg-[#D62839] text-white shadow-sm'
+                : 'text-[#64748b] hover:text-[#0f172a] hover:bg-white'
+            }`}
+          >
+            <span>💬 Leads & Inquiries</span>
+            {enquiries.length > 0 && (
+              <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full font-bold">
+                {enquiries.length}
+              </span>
             )}
           </button>
 
@@ -892,6 +938,192 @@ export default function MyListingsPage() {
                   {submittingAgentReq ? 'Submitting Request...' : 'Submit Agent Registration Request →'}
                 </button>
               </form>
+            )}
+          </div>
+        )}
+        {/* ── TAB 5: LEADS & ENQUIRIES (USER REQUIREMENT) ── */}
+        {navTab === 'enquiries' && (
+          <div className="bg-white rounded-3xl border border-[#e2e8f0] p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-black text-slate-900">
+                    Buyer Leads & Property Enquiries
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#fff1f2] text-[#D62839]">
+                    {enquiries.length} {enquiries.length === 1 ? 'Lead' : 'Leads'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Prospective buyers & tenants who submitted inquiry forms on your listed properties.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={fetchMyEnquiries}
+                disabled={loadingEnquiries}
+                className="self-start sm:self-auto px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span>🔄</span>
+                <span>{loadingEnquiries ? 'Refreshing...' : 'Refresh Leads'}</span>
+              </button>
+            </div>
+
+            {enquiryError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-[#D62839]">
+                {enquiryError}
+              </div>
+            )}
+
+            {loadingEnquiries && (
+              <div className="space-y-4">
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="p-5 rounded-2xl border border-slate-100 bg-slate-50 animate-pulse space-y-3">
+                    <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+                    <div className="h-3 bg-slate-200 rounded w-2/3"></div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!loadingEnquiries && enquiries.length === 0 && (
+              <div className="py-12 text-center max-w-md mx-auto space-y-3">
+                <div className="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-2xl">
+                  💬
+                </div>
+                <h4 className="text-base font-bold text-slate-800">No Inquiries Received Yet</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  When prospective buyers or tenants visit your property details page and submit an inquiry form, their contact details and message will appear here in real time.
+                </p>
+                <Link
+                  to="/post-property"
+                  className="inline-block mt-2 px-5 py-2.5 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-bold shadow-md transition-colors"
+                >
+                  Post More Properties →
+                </Link>
+              </div>
+            )}
+
+            {!loadingEnquiries && enquiries.length > 0 && (
+              <div className="space-y-4">
+                {enquiries.map((enq) => {
+                  const prop = enq.property || {};
+                  const propId = prop._id || prop.id || enq.propertyId;
+                  const cleanPhone = enq.userPhone ? enq.userPhone.replace(/\D/g, '') : '';
+
+                  return (
+                    <div
+                      key={enq._id || enq.id}
+                      className="p-5 rounded-2xl border border-slate-200 bg-white hover:border-[#D62839]/40 hover:shadow-md transition-all space-y-3.5"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            {enq.status || 'New Lead'}
+                          </span>
+                          <span className="text-xs font-bold text-[#142D4E]">
+                            Property:
+                          </span>
+                          {propId ? (
+                            <Link
+                              to={`/property/${propId}`}
+                              className="text-xs font-bold text-[#D62839] hover:underline truncate max-w-sm"
+                            >
+                              {enq.propertyTitle || prop.title || 'View Property'} →
+                            </Link>
+                          ) : (
+                            <span className="text-xs font-bold text-slate-700">
+                              {enq.propertyTitle || 'Property Listing'}
+                            </span>
+                          )}
+                        </div>
+
+                        <span className="text-[11px] text-slate-400">
+                          {enq.createdAt ? new Date(enq.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }) : 'Recent'}
+                        </span>
+                      </div>
+
+                      {/* Prospective Buyer Info */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs">
+                        <div>
+                          <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Prospective Buyer
+                          </span>
+                          <strong className="text-[#142D4E] text-sm mt-0.5 block">
+                            {enq.userName}
+                          </strong>
+                        </div>
+                        <div>
+                          <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Phone Number
+                          </span>
+                          <strong className="text-slate-800 text-xs mt-0.5 block font-mono">
+                            {enq.userPhone || 'Not provided'}
+                          </strong>
+                        </div>
+                        <div>
+                          <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                            Email
+                          </span>
+                          <span className="text-slate-600 text-xs mt-0.5 block truncate">
+                            {enq.userEmail || 'Not provided'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Buyer Note / Message */}
+                      {enq.message && (
+                        <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200/60 text-xs text-slate-700">
+                          <strong className="text-amber-900 block mb-0.5">💬 Buyer's Message:</strong>
+                          <p className="italic">"{enq.message}"</p>
+                        </div>
+                      )}
+
+                      {/* Instant Buyer Contact Actions */}
+                      <div className="flex items-center gap-2 pt-1 flex-wrap">
+                        {enq.userPhone && (
+                          <>
+                            <a
+                              href={`tel:${enq.userPhone}`}
+                              className="py-2 px-3.5 rounded-xl bg-[#142D4E] hover:bg-[#0f233d] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                              </svg>
+                              <span>Call Buyer ({enq.userPhone})</span>
+                            </a>
+
+                            <a
+                              href={`https://wa.me/91${cleanPhone}?text=Hi%20${encodeURIComponent(enq.userName)},%20I%20am%20contacting%20you%20regarding%20your%20inquiry%20on%20our%20property:%20${encodeURIComponent(enq.propertyTitle || 'Property Adda Listing')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
+                            >
+                              <span>WhatsApp</span>
+                            </a>
+                          </>
+                        )}
+
+                        {propId && (
+                          <Link
+                            to={`/property/${propId}`}
+                            className="py-2 px-3 rounded-xl border border-slate-200 text-slate-700 hover:text-[#D62839] text-xs font-bold transition-colors ml-auto"
+                          >
+                            View Property →
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}

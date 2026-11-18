@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
+import ClientAuthModal from '../../components/common/ClientAuthModal';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
@@ -125,6 +126,11 @@ export default function PostPropertyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const fileInputRef = useRef(null);
+
+  // Pre-post Auth Gate States
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('signup');
+  const [selectedRole, setSelectedRole] = useState('Owner');
 
   // Auto-generated Property ID (display preview)
   const [autoPropertyId] = useState(() => 'PA-' + Math.floor(100000 + Math.random() * 900000));
@@ -482,10 +488,16 @@ export default function PostPropertyPage() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <Link
-              to="/my-listings"
-              className="w-full py-3 px-4 rounded-xl bg-[#2563eb] text-white font-bold text-xs hover:bg-[#1d4ed8] shadow-md transition-all text-center"
+              to={`/property/${successData.uniqueCode || successData._id || autoPropertyId}`}
+              className="w-full py-3 px-4 rounded-xl bg-[#D62839] text-white font-bold text-xs hover:bg-[#b81d2c] shadow-md transition-all text-center"
             >
-              View in My Listings →
+              View Property Details Page →
+            </Link>
+            <Link
+              to="/my-listings"
+              className="w-full py-3 px-4 rounded-xl bg-[#142D4E] text-white font-bold text-xs hover:bg-[#0f233d] shadow-md transition-all text-center"
+            >
+              Manage in My Listings →
             </Link>
             <button
               onClick={() => {
@@ -496,9 +508,108 @@ export default function PostPropertyPage() {
               }}
               className="w-full py-3 px-4 rounded-xl border border-[#cbd5e1] text-[#334155] font-bold text-xs hover:bg-[#f8fafc] transition-all cursor-pointer"
             >
-              + Post Another Property
+              + Post Another
             </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Require Account before posting property (Owner / Dealer / Builder)
+  const token = localStorage.getItem('token');
+  if (!user && !token) {
+    return (
+      <div className="min-h-screen bg-[#F3F5F8] py-16 px-4 sm:px-6">
+        <div className="max-w-xl mx-auto bg-white rounded-3xl border border-slate-200 p-8 shadow-sm text-center">
+          <div className="w-16 h-16 bg-[#fff1f2] border-2 border-[#D62839] text-[#D62839] rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold mb-4">
+            🏢
+          </div>
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#D62839] bg-[#fff1f2] px-3 py-1 rounded-full">
+            Step 1 · Account Required
+          </span>
+          <h2 className="text-2xl font-extrabold text-[#142D4E] mt-3">
+            Choose Account Type to Post Property
+          </h2>
+          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+            Direct buyer inquiries, verified badges, and listing management ke liye post property se pehle account banana zaroori hai. Please select your role:
+          </p>
+
+          {/* Role Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-6 text-left">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('Owner')}
+              className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                selectedRole === 'Owner'
+                  ? 'border-[#D62839] bg-[#fff1f2]/40 shadow-xs'
+                  : 'border-slate-200 hover:border-slate-300 bg-white'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-2xl">🏠</span>
+                <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  selectedRole === 'Owner' ? 'border-[#D62839] bg-[#D62839]' : 'border-slate-300'
+                }`}>
+                  {selectedRole === 'Owner' && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
+                </span>
+              </div>
+              <h4 className="font-extrabold text-sm text-[#142D4E]">Individual Owner</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Posting my own flat, house, or plot. 0% Brokerage.</p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedRole('Dealer / Agent')}
+              className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                selectedRole === 'Dealer / Agent'
+                  ? 'border-[#D62839] bg-[#fff1f2]/40 shadow-xs'
+                  : 'border-slate-200 hover:border-slate-300 bg-white'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-2xl">🤝</span>
+                <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  selectedRole === 'Dealer / Agent' ? 'border-[#D62839] bg-[#D62839]' : 'border-slate-300'
+                }`}>
+                  {selectedRole === 'Dealer / Agent' && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
+                </span>
+              </div>
+              <h4 className="font-extrabold text-sm text-[#142D4E]">Dealer / Agent</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Licensed broker, dealer or agent managing multiple client properties.</p>
+            </button>
+          </div>
+
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              onClick={() => {
+                setAuthModalMode('signup');
+                setAuthModalOpen(true);
+              }}
+              className="w-full py-3.5 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+            >
+              Create {selectedRole} Account & Post Property →
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setAuthModalMode('login');
+                setAuthModalOpen(true);
+              }}
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-[#142D4E] hover:text-[#D62839] transition-all cursor-pointer"
+            >
+              Already have an account? Sign In
+            </button>
+          </div>
+
+          <ClientAuthModal
+            isOpen={authModalOpen}
+            onClose={() => setAuthModalOpen(false)}
+            initialMode={authModalMode}
+            nextUrl="/post-property"
+          />
         </div>
       </div>
     );
@@ -507,6 +618,33 @@ export default function PostPropertyPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] py-8 px-4 sm:px-6 font-sans text-[#0f172a]">
       <div className="max-w-5xl mx-auto">
+        {/* Account Verification & Role Banner */}
+        <div className="mb-6 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#142D4E] text-white flex items-center justify-center font-bold text-sm">
+              {(user?.name || user?.firstName || 'U').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#142D4E]">
+                  Posting as: <strong className="text-[#D62839]">{user?.name || user?.firstName || 'Partner'}</strong>
+                </span>
+                <span className="text-[10px] font-extrabold uppercase bg-[#fff1f2] text-[#D62839] px-2 py-0.5 rounded">
+                  {user?.userType || 'Owner'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                {user?.email || user?.phone} · Direct buyer inquiries will be routed to your dashboard
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/my-listings"
+            className="text-xs font-bold text-[#142D4E] hover:text-[#D62839] bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 transition-colors"
+          >
+            My Listings & Leads →
+          </Link>
+        </div>
         {/* Main Title Banner */}
         <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>

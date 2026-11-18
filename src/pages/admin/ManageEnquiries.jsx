@@ -186,6 +186,7 @@ const ManageEnquiries = () => {
               <thead className="bg-gray-50/80 text-gray-500 text-[11px] font-bold uppercase tracking-wider border-b border-gray-200">
                 <tr>
                   <th className="px-5 py-3.5">Property</th>
+                  <th className="px-5 py-3.5">Owner / Dealer</th>
                   <th className="px-5 py-3.5">Prospective Buyer</th>
                   <th className="px-5 py-3.5">Message / Note</th>
                   <th className="px-5 py-3.5">Status</th>
@@ -200,10 +201,13 @@ const ManageEnquiries = () => {
                   const userEmail = enquiry.userEmail || enquiry.user?.email || "";
                   const userPhone = enquiry.userPhone || enquiry.user?.phone || "";
                   const propTitle = enquiry.propertyTitle || enquiry.property?.title || "Direct Website Enquiry";
+                  const ownerRole = enquiry.postedByType || enquiry.owner?.userType || "Owner";
+                  const ownerName = enquiry.ownerName || enquiry.owner?.name || "Property Owner";
+                  const ownerPhone = enquiry.ownerPhone || enquiry.owner?.phone || "";
 
                   return (
                     <tr key={enqId} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-5 py-3.5 max-w-[280px]">
+                      <td className="px-5 py-3.5 max-w-[240px]">
                         <p className="font-bold text-gray-900 truncate">{propTitle}</p>
                         {enquiry.propertyLocation && (
                           <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
@@ -214,6 +218,25 @@ const ManageEnquiries = () => {
                           <p className="text-[11px] font-bold text-emerald-700 mt-0.5">
                             ₹{Number(enquiry.property.price).toLocaleString("en-IN")}
                           </p>
+                        )}
+                      </td>
+
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-[#142D4E]">
+                            {ownerRole}
+                          </span>
+                        </div>
+                        <p className="font-bold text-gray-900 text-xs">
+                          {ownerName}
+                        </p>
+                        {ownerPhone && (
+                          <a
+                            href={`tel:${ownerPhone}`}
+                            className="text-[11px] text-blue-600 hover:underline block"
+                          >
+                            📞 {ownerPhone}
+                          </a>
                         )}
                       </td>
 

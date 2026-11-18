@@ -18,6 +18,7 @@ import ClientAuthPage from './pages/public/ClientAuthPage';
 import ProfilePage from './pages/public/ProfilePage';
 import MyListingsPage from './pages/public/MyListingsPage';
 import PostPropertyPage from './pages/public/PostPropertyPage';
+import PropertyDetailPage from './pages/public/PropertyDetailPage';
 import Pgpage from './pages/public/Pgpage';
 import Plotspage from './pages/public/Plotspage';
 import BlogsPage from './pages/public/BlogsPage';
@@ -106,6 +107,8 @@ function AppContent() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/my-listings" element={<MyListingsPage />} />
         <Route path="/post-property" element={<PostPropertyPage />} />
+        <Route path="/property/:id" element={<PropertyDetailPage />} />
+        <Route path="/properties/:id" element={<PropertyDetailPage />} />
 
         {/* Dynamic CMS Pages (Managed from Admin Panel) */}
         <Route path="/about-us" element={<CmsViewPage defaultSlug="about-us" />} />

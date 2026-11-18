@@ -44,6 +44,11 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   const [enquiryData, setEnquiryData] = useState({ name: '', phone: '', note: '' });
   const [favoriteIds, setFavoriteIds] = useState(new Set());
 
+  // Interactive Filter States
+  const [locationInput, setLocationInput] = useState('');
+  const [priceRange, setPriceRange] = useState('all');
+  const [selectedAmenity, setSelectedAmenity] = useState('');
+
   // Load user favorites if logged in
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -93,7 +98,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
 
   useEffect(() => {
     fetchProperties();
-  }, [filter, location.search]);
+  }, [filter, location.search, priceRange, selectedAmenity]);
 
   const fetchProperties = async () => {
     try {
@@ -111,6 +116,19 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
       if (queryMinPrice) url += `&minPrice=${encodeURIComponent(queryMinPrice)}`;
       if (queryMaxPrice) url += `&maxPrice=${encodeURIComponent(queryMaxPrice)}`;
       if (queryQ) url += `&q=${encodeURIComponent(queryQ)}`;
+
+      // Location Filter (User Requirement)
+      if (locationInput.trim()) url += `&location=${encodeURIComponent(locationInput.trim())}`;
+
+      // Amenities Filter (User Requirement)
+      if (selectedAmenity) url += `&amenities=${encodeURIComponent(selectedAmenity)}`;
+
+      // Budget / Price Range Filter (User Requirement)
+      if (priceRange !== 'all') {
+        const parts = priceRange.split('-');
+        if (parts[0]) url += `&minPrice=${parts[0]}`;
+        if (parts[1]) url += `&maxPrice=${parts[1]}`;
+      }
 
       const res = await axios.get(url);
       if (res.data?.success && res.data?.properties) {
@@ -259,6 +277,104 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
           </div>
         </div>
 
+        {/* Interactive Filter Bar (Price, Location & Amenities - User Requirement) */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-[#e2e8f0] shadow-xs mb-8 space-y-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+            {/* 1. Location Filter */}
+            <div className="sm:col-span-5">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                📍 Location / Locality
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Filter by City, Locality, or Project..."
+                  value={locationInput}
+                  onChange={(e) => setLocationInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && fetchProperties()}
+                  className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#D62839] focus:bg-white transition-all"
+                />
+                {locationInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLocationInput('');
+                    }}
+                    className="absolute right-2.5 top-2 text-xs text-slate-400 hover:text-slate-600"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* 2. Price Range Filter */}
+            <div className="sm:col-span-4">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                💰 Budget / Price Range
+              </label>
+              <select
+                value={priceRange}
+                onChange={(e) => setPriceRange(e.target.value)}
+                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#D62839] focus:bg-white transition-all cursor-pointer font-medium"
+              >
+                <option value="all">Any Budget / All Prices</option>
+                <option value="0-2500000">Under ₹25 Lakh</option>
+                <option value="2500000-5000000">₹25 Lakh - ₹50 Lakh</option>
+                <option value="5000000-10000000">₹50 Lakh - ₹1 Crore</option>
+                <option value="10000000-30000000">₹1 Crore - ₹3 Crore</option>
+                <option value="30000000-100000000">₹3 Crore & Above</option>
+              </select>
+            </div>
+
+            {/* 3. Action Buttons */}
+            <div className="sm:col-span-3 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={fetchProperties}
+                className="flex-1 py-2 px-3 rounded-xl bg-[#142D4E] hover:bg-[#0f233d] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                Filter Properties
+              </button>
+              {(locationInput || priceRange !== 'all' || selectedAmenity) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocationInput('');
+                    setPriceRange('all');
+                    setSelectedAmenity('');
+                  }}
+                  className="py-2 px-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-[#D62839] text-xs font-bold transition-colors cursor-pointer"
+                  title="Reset filters"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Amenities Filter Chips */}
+          <div className="pt-2 border-t border-slate-100 flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-bold text-slate-500 mr-1">
+              ✨ Amenities:
+            </span>
+            {['Gated society', 'Lift', 'Gym', 'Swimming pool', 'Security', 'Clubhouse', 'Parking', 'Modular kitchen'].map((am) => (
+              <button
+                key={am}
+                type="button"
+                onClick={() => setSelectedAmenity((prev) => (prev === am ? '' : am))}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                  selectedAmenity === am
+                    ? 'bg-[#D62839] text-white shadow-xs'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                }`}
+              >
+                {selectedAmenity === am ? `✓ ${am}` : am}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Loading State */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -336,11 +452,19 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                   {/* Body Content */}
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      {/* Price & BHK */}
-                      <div className="flex items-baseline justify-between gap-2 mb-1.5">
-                        <strong className="text-xl font-extrabold text-[#D62839]">
-                          {formatPrice(prop.price, prop.listingType)}
-                        </strong>
+                      {/* Price, Rate Per Sq.Ft & BHK */}
+                      <div className="flex items-baseline justify-between gap-2 mb-1.5 flex-wrap">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <strong className="text-xl font-extrabold text-[#D62839]">
+                            {formatPrice(prop.price, prop.listingType)}
+                          </strong>
+                          {/* RATE PER SQUARE FOOT DISPLAY (USER REQUIREMENT) */}
+                          {(prop.pricePerSqft || (prop.price && (prop.areaSqft || prop.size))) && (
+                            <span className="text-[11px] font-bold text-[#142D4E] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
+                              ₹{(prop.pricePerSqft || Math.round(Number(prop.price) / Number(prop.areaSqft || prop.size))).toLocaleString('en-IN')}/sq.ft
+                            </span>
+                          )}
+                        </div>
                         {prop.bhk && (
                           <span className="text-xs font-bold text-[#b45309] bg-[#fef3c7] px-2 py-0.5 rounded-md">
                             {prop.bhk}
@@ -348,10 +472,12 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                         )}
                       </div>
 
-                      {/* Title */}
-                      <h3 className="font-bold text-sm sm:text-base text-[#142D4E] line-clamp-1 group-hover:text-[#D62839] transition-colors mb-1">
-                        {prop.title}
-                      </h3>
+                      {/* Title with link to Details Page */}
+                      <Link to={`/property/${prop._id || prop.id}`}>
+                        <h3 className="font-bold text-sm sm:text-base text-[#142D4E] line-clamp-1 hover:text-[#D62839] transition-colors mb-1 cursor-pointer">
+                          {prop.title}
+                        </h3>
+                      </Link>
 
                       {/* Locality */}
                       <p className="text-xs text-[#64748b] flex items-center gap-1 mb-3">
@@ -378,6 +504,14 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
 
                     {/* Action buttons */}
                     <div className="pt-4 flex items-center gap-2">
+                      <Link
+                        to={`/property/${prop._id || prop.id}`}
+                        className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#142D4E] text-xs font-bold flex items-center justify-center transition-colors"
+                        title="View Full Property Details"
+                      >
+                        Details →
+                      </Link>
+
                       <button
                         type="button"
                         onClick={() => setSelectedProperty(prop)}
@@ -386,7 +520,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                         </svg>
-                        <span>Contact Owner</span>
+                        <span>Contact</span>
                       </button>
 
                       <a
