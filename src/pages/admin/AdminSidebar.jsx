@@ -12,7 +12,6 @@ const NAV_GROUPS = [
     items: [
       { label: "All Pages Content", icon: "fa-th-large", path: "/admin/content" },
       { label: "Navbar Dropdowns", icon: "fa-compass", path: "/admin/navigation" },
-      { label: "Advertisements", icon: "fa-ad", path: "/admin/advertisements" },
       { label: "CMS Pages", icon: "fa-file-alt", path: "/admin/cms" },
       { label: "Blog Management", icon: "fa-blog", path: "/admin/blogs" },
     ],
