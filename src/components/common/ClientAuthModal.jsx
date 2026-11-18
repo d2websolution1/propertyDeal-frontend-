@@ -333,54 +333,14 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
             </button>
           </div>
 
-          {/* Auth Method Switcher: Gmail OTP vs Mobile */}
-          <div className="flex items-center gap-2 bg-[#F3F5F8] p-1.5 rounded-xl border border-slate-200 text-xs">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMethod('gmail');
-                setOtpStep('input');
-                setError('');
-              }}
-              className={`flex-1 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                authMethod === 'gmail'
-                  ? 'bg-[#D62839] text-white shadow-xs'
-                  : 'text-[#64748B] hover:text-[#142D4E] bg-transparent'
-              }`}
-            >
-              <i className="fab fa-google text-xs"></i>
-              <span>Gmail OTP Verification</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMethod('mobile');
-                setError('');
-              }}
-              className={`flex-1 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                authMethod === 'mobile'
-                  ? 'bg-[#D62839] text-white shadow-xs'
-                  : 'text-[#64748B] hover:text-[#142D4E] bg-transparent'
-              }`}
-            >
-              <i className="fas fa-mobile-alt text-xs"></i>
-              <span>Mobile Number</span>
-            </button>
-          </div>
-
           {/* Title */}
           <div className="text-center">
             <h3 className="text-xl font-black text-[#142D4E]">
               {otpStep === 'otp'
                 ? 'Verify 6-Digit OTP'
                 : mode === 'signup'
-                  ? authMethod === 'mobile'
-                    ? 'Sign Up with Mobile Number'
-                    : 'Sign Up with Gmail OTP'
-                  : authMethod === 'mobile'
-                    ? 'Sign In with Mobile Number'
-                    : 'Sign In via Gmail OTP'}
+                  ? 'Sign Up with Gmail'
+                  : 'Sign In via Gmail OTP'}
             </h3>
             <p className="text-xs text-[#64748B] mt-1">
               {otpStep === 'otp'
@@ -461,26 +421,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                               onChange={(e) => setName(e.target.value)}
                               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
                             />
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                              Mobile Number <span className="text-[#D62839]">*</span>
-                            </label>
-                            <div className="flex rounded-xl border border-slate-300 overflow-hidden focus-within:border-[#D62839] focus-within:ring-1 focus-within:ring-[#D62839]">
-                              <span className="px-3 py-2 bg-slate-100 text-[#64748B] text-xs font-bold border-r border-slate-200 flex items-center">
-                                +91
-                              </span>
-                              <input
-                                type="tel"
-                                required
-                                maxLength="10"
-                                placeholder="10-digit mobile number"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                className="w-full px-3 py-2 text-xs text-[#142D4E] outline-none bg-white font-mono"
-                              />
-                            </div>
                           </div>
 
                           <div>
@@ -641,102 +581,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                 </form>
               )}
             </>
-          )}
-
-          {/* METHOD 2: MOBILE NUMBER AUTH */}
-          {authMethod === 'mobile' && (
-            <form onSubmit={handleMobileSubmit} className="space-y-3.5">
-              {mode === 'signup' && (
-                <>
-                  <div>
-                    <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                      Full Name <span className="text-[#D62839]">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Ramesh Kumar"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                      User Type:
-                    </label>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {['Owner', 'Dealer / Agent', 'Builder'].map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setUserType(t)}
-                          className={`py-1.5 px-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
-                            userType === t
-                              ? 'bg-[#142D4E] text-white border-[#142D4E]'
-                              : 'bg-[#F3F5F8] text-[#64748B] border-slate-200 hover:bg-slate-200'
-                          }`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                  Mobile Number <span className="text-[#D62839]">*</span>
-                </label>
-                <div className="flex rounded-xl border border-slate-300 overflow-hidden focus-within:border-[#D62839] focus-within:ring-1 focus-within:ring-[#D62839]">
-                  <span className="bg-slate-100 px-3 py-2.5 text-xs font-bold text-[#64748B] border-r border-slate-200 flex items-center gap-1.5">
-                    <span>🇮🇳</span>
-                    <span>+91</span>
-                  </span>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="98765 43210"
-                    maxLength={10}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    className="flex-1 px-3 py-2.5 text-xs sm:text-sm text-[#142D4E] outline-none bg-white font-mono"
-                  />
-                </div>
-                <p className="text-[10px] text-[#64748B] mt-1">Enter your 10-digit mobile number</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                  Password <span className="text-[#64748B] font-normal">({mode === 'signup' ? 'Optional' : 'If set'})</span>
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 active:scale-98"
-              >
-                {loading ? (
-                  <span>Processing...</span>
-                ) : (
-                  <span>
-                    {mode === 'signup'
-                      ? '📱 Create Account with Mobile →'
-                      : '📱 Sign In with Mobile Number →'}
-                  </span>
-                )}
-              </button>
-            </form>
           )}
 
           {/* Toggle between OTP and Password */}

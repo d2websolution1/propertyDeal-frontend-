@@ -322,42 +322,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
 
       <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-5 sm:px-8 shadow-xl shadow-slate-200/50 rounded-3xl border border-[#e2e8f0] space-y-5">
-          {/* Auth Method Switcher (Gmail OTP vs Mobile) */}
-          <div className="flex items-center gap-2 bg-[#F3F5F8] p-1.5 rounded-2xl border border-slate-200 text-xs">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMethod('gmail');
-                setOtpStep('input');
-                setError('');
-              }}
-              className={`flex-1 py-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                authMethod === 'gmail'
-                  ? 'bg-[#D62839] text-white shadow-xs'
-                  : 'text-[#64748B] hover:text-[#142D4E] bg-transparent'
-              }`}
-            >
-              <i className="fab fa-google text-xs"></i>
-              <span>Gmail OTP Verification</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMethod('mobile');
-                setError('');
-              }}
-              className={`flex-1 py-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                authMethod === 'mobile'
-                  ? 'bg-[#D62839] text-white shadow-xs'
-                  : 'text-[#64748B] hover:text-[#142D4E] bg-transparent'
-              }`}
-            >
-              <i className="fas fa-mobile-alt text-xs"></i>
-              <span>Mobile Number</span>
-            </button>
-          </div>
-
           {/* Alerts */}
           {error && (
             <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
@@ -431,27 +395,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
                               onChange={(e) => setName(e.target.value)}
                               className="w-full px-4 py-2.5 rounded-xl border border-[#cbd5e1] text-xs sm:text-sm text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
                             />
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
-                              Mobile Number <span className="text-[#D62839]">*</span>
-                            </label>
-                            <div className="flex rounded-xl border border-[#cbd5e1] overflow-hidden focus-within:border-[#D62839] focus-within:ring-1 focus-within:ring-[#D62839]">
-                              <span className="bg-slate-100 px-3 py-2.5 text-xs font-bold text-[#64748B] border-r border-[#cbd5e1] flex items-center gap-1.5">
-                                <span>🇮🇳</span>
-                                <span>+91</span>
-                              </span>
-                              <input
-                                type="tel"
-                                required
-                                maxLength={10}
-                                placeholder="98765 43210"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                                className="flex-1 px-3 py-2 text-xs sm:text-sm text-[#142D4E] outline-none bg-white font-mono"
-                              />
-                            </div>
                           </div>
 
                           <div>
@@ -608,102 +551,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
                 </form>
               )}
             </>
-          )}
-
-          {/* METHOD 2: MOBILE NUMBER AUTH */}
-          {authMethod === 'mobile' && (
-            <form onSubmit={handleMobileSubmit} className="space-y-4">
-              {mode === 'signup' && (
-                <>
-                  <div>
-                    <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
-                      Your Full Name <span className="text-[#D62839]">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Ramesh Kumar"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-[#cbd5e1] text-xs sm:text-sm text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
-                      I am a:
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Owner', 'Dealer / Agent', 'Builder'].map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setUserType(t)}
-                          className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                            userType === t
-                              ? 'bg-[#142D4E] text-white border-[#142D4E]'
-                              : 'bg-[#F3F5F8] text-[#64748B] border-[#cbd5e1] hover:bg-slate-200'
-                          }`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
-                  Mobile Number <span className="text-[#D62839]">*</span>
-                </label>
-                <div className="flex rounded-xl border border-[#cbd5e1] overflow-hidden focus-within:border-[#D62839] focus-within:ring-1 focus-within:ring-[#D62839]">
-                  <span className="bg-slate-100 px-3 py-2.5 text-xs font-bold text-[#64748B] border-r border-[#cbd5e1] flex items-center gap-1.5">
-                    <span>🇮🇳</span>
-                    <span>+91</span>
-                  </span>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="98765 43210"
-                    maxLength={10}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    className="flex-1 px-3 py-2 text-xs sm:text-sm text-[#142D4E] outline-none bg-white font-mono"
-                  />
-                </div>
-                <p className="text-[10px] text-[#64748B] mt-1">Enter your 10-digit mobile number</p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#142D4E] mb-1.5">
-                  Password <span className="text-[#64748B] font-normal">({mode === 'signup' ? 'Optional' : 'If set'})</span>
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#cbd5e1] text-xs sm:text-sm text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 px-4 rounded-2xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 active:scale-98"
-              >
-                {loading ? (
-                  <span>Processing...</span>
-                ) : (
-                  <span>
-                    {mode === 'signup'
-                      ? '📱 Create Account with Mobile →'
-                      : '📱 Sign In with Mobile Number →'}
-                  </span>
-                )}
-              </button>
-            </form>
           )}
 
           {/* Toggle Password vs OTP */}
