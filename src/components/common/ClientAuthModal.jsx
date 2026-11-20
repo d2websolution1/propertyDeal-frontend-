@@ -15,6 +15,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState('Owner');
+  const [selectedPlan, setSelectedPlan] = useState({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
   const [password, setPassword] = useState('');
   const [showPasswordLogin, setShowPasswordLogin] = useState(false);
 
@@ -132,6 +133,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         name: name.trim() || undefined,
         phone: phone ? phone.trim() : undefined,
         userType: userType || 'Owner',
+        activePlan: selectedPlan.name,
+        validityDays: selectedPlan.days,
       });
 
       setSuccessMsg(
@@ -436,7 +439,14 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                                 <button
                                   key={t.id}
                                   type="button"
-                                  onClick={() => setUserType(t.id)}
+                                  onClick={() => {
+                                    setUserType(t.id);
+                                    if (t.id === 'Dealer / Agent') {
+                                      setSelectedPlan({ name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹1999' });
+                                    } else {
+                                      setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
+                                    }
+                                  }}
                                   className={`py-1.5 px-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
                                     userType === t.id
                                       ? 'bg-[#142D4E] text-white border-[#142D4E]'
@@ -444,6 +454,45 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                                   }`}
                                 >
                                   {t.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                              Select Account Plan ({userType}):
+                            </label>
+                            <div className="grid grid-cols-1 gap-1.5">
+                              {(userType === 'Dealer / Agent'
+                                ? [
+                                    { name: 'Standard Agent Plan (45 Days)', days: 45, price: '₹999' },
+                                    { name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹1999' },
+                                    { name: 'Annual Agent Plan (365 Days)', days: 365, price: '₹4999' },
+                                  ]
+                                : [
+                                    { name: 'Free Starter (30 Days)', days: 30, price: '₹0' },
+                                    { name: 'Gold Owner Plan (60 Days)', days: 60, price: '₹499' },
+                                    { name: 'Annual Owner Plan (365 Days)', days: 365, price: '₹1499' },
+                                  ]
+                              ).map((p) => (
+                                <button
+                                  key={p.name}
+                                  type="button"
+                                  onClick={() => setSelectedPlan(p)}
+                                  className={`p-2 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between text-xs ${
+                                    selectedPlan.name === p.name
+                                      ? 'bg-blue-50 border-blue-500 text-blue-900 font-bold'
+                                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${selectedPlan.name === p.name ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}>
+                                      {selectedPlan.name === p.name && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
+                                    </span>
+                                    <span>{p.name}</span>
+                                  </div>
+                                  <span className="font-extrabold text-[#D62839]">{p.price}</span>
                                 </button>
                               ))}
                             </div>

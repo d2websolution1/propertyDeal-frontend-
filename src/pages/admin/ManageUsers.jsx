@@ -338,6 +338,19 @@ const ManageUsers = () => {
                       <td className="px-5 py-3.5">
                         <div className="space-y-1">
                           {getRoleBadge(u.userType)}
+                          
+                          {/* User Plan & Days Duration */}
+                          <div className="pt-0.5">
+                            <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md block w-max">
+                              📦 {u.activePlan || "Free Starter (30 Days)"}
+                            </span>
+                            <span className="text-[10px] text-gray-500 font-semibold block mt-0.5">
+                              {u.planExpiresAt
+                                ? `⏱️ ${Math.max(0, Math.ceil((new Date(u.planExpiresAt) - new Date()) / (1000 * 60 * 60 * 24)))} days validity left`
+                                : "⏱️ 30 days validity"}
+                            </span>
+                          </div>
+
                           {u.isVerifiedAgent && (
                             <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md flex items-center gap-1 w-max shadow-xs">
                               ✓ Verified Agent

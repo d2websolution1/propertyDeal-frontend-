@@ -25,6 +25,45 @@ const ManageVerifiedTags = () => {
   const [filter, setFilter] = useState("all");
   const [actionId, setActionId] = useState(null);
 
+  // Approved Authorities State
+  const [authorities, setAuthorities] = useState([]);
+  const [newAuthInput, setNewAuthInput] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+
+  const fetchAuthorities = useCallback(async () => {
+    try {
+      const res = await api.get("/authorities");
+      setAuthorities(res.data?.data || []);
+    } catch (e) {
+      console.error("Failed to load authorities:", e);
+    }
+  }, []);
+
+  const handleAddAuthority = async (e) => {
+    e.preventDefault();
+    if (!newAuthInput.trim()) return;
+    try {
+      setAuthLoading(true);
+      await api.post("/authorities", { name: newAuthInput.trim() });
+      setNewAuthInput("");
+      fetchAuthorities();
+    } catch (e) {
+      alert(e.response?.data?.message || "Failed to add authority");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleDeleteAuthority = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this authority option?")) return;
+    try {
+      await api.delete(`/authorities/${id}`);
+      setAuthorities((prev) => prev.filter((a) => (a.id || a._id) !== id));
+    } catch (e) {
+      alert("Failed to delete authority");
+    }
+  };
+
   const fetchProperties = useCallback(async () => {
     setLoading(true);
     try {
@@ -44,7 +83,8 @@ const ManageVerifiedTags = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [fetchProperties]);
+    fetchAuthorities();
+  }, [fetchProperties, fetchAuthorities]);
 
   const toggleVerified = async (property) => {
     const propId = property.id || property._id;
@@ -108,6 +148,60 @@ const ManageVerifiedTags = () => {
           >
             Unverified ({properties.filter((p) => !p.isVerified).length})
           </button>
+        </div>
+      </div>
+
+      {/* 🏛️ Approved Authorities Management Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-100">
+          <div>
+            <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
+              <span>🏛️</span> Manage Property Approved / Recognised Authorities
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              These authority options (e.g. JDA, DDA, Collector, Nagar Nigam) populate the Post Property & Detail page dropdowns
+            </p>
+          </div>
+
+          <form onSubmit={handleAddAuthority} className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="e.g. JDA, DDA, Collector, Other..."
+              value={newAuthInput}
+              onChange={(e) => setNewAuthInput(e.target.value)}
+              className="px-3.5 py-2 text-xs border border-gray-300 rounded-xl focus:border-[#D62839] outline-none w-56 sm:w-64"
+            />
+            <button
+              type="submit"
+              disabled={authLoading || !newAuthInput.trim()}
+              className="px-4 py-2 bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+            >
+              + Add
+            </button>
+          </form>
+        </div>
+
+        {/* Authorities Badges List */}
+        <div className="flex flex-wrap items-center gap-2">
+          {authorities.map((a) => {
+            const authId = a.id || a._id;
+            return (
+              <span
+                key={authId}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl text-xs font-bold shadow-2xs group"
+              >
+                <span>🏛️ {a.name}</span>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteAuthority(authId)}
+                  className="text-gray-400 hover:text-red-600 transition-colors ml-1 cursor-pointer"
+                  title="Delete authority"
+                >
+                  ✕
+                </button>
+              </span>
+            );
+          })}
         </div>
       </div>
 

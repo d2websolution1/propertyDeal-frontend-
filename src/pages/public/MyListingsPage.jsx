@@ -361,20 +361,6 @@ export default function MyListingsPage() {
           </button>
 
           <button
-            onClick={() => setNavTab('favorites')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-              navTab === 'favorites'
-                ? 'bg-[#2563eb] text-white shadow-sm'
-                : 'text-[#64748b] hover:text-[#0f172a] hover:bg-white'
-            }`}
-          >
-            <span>❤️ Favorites</span>
-            {favorites.length > 0 && (
-              <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-full">{favorites.length}</span>
-            )}
-          </button>
-
-          <button
             onClick={() => setNavTab('enquiries')}
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               navTab === 'enquiries'
@@ -634,85 +620,6 @@ export default function MyListingsPage() {
                 </div>
               )}
             </div>
-          </div>
-        )}
-
-        {/* ── TAB 2: FAVORITES ── */}
-        {navTab === 'favorites' && (
-          <div className="bg-white rounded-3xl border border-[#e2e8f0] p-6 shadow-sm space-y-4">
-            <div>
-              <h3 className="text-lg font-bold text-[#0f172a]">Saved & Favorited Properties</h3>
-              <p className="text-xs text-[#64748b] mt-0.5">
-                Quick access to properties you have shortlisted across Property Adda.
-              </p>
-            </div>
-
-            {loadingFavorites ? (
-              <div className="py-16 text-center text-slate-400">Loading your favorites...</div>
-            ) : favorites.length === 0 ? (
-              <div className="py-16 text-center">
-                <span className="text-4xl">❤️</span>
-                <p className="text-base font-bold text-slate-800 mt-3">No favorite properties saved yet</p>
-                <p className="text-xs text-slate-500 mt-1">
-                  Click the heart icon on any property card across the website to save it here.
-                </p>
-                <Link
-                  to="/"
-                  className="inline-block mt-4 px-6 py-2.5 rounded-xl bg-[#2563eb] text-white font-bold text-xs shadow-md"
-                >
-                  Explore Properties →
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                {favorites.map((prop) => {
-                  const imgUrl = Array.isArray(prop.images) && prop.images[0]
-                    ? prop.images[0]
-                    : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
-
-                  return (
-                    <div
-                      key={prop.id || prop._id}
-                      className="rounded-2xl border border-[#e2e8f0] overflow-hidden bg-white shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
-                          <img src={imgUrl} alt={prop.title} className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFavorite(prop.id || prop._id)}
-                            className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-md cursor-pointer hover:bg-rose-600"
-                            title="Remove from favorites"
-                          >
-                            ❤️
-                          </button>
-                        </div>
-                        <div className="p-4 space-y-1.5">
-                          <h4 className="font-bold text-sm text-[#0f172a] line-clamp-1">
-                            {prop.title || `${prop.propertyType} in ${prop.city}`}
-                          </h4>
-                          <p className="text-xs text-[#64748b]">
-                            📍 {prop.locality ? `${prop.locality}, ` : ''}{prop.city}
-                          </p>
-                          <p className="text-base font-extrabold text-[#2563eb]">
-                            {formatIndianPrice(prop.price, prop.listingType || prop.purpose)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="p-4 pt-0">
-                        <Link
-                          to="/"
-                          className="w-full block py-2 rounded-xl bg-[#eff6ff] text-[#2563eb] text-xs font-bold text-center hover:bg-[#dbeafe]"
-                        >
-                          View Property Details
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         )}
 

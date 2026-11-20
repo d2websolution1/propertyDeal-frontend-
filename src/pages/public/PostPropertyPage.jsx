@@ -189,7 +189,19 @@ export default function PostPropertyPage() {
   const [subAreas, setSubAreas] = useState('');
   const [projectName, setProjectName] = useState('');
   const [address, setAddress] = useState('');
-  const [pincode, setPincode] = useState('');
+
+  // Property Approval / Recognised By (JDA, DDA, Collector, etc. Managed by Admin)
+  const [authoritiesList, setAuthoritiesList] = useState([
+    'JDA Approved',
+    'DDA Approved',
+    'Collector Approved',
+    'Municipal Corporation',
+    'Other Collector',
+    'Gram Panchayat Approved',
+    'RERA Registered',
+    'Freehold / Registry Ready',
+  ]);
+  const [approvedAuthority, setApprovedAuthority] = useState('JDA Approved');
 
   // Dynamic locations from Admin
   const [locationsData, setLocationsData] = useState([]);
@@ -203,6 +215,16 @@ export default function PostPropertyPage() {
             setCity(res.data.locations[0].city);
             if (res.data.locations[0].state) setState(res.data.locations[0].state);
           }
+        }
+      })
+      .catch(() => {});
+
+    // Fetch approved authorities
+    axios
+      .get(`${API_BASE_URL}/authorities`)
+      .then((res) => {
+        if (Array.isArray(res.data?.authorities) && res.data.authorities.length > 0) {
+          setAuthoritiesList(res.data.authorities);
         }
       })
       .catch(() => {});
@@ -287,7 +309,7 @@ export default function PostPropertyPage() {
           if (Array.isArray(p.subAreas)) setSubAreas(p.subAreas.join(', '));
           if (p.projectName) setProjectName(p.projectName);
           if (p.address) setAddress(p.address);
-          if (p.pincode) setPincode(p.pincode);
+          if (p.approvedAuthority) setApprovedAuthority(p.approvedAuthority);
           if (p.contactName) setContactName(p.contactName);
           if (p.contactPhone) setContactPhone(p.contactPhone);
           if (p.contactEmail) setContactEmail(p.contactEmail);
@@ -422,6 +444,11 @@ export default function PostPropertyPage() {
     e.preventDefault();
     setSubmitError('');
 
+    if (!title.trim()) {
+      setSubmitError('Property Title is compulsory. Please enter a descriptive title.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     if (!city.trim()) {
       setSubmitError('Please select or enter the City.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -445,7 +472,8 @@ export default function PostPropertyPage() {
       const featuredPhoto = photos.find((p) => p.isFeatured)?.url || photos[0]?.url || '';
 
       const payload = {
-        title: title.trim() || `${propertyType} in ${city}`,
+        title: title.trim(),
+        uniqueCode: autoPropertyId,
         description: description.trim(),
         purpose: purpose.toLowerCase(),
         listingType: purpose.toLowerCase() === 'rent' ? 'rent' : 'sale',
@@ -485,11 +513,11 @@ export default function PostPropertyPage() {
         areas: selectedAreas,
         subAreas: subAreas ? subAreas.split(',').map((s) => s.trim()).filter(Boolean) : [],
         projectName: projectName.trim(),
-        pincode: pincode.trim(),
+        approvedAuthority,
         address: address.trim(),
         reraNumber: reraNumber.trim(),
         contactName: contactName.trim() || user?.name || 'Property Adda Partner',
-        whatsappAlerts,
+        whatsappAlerts: false,
         ownerName: contactName.trim() || user?.name || 'Property Adda Partner',
         ownerPhone: contactPhone.trim() || user?.phone || '',
         ownerEmail: contactEmail.trim() || user?.email || '',
@@ -877,10 +905,11 @@ export default function PostPropertyPage() {
             <div className="space-y-3 pt-2">
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Property Title (Text)
+                  Property Title (Text) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Spacious 3 BHK Luxury Apartment with Open Garden View"
@@ -1434,15 +1463,19 @@ export default function PostPropertyPage() {
 
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Pincode
+                  Property Approved / Recognised By
                 </label>
-                <input
-                  type="text"
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  placeholder="e.g. 201301"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
-                />
+                <select
+                  value={approvedAuthority}
+                  onChange={(e) => setApprovedAuthority(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] bg-white text-xs font-semibold text-[#0f172a] outline-none focus:border-[#2563eb]"
+                >
+                  {authoritiesList.map((auth) => (
+                    <option key={auth} value={auth}>
+                      {auth}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -1642,23 +1675,21 @@ export default function PostPropertyPage() {
               <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#0f172a]">
                 <input
                   type="checkbox"
-                  checked={whatsappAlerts}
-                  onChange={(e) => setWhatsappAlerts(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#2563eb]"
-                />
-                <span>Send me enquiry alerts on WhatsApp</span>
-              </label>
-
-              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#0f172a]">
-                <input
-                  type="checkbox"
                   required
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
                   className="w-4 h-4 rounded text-[#2563eb]"
                 />
                 <span>
-                  I confirm that all details provided are accurate and I agree to Property Adda Terms of Use.
+                  I confirm that all details provided are accurate and I agree to{' '}
+                  <a
+                    href="/cms/terms-and-conditions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#2563eb] underline hover:text-[#1d4ed8]"
+                  >
+                    Property Adda Terms of Use
+                  </a>.
                 </span>
               </label>
             </div>

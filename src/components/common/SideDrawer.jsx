@@ -19,7 +19,6 @@ const SideDrawer = ({ open, onClose, onLoginClick }) => {
   const activityItems = [
     { label: 'Contacted Properties', icon: <DescriptionOutlined fontSize="small" />, count: '00' },
     { label: 'Seen Properties', icon: <DescriptionOutlined fontSize="small" />, count: '00', active: true },
-    { label: 'Saved Properties', icon: <FavoriteBorder fontSize="small" />, count: '00' },
     { label: 'Recent Searches', icon: <SearchOutlined fontSize="small" />, count: '00' },
   ];
 

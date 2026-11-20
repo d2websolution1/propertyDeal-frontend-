@@ -295,11 +295,11 @@ const ManageProperties = () => {
         </div>
 
         {/* Search input */}
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 max-w-md">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 max-w-md flex-1">
           <i className="fas fa-search text-gray-400 text-sm"></i>
           <input
             type="text"
-            placeholder="Search by title, city, user name, email, phone or code..."
+            placeholder="Search by Property ID (e.g. PA-267759), Title, City, Owner..."
             value={search}
             onChange={(e) => {
               setPage(1);
@@ -575,6 +575,15 @@ const ManageProperties = () => {
                   )}
 
                   <div className="flex items-center gap-1.5">
+                    <Link
+                      to={`/post-property?edit=${propId}`}
+                      className="px-2.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-colors inline-flex items-center gap-1 border border-blue-200"
+                      title="Edit this Property Listing as Admin"
+                    >
+                      <i className="fas fa-edit"></i>
+                      <span>Edit</span>
+                    </Link>
+
                     <button
                       onClick={() => setDetailModal(property)}
                       className="px-2.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-colors cursor-pointer"
