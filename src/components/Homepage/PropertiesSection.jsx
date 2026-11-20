@@ -397,9 +397,6 @@ const CATEGORY_DATA = {
 const SEARCH_TABS = [
   { id: 'BUY', label: 'BUY', path: '/' },
   { id: 'RENT', label: 'RENT', path: '/rent' },
-  { id: 'COMMERCIAL', label: 'COMMERCIAL', path: '/commercial' },
-  { id: 'PLOTS', label: 'PLOTS', path: '/plots' },
-  { id: 'PG', label: 'PG / CO-LIVING', path: '/pg-co-living' },
 ];
 
 const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
@@ -600,13 +597,22 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                       </strong>
                     </div>
 
-                    <Link
-                      to={slide.link}
-                      className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
-                    >
-                      <span>Explore Now</span>
-                      <span>→</span>
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        to="/?purpose=sale"
+                        className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
+                      >
+                        <span>For Buy</span>
+                        <span>→</span>
+                      </Link>
+                      <Link
+                        to="/rent"
+                        className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white text-[#142D4E] hover:bg-slate-100 text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
+                      >
+                        <span>For Rent</span>
+                        <span>→</span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

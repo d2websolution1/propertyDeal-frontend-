@@ -265,6 +265,18 @@ const Header = () => {
 
         {/* Center: Desktop Navigation Dropdowns */}
         <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          {/* Direct Home Page Link */}
+          <Link
+            to="/"
+            className={`px-3 py-2 text-xs xl:text-sm font-semibold rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap ${
+              location.pathname === "/"
+                ? "bg-[#eff6ff] text-[#2563eb]"
+                : "text-[#1e293b] hover:text-[#2563eb]"
+            }`}
+          >
+            <span>Home</span>
+          </Link>
+
           {/* LATEST NEWS, ABOUT US & CONTACT SUPPORT (COMBINED DROPDOWN) */}
           <div
             className="relative"
@@ -584,8 +596,25 @@ const Header = () => {
                   </button>
                 </div>
 
-                {/* 3. Navigation Accordions */}
+                {/* 3. Navigation Links & Accordions */}
                 <div className="space-y-1.5 pt-1">
+                  {/* Home Mobile Link */}
+                  <Link
+                    to="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-colors ${
+                      location.pathname === "/"
+                        ? "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]"
+                        : "bg-white border-[#e2e8f0] text-[#0f172a] hover:bg-[#f8fafc]"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>🏠</span>
+                      <span>Home</span>
+                    </span>
+                    <span className="text-[11px] text-[#2563eb]">Visit →</span>
+                  </Link>
+
                   {/* Latest News, About Us & Support Accordion */}
                   <div className="rounded-xl border border-[#e2e8f0] overflow-hidden bg-white">
                     <button

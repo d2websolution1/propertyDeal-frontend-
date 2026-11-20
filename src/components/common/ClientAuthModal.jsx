@@ -33,7 +33,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
     setMode(initialMode);
     setError('');
     setSuccessMsg('');
-    setShowPasswordLogin(false);
+    setShowPasswordLogin(initialMode === 'login');
     setOtpStep('input');
     setOtp('');
 
@@ -90,6 +90,10 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         setError('Mobile number is mandatory. Please enter a valid 10-digit phone number.');
         return;
       }
+      if (!password || password.length < 6) {
+        setError('Please choose a password of at least 6 characters for future sign-ins.');
+        return;
+      }
     }
 
     try {
@@ -99,6 +103,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         name: name.trim() || undefined,
         phone: phone ? phone.trim() : undefined,
         userType: userType || 'Owner',
+        password: password || undefined,
       });
 
       setOtpStep('otp');
@@ -133,6 +138,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         name: name.trim() || undefined,
         phone: phone ? phone.trim() : undefined,
         userType: userType || 'Owner',
+        password: password || undefined,
         activePlan: selectedPlan.name,
         validityDays: selectedPlan.days,
       });
@@ -306,6 +312,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
               type="button"
               onClick={() => {
                 setMode('login');
+                setShowPasswordLogin(true);
                 setOtpStep('input');
                 setError('');
                 setSuccessMsg('');
@@ -322,6 +329,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
               type="button"
               onClick={() => {
                 setMode('signup');
+                setShowPasswordLogin(false);
                 setOtpStep('input');
                 setError('');
                 setSuccessMsg('');
@@ -342,13 +350,17 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
               {otpStep === 'otp'
                 ? 'Verify 6-Digit OTP'
                 : mode === 'signup'
-                  ? 'Sign Up with Gmail'
-                  : 'Sign In via Gmail OTP'}
+                  ? 'Create Client Account'
+                  : showPasswordLogin
+                    ? 'Sign In with Gmail & Password'
+                    : 'Sign In via Gmail OTP'}
             </h3>
             <p className="text-xs text-[#64748B] mt-1">
               {otpStep === 'otp'
                 ? `Enter the 6-digit verification code sent to ${email}`
-                : 'Secure Email OTP Verification • Direct Access to Verified Properties'}
+                : mode === 'signup'
+                  ? 'Sign up with Name, Mobile & Gmail OTP verification'
+                  : 'Enter your registered Gmail & password to access your dashboard'}
             </p>
           </div>
 
@@ -407,98 +419,108 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                     </span>
                   </div>
 
-                  {!showPasswordLogin ? (
-                    /* Gmail OTP Send Form */
-                    <form onSubmit={handleSendOtpSubmit} className="space-y-3.5">
-                      {mode === 'signup' && (
-                        <>
-                          <div>
-                            <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                              Full Name <span className="text-[#D62839]">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="e.g. Amit Sharma"
-                              value={name}
-                              onChange={(e) => setName(e.target.value)}
-                              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
-                            />
-                          </div>
+                  {mode === 'login' ? (
+                    showPasswordLogin ? (
+                      /* Traditional Gmail & Password Login */
+                      <form onSubmit={handlePasswordLoginSubmit} className="space-y-3.5">
+                        <div>
+                          <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                            Gmail / Email Address <span className="text-[#D62839]">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="e.g. yourname@gmail.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
+                          />
+                        </div>
 
-                          <div>
-                            <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                              User Type:
-                            </label>
-                            <div className="grid grid-cols-3 gap-1.5">
-                              {[
-                                { id: 'Owner', label: '👤 Owner' },
-                                { id: 'Dealer / Agent', label: '💼 Agent' },
-                                { id: 'Builder', label: '🏗️ Builder' },
-                              ].map((t) => (
-                                <button
-                                  key={t.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setUserType(t.id);
-                                    if (t.id === 'Dealer / Agent') {
-                                      setSelectedPlan({ name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹1999' });
-                                    } else {
-                                      setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
-                                    }
-                                  }}
-                                  className={`py-1.5 px-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer ${
-                                    userType === t.id
-                                      ? 'bg-[#142D4E] text-white border-[#142D4E]'
-                                      : 'bg-[#F3F5F8] text-[#64748B] border-slate-200 hover:bg-slate-200'
-                                  }`}
-                                >
-                                  {t.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
+                        <div>
+                          <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                            Password <span className="text-[#D62839]">*</span>
+                          </label>
+                          <input
+                            type="password"
+                            required
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
+                          />
+                        </div>
 
-                          <div>
-                            <label className="block text-xs font-bold text-[#142D4E] mb-1">
-                              Select Account Plan ({userType}):
-                            </label>
-                            <div className="grid grid-cols-1 gap-1.5">
-                              {(userType === 'Dealer / Agent'
-                                ? [
-                                    { name: 'Standard Agent Plan (45 Days)', days: 45, price: '₹999' },
-                                    { name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹1999' },
-                                    { name: 'Annual Agent Plan (365 Days)', days: 365, price: '₹4999' },
-                                  ]
-                                : [
-                                    { name: 'Free Starter (30 Days)', days: 30, price: '₹0' },
-                                    { name: 'Gold Owner Plan (60 Days)', days: 60, price: '₹499' },
-                                    { name: 'Annual Owner Plan (365 Days)', days: 365, price: '₹1499' },
-                                  ]
-                              ).map((p) => (
-                                <button
-                                  key={p.name}
-                                  type="button"
-                                  onClick={() => setSelectedPlan(p)}
-                                  className={`p-2 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between text-xs ${
-                                    selectedPlan.name === p.name
-                                      ? 'bg-blue-50 border-blue-500 text-blue-900 font-bold'
-                                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${selectedPlan.name === p.name ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}>
-                                      {selectedPlan.name === p.name && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
-                                    </span>
-                                    <span>{p.name}</span>
-                                  </div>
-                                  <span className="font-extrabold text-[#D62839]">{p.price}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </>
-                      )}
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                        >
+                          {loading ? 'Signing in...' : 'Sign In with Password →'}
+                        </button>
+                      </form>
+                    ) : (
+                      /* Gmail OTP Login Form */
+                      <form onSubmit={handleSendOtpSubmit} className="space-y-3.5">
+                        <div>
+                          <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                            Registered Gmail / Email <span className="text-[#D62839]">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="e.g. yourname@gmail.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                        >
+                          {loading ? 'Sending OTP code...' : 'Get 6-Digit OTP via Email →'}
+                        </button>
+                      </form>
+                    )
+                  ) : (
+                    /* Account Creation / Signup Form: Name + Mobile + Gmail + Password + UserType + Plan */
+                    <form onSubmit={handleSendOtpSubmit} className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                          Full Name <span className="text-[#D62839]">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Amit Sharma"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                          Mobile Number <span className="text-[#D62839]">*</span>
+                        </label>
+                        <div className="relative flex items-center">
+                          <span className="absolute left-3 text-xs font-bold text-slate-500 border-r border-slate-300 pr-2">
+                            +91
+                          </span>
+                          <input
+                            type="tel"
+                            required
+                            maxLength={10}
+                            placeholder="9876543210"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-full pl-14 pr-3.5 py-2 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
+                          />
+                        </div>
+                      </div>
 
                       <div>
                         <label className="block text-xs font-bold text-[#142D4E] mb-1">
@@ -510,8 +532,94 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                           placeholder="e.g. amit@gmail.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
                         />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                          Create Account Password <span className="text-[#D62839]">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          minLength={6}
+                          placeholder="Choose password (min 6 characters)"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] focus:ring-1 focus:ring-[#D62839] bg-[#F3F5F8]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                          User Type:
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'Owner', label: '👤 Individual Owner' },
+                            { id: 'Dealer / Agent', label: '💼 Dealer / Agent' },
+                          ].map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => {
+                                setUserType(t.id);
+                                if (t.id === 'Dealer / Agent') {
+                                  setSelectedPlan({ name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹1999' });
+                                } else {
+                                  setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
+                                }
+                              }}
+                              className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                                userType === t.id
+                                  ? 'bg-[#142D4E] text-white border-[#142D4E]'
+                                  : 'bg-[#F3F5F8] text-[#64748B] border-slate-200 hover:bg-slate-200'
+                              }`}
+                            >
+                              {t.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#142D4E] mb-1">
+                          Select Account Plan ({userType}):
+                        </label>
+                        <div className="grid grid-cols-1 gap-1.5">
+                          {(userType === 'Dealer / Agent'
+                            ? [
+                                { name: 'Standard Agent Plan (45 Days)', days: 45, price: '₹999' },
+                                { name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹1999' },
+                                { name: 'Annual Agent Plan (365 Days)', days: 365, price: '₹4999' },
+                              ]
+                            : [
+                                { name: 'Free Starter (30 Days)', days: 30, price: '₹0' },
+                                { name: 'Gold Owner Plan (60 Days)', days: 60, price: '₹499' },
+                                { name: 'Annual Owner Plan (365 Days)', days: 365, price: '₹1499' },
+                              ]
+                          ).map((p) => (
+                            <button
+                              key={p.name}
+                              type="button"
+                              onClick={() => setSelectedPlan(p)}
+                              className={`p-2 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between text-xs ${
+                                selectedPlan.name === p.name
+                                  ? 'bg-blue-50 border-blue-500 text-blue-900 font-bold'
+                                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${selectedPlan.name === p.name ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}>
+                                  {selectedPlan.name === p.name && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
+                                </span>
+                                <span>{p.name}</span>
+                              </div>
+                              <span className="font-extrabold text-[#D62839]">{p.price}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
 
                       <button
@@ -524,41 +632,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                         ) : (
                           <span>Get 6-Digit OTP via Email →</span>
                         )}
-                      </button>
-                    </form>
-                  ) : (
-                    /* Traditional Password Login */
-                    <form onSubmit={handlePasswordLoginSubmit} className="space-y-3.5">
-                      <div>
-                        <label className="block text-xs font-bold text-[#142D4E] mb-1">Email</label>
-                        <input
-                          type="email"
-                          required
-                          placeholder="admin@property-adda.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-[#142D4E] mb-1">Password</label>
-                        <input
-                          type="password"
-                          required
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-[#142D4E] outline-none focus:border-[#D62839] bg-[#F3F5F8]"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-60"
-                      >
-                        {loading ? 'Signing in...' : 'Sign In with Password'}
                       </button>
                     </form>
                   )}
@@ -632,8 +705,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
             </>
           )}
 
-          {/* Toggle between OTP and Password */}
-          {authMethod === 'gmail' && otpStep === 'input' && (
+          {/* Toggle between OTP and Password for Login */}
+          {mode === 'login' && otpStep === 'input' && (
             <div className="text-center pt-1 border-t border-slate-100">
               <button
                 type="button"
@@ -644,8 +717,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                 className="text-[11px] font-bold text-[#64748B] hover:text-[#D62839] transition-colors cursor-pointer"
               >
                 {showPasswordLogin
-                  ? '← Switch back to Gmail OTP login'
-                  : 'Have an account password? Sign in with password'}
+                  ? '🔑 Forgot password or prefer OTP? Sign in via Gmail OTP'
+                  : '← Switch back to Gmail & Password sign in'}
               </button>
             </div>
           )}

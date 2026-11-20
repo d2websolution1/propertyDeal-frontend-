@@ -123,6 +123,17 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const res = await api.get("/auth/me");
+      const freshUser = res.data.user || res.data;
+      setUser(freshUser);
+      return freshUser;
+    } catch {
+      return null;
+    }
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     setUser(null);
@@ -130,6 +141,8 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
+    refreshUser,
     isAuthenticated: !!user,
     loading,
     login,

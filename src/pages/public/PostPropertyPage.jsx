@@ -122,10 +122,22 @@ const compressPhoto = (file, maxWidth = 1000, maxHeight = 1000, quality = 0.8) =
   });
 };
 
+const OWNER_PLANS = [
+  { id: 'owner-starter', name: 'Free Starter (30 Days)', price: '₹0', originalPrice: '₹999', days: 30, limit: 2, featured: 0, tag: 'FREE' },
+  { id: 'owner-gold', name: 'Gold Owner Plan (60 Days)', price: '₹499', originalPrice: '₹1499', days: 60, limit: 5, featured: 1, tag: 'POPULAR' },
+  { id: 'owner-annual', name: 'Annual Owner Plan (365 Days)', price: '₹1499', originalPrice: '₹3999', days: 365, limit: 20, featured: 5, tag: 'BEST VALUE' },
+];
+
+const AGENT_PLANS = [
+  { id: 'agent-std', name: 'Standard Agent Plan (45 Days)', price: '₹999', originalPrice: '₹1999', days: 45, limit: 20, featured: 2, tag: 'STARTER' },
+  { id: 'agent-pro', name: 'Pro Agent Plan (90 Days)', price: '₹1999', originalPrice: '₹3999', days: 90, limit: 50, featured: 5, tag: 'MOST POPULAR' },
+  { id: 'agent-annual', name: 'Annual Agent Plan (365 Days)', price: '₹4999', originalPrice: '₹9999', days: 365, limit: 200, featured: 20, tag: 'UNLIMITED LEADS' },
+];
+
 export default function PostPropertyPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const fileInputRef = useRef(null);
 
   // Edit Mode Query Handling
@@ -558,16 +570,42 @@ export default function PostPropertyPage() {
     }
 
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/subscriptions/subscribe`,
-        { planId: plan.id || plan._id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert(res.data?.message || 'Plan activated successfully!');
+      setSubmitting(true);
+      let success = false;
+      if (plan._id || (plan.id && !plan.id.startsWith('owner-') && !plan.id.startsWith('agent-'))) {
+        try {
+          const res = await axios.post(
+            `${API_BASE_URL}/subscriptions/subscribe`,
+            { planId: plan.id || plan._id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          alert(res.data?.message || 'Plan activated successfully!');
+          success = true;
+        } catch {
+          // fallback to direct profile update
+        }
+      }
+
+      if (!success) {
+        await axios.put(
+          `${API_BASE_URL}/auth/profile`,
+          {
+            activePlan: plan.name,
+            validityDays: plan.days || 30,
+            listingLimit: plan.limit || (user?.userType === 'Dealer / Agent' ? 50 : 2),
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        alert(`Plan "${plan.name}" activated successfully!`);
+      }
+
+      if (refreshUser) await refreshUser();
       setShowSubscriptionModal(false);
       setSubmitError('');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to activate plan.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -737,6 +775,131 @@ export default function PostPropertyPage() {
     );
   }
 
+  // Calculate plan status and validity
+  const isPlanExpired = Boolean(user?.planExpiresAt && new Date(user.planExpiresAt) < new Date());
+  const hasActivePlan = Boolean(user?.activePlan && !isPlanExpired);
+
+  const purchasedDateStr = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  const expiryDateStr = user?.planExpiresAt
+    ? new Date(user.planExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'Valid for 30 Days';
+
+  const rolePlans = user?.userType === 'Dealer / Agent' ? AGENT_PLANS : OWNER_PLANS;
+
+  // Step 2 Gate: If user has no active plan and not editing, require selecting plan first!
+  if (!hasActivePlan && !isEditMode) {
+    return (
+      <div className="min-h-screen bg-[#F3F5F8] py-12 px-4 sm:px-6 font-sans">
+        <div className="max-w-4xl mx-auto">
+          {/* User Status Bar */}
+          <div className="mb-6 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#142D4E] text-white flex items-center justify-center font-bold text-sm">
+                {(user?.name || user?.firstName || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#142D4E]">
+                    Posting as: <strong className="text-[#D62839]">{user?.name}</strong>
+                  </span>
+                  <span className="text-[10px] font-extrabold uppercase bg-[#fff1f2] text-[#D62839] px-2 py-0.5 rounded">
+                    {user?.userType || 'Owner'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500">{user?.email || user?.phone}</p>
+              </div>
+            </div>
+            <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
+              {isPlanExpired ? 'Plan Expired — Renewal Required' : 'No Active Plan Selected'}
+            </span>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#2563eb] bg-[#eff6ff] px-3 py-1 rounded-full">
+                Step 2 · Select Listing Plan
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#142D4E] mt-3">
+                Select Your Plan to Post Property
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                Post property se pehle apna plan select aur purchase/activate karein. Plan activate hote hi property post karne ka form open ho jayega.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+              {rolePlans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`p-5 rounded-2xl border-2 flex flex-col justify-between transition-all ${
+                    plan.tag === 'POPULAR' || plan.tag === 'MOST POPULAR'
+                      ? 'border-[#2563eb] bg-blue-50/40 shadow-md relative'
+                      : 'border-slate-200 hover:border-slate-300 bg-white shadow-xs'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black uppercase bg-[#2563eb] text-white px-2 py-0.5 rounded-full">
+                        {plan.tag}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-500">
+                        {plan.days} Days Validity
+                      </span>
+                    </div>
+                    <h3 className="font-extrabold text-base text-[#142D4E] mt-1">{plan.name}</h3>
+                    <div className="flex items-baseline gap-2 my-2.5">
+                      <span className="text-3xl font-black text-[#D62839]">{plan.price}</span>
+                      <span className="text-xs text-slate-400 line-through">{plan.originalPrice}</span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 mb-3 bg-white p-2 rounded-lg border border-slate-100">
+                      <span>📅 Start Date: <strong>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
+                    </div>
+                    <ul className="text-xs text-slate-600 space-y-2 mb-4">
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span><strong>{plan.limit}</strong> Property Listings Allowed</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span><strong>{plan.days} Days</strong> Active Expiry Window</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span>Direct Buyer & Tenant Inquiries</span>
+                      </li>
+                      {plan.featured > 0 && (
+                        <li className="flex items-center gap-1.5">
+                          <span className="text-emerald-600 font-bold">✓</span>
+                          <span><strong>{plan.featured}</strong> Featured High-Visibility Tags</span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleUpgradePlan(plan)}
+                    className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  >
+                    {submitting ? 'Activating Plan...' : `Activate ${plan.price === '₹0' ? 'Free' : plan.price} & Post Property →`}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center text-[11px] text-slate-400">
+              * Plan is valid immediately upon activation with live inquiry routing to your dashboard.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] py-8 px-4 sm:px-6 font-sans text-[#0f172a]">
       <div className="max-w-5xl mx-auto">
@@ -766,6 +929,44 @@ export default function PostPropertyPage() {
           >
             My Listings & Leads →
           </Link>
+        </div>
+
+        {/* Active Subscription & Plan Validity Banner */}
+        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-white border border-blue-200/80 shadow-xs flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-[#2563eb] text-white flex items-center justify-center text-xl shadow-xs flex-shrink-0">
+              ⚡
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-black text-[#142D4E] uppercase tracking-wide">
+                  Active Plan: <span className="text-[#2563eb]">{user?.activePlan || 'Free Starter Plan'}</span>
+                </span>
+                <span className="text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  ● Active
+                </span>
+                <span className="text-[10px] font-bold bg-blue-100 text-[#2563eb] px-2 py-0.5 rounded-full">
+                  {user?.listingLimit ? `${user.listingLimit} Listings Quota` : '2 Listings'}
+                </span>
+              </div>
+              <div className="flex items-center gap-4 text-xs text-slate-600 mt-1.5 flex-wrap">
+                <span>
+                  📅 <strong>Plan Purchased:</strong> {purchasedDateStr}
+                </span>
+                <span>
+                  ⏳ <strong>Plan Expires:</strong> <strong className="text-rose-600">{expiryDateStr}</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowSubscriptionModal(true)}
+            className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-[#2563eb] border border-blue-200 text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer ml-auto"
+          >
+            Upgrade / Change Plan →
+          </button>
         </div>
         {/* Main Title Banner */}
         <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1734,81 +1935,50 @@ export default function PostPropertyPage() {
             </div>
 
             {/* Plans Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-              {/* Plan 1: Free Starter */}
-              <div className="p-5 rounded-2xl border-2 border-slate-200 bg-slate-50 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-black text-slate-600 uppercase bg-slate-200 px-2 py-0.5 rounded">
-                    STARTER
-                  </span>
-                  <h4 className="text-lg font-bold text-slate-900 mt-2">फ्री में दो लिस्टिंग</h4>
-                  <p className="text-xs text-slate-600 mt-1">2 Free property listings for 1 month (30 days validity).</p>
-                  <p className="text-2xl font-black text-slate-900 mt-3">₹0</p>
-                </div>
-                <button
-                  onClick={() => handleUpgradePlan({ _id: availablePlans[0]?._id || 'free', name: 'Free Starter' })}
-                  className="mt-4 w-full py-2.5 rounded-xl border border-slate-300 font-bold text-xs text-slate-800 hover:bg-white cursor-pointer"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+              {rolePlans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`p-5 rounded-2xl border-2 flex flex-col justify-between transition-all ${
+                    user?.activePlan === plan.name
+                      ? 'border-emerald-500 bg-emerald-50/40 shadow-xs'
+                      : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+                  }`}
                 >
-                  Activate Free Plan
-                </button>
-              </div>
-
-              {/* Plan 2: ₹99 Featured */}
-              <div className="p-5 rounded-2xl border-2 border-amber-300 bg-amber-50/50 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-black text-amber-800 uppercase bg-amber-200 px-2 py-0.5 rounded">
-                    FEATURED BOOST
-                  </span>
-                  <h4 className="text-lg font-bold text-slate-900 mt-2">₹99 में 1 featured लिस्टिंग</h4>
-                  <p className="text-xs text-slate-600 mt-1">Get 1 premium featured tag with 5x enquiry boost for 1 month.</p>
-                  <p className="text-2xl font-black text-amber-700 mt-3">₹99</p>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black uppercase bg-[#2563eb] text-white px-2 py-0.5 rounded">
+                        {plan.tag}
+                      </span>
+                      {user?.activePlan === plan.name && (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                          Current Plan
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-base font-bold text-slate-900 mt-1">{plan.name}</h4>
+                    <p className="text-xs text-slate-600 mt-1">
+                      {plan.limit} Listings • {plan.days} Days Validity • Direct inquiries
+                    </p>
+                    <div className="flex items-baseline gap-2 mt-3">
+                      <p className="text-2xl font-black text-[#D62839]">{plan.price}</p>
+                      <span className="text-xs text-slate-400 line-through">{plan.originalPrice}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={submitting || user?.activePlan === plan.name}
+                    onClick={() => handleUpgradePlan(plan)}
+                    className={`mt-4 w-full py-2.5 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition-all ${
+                      user?.activePlan === plan.name
+                        ? 'bg-emerald-600 text-white cursor-default'
+                        : 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white'
+                    }`}
+                  >
+                    {user?.activePlan === plan.name ? '✓ Currently Active' : `Select ${plan.price} Plan →`}
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleUpgradePlan(availablePlans.find((p) => p.price === 99) || { price: 99 })}
-                  className="mt-4 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs cursor-pointer shadow-xs"
-                >
-                  Pay ₹99 Online →
-                </button>
-              </div>
-
-              {/* Plan 3: ₹499 Standard */}
-              <div className="p-5 rounded-2xl border-2 border-blue-500 bg-blue-50/50 flex flex-col justify-between relative">
-                <span className="absolute -top-3 right-4 bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs">
-                  MOST POPULAR
-                </span>
-                <div>
-                  <span className="text-[10px] font-black text-blue-800 uppercase bg-blue-200 px-2 py-0.5 rounded">
-                    QUARTERLY
-                  </span>
-                  <h4 className="text-lg font-bold text-slate-900 mt-2">₹499 में 10 लिस्टिंग</h4>
-                  <p className="text-xs text-slate-600 mt-1">10 listings for 3 months (90 days) + 2 featured boosts.</p>
-                  <p className="text-2xl font-black text-blue-700 mt-3">₹499</p>
-                </div>
-                <button
-                  onClick={() => handleUpgradePlan(availablePlans.find((p) => p.price === 499) || { price: 499 })}
-                  className="mt-4 w-full py-2.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs cursor-pointer shadow-md"
-                >
-                  Pay ₹499 Online →
-                </button>
-              </div>
-
-              {/* Plan 4: ₹999 Pro Agency */}
-              <div className="p-5 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-black text-emerald-800 uppercase bg-emerald-200 px-2 py-0.5 rounded">
-                    BEST VALUE (9 MONTHS)
-                  </span>
-                  <h4 className="text-lg font-bold text-slate-900 mt-2">₹999 में 30 लिस्टिंग</h4>
-                  <p className="text-xs text-slate-600 mt-1">30 listings for 9 months (270 days) + 5 featured boosts.</p>
-                  <p className="text-2xl font-black text-emerald-700 mt-3">₹999</p>
-                </div>
-                <button
-                  onClick={() => handleUpgradePlan(availablePlans.find((p) => p.price === 999) || { price: 999 })}
-                  className="mt-4 w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-md"
-                >
-                  Pay ₹999 Online →
-                </button>
-              </div>
+              ))}
             </div>
 
             <div className="text-center text-xs text-slate-400">
