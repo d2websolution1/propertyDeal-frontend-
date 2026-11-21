@@ -36,35 +36,81 @@ const Footer = () => {
           {/* Quick Links */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Explore Property Adda
+              Explore Properties
             </h4>
             <ul className="space-y-2.5 text-xs">
               <li><Link to="/" className="hover:text-white transition-colors">Residential Properties for Sale</Link></li>
               <li><Link to="/rent" className="hover:text-white transition-colors">Flats & Houses for Rent</Link></li>
-              <li><Link to="/commercial" className="hover:text-white transition-colors">Commercial Shops & Office Spaces</Link></li>
+              <li><Link to="/commercial" className="hover:text-white transition-colors">Commercial Shops & Offices</Link></li>
               <li><Link to="/plots" className="hover:text-white transition-colors">Residential Plots & Land</Link></li>
               <li><Link to="/pg-co-living" className="hover:text-white transition-colors">PG & Co-Living Spaces</Link></li>
-              <li><Link to="/blogs" className="hover:text-white transition-colors">Latest News & Blogs</Link></li>
-              <li><Link to="/about-us" className="hover:text-white transition-colors font-medium">About Us</Link></li>
-              <li><Link to="/contact-us" className="hover:text-white transition-colors font-medium">Contact & Support</Link></li>
-              <li><Link to="/post-property" className="text-[#D62839] hover:text-[#ff4d5e] font-extrabold">Post Property for FREE →</Link></li>
+              <li><Link to="/post-property" className="text-[#D62839] hover:text-[#ff4d5e] font-extrabold inline-block pt-1">Post Property for FREE →</Link></li>
             </ul>
           </div>
 
-          {/* Popular Cities */}
+          {/* Latest News & Support (Moved from Header) */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Popular Searches
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 flex items-center gap-1.5">
+              <span>📰</span> Latest News & Support
             </h4>
-            <ul className="space-y-2.5 text-xs">
-              {topCities.map((city, idx) => (
-                <li key={idx}>
-                  <Link to={`/?q=${encodeURIComponent(city)}`} className="hover:text-white transition-colors">
-                    {city}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-2.5">
+              {/* 1. Latest News & Blogs */}
+              <Link
+                to="/blogs"
+                className="block p-2.5 rounded-xl bg-[#1b3a63]/80 hover:bg-[#22477a] border border-[#264977] transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">📰</span>
+                    <strong className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">
+                      Latest News & Blogs
+                    </strong>
+                  </div>
+                  <span className="text-[10px] text-blue-300 font-bold">Explore →</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                  Real estate market news, price trends & homebuyer guides
+                </p>
+              </Link>
+
+              {/* 2. About Us */}
+              <Link
+                to="/about-us"
+                className="block p-2.5 rounded-xl bg-[#1b3a63]/80 hover:bg-[#22477a] border border-[#264977] transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">ℹ️</span>
+                    <strong className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                      About Us
+                    </strong>
+                  </div>
+                  <span className="text-[10px] text-emerald-300 font-bold">Read →</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                  Learn about Property Adda, 100% verified listings & transparency
+                </p>
+              </Link>
+
+              {/* 3. Contact Support */}
+              <Link
+                to="/contact-us"
+                className="block p-2.5 rounded-xl bg-[#1b3a63]/80 hover:bg-[#22477a] border border-[#264977] transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">📞</span>
+                    <strong className="text-xs font-bold text-white group-hover:text-green-300 transition-colors">
+                      Contact Support
+                    </strong>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-bold">Live Desk →</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                  +91 9672 056 670 • WhatsApp chat & instant inquiries desk
+                </p>
+              </Link>
+            </div>
           </div>
 
           {/* Contact & Support */}
@@ -95,6 +141,19 @@ const Footer = () => {
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Popular Searches Bar */}
+        <div className="py-3.5 border-b border-[#1e3a61]/80 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-slate-300">
+          <span className="text-white font-bold uppercase tracking-wider text-[10px]">Popular Searches:</span>
+          {topCities.map((city, idx) => (
+            <React.Fragment key={idx}>
+              <Link to={`/?q=${encodeURIComponent(city)}`} className="hover:text-white hover:underline transition-colors">
+                {city}
+              </Link>
+              {idx < topCities.length - 1 && <span className="text-slate-600">|</span>}
+            </React.Fragment>
+          ))}
         </div>
 
         {/* Bottom Bar */}
