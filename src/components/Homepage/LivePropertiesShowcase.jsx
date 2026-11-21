@@ -93,7 +93,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
 
   // ── ADVANCED SEARCH FILTER STATES (Matching Image 1 & Image 3) ──
   const [purpose, setPurpose] = useState(queryPurpose || queryListingType || initialFilter || 'all');
-  const [city, setCity] = useState(queryCity || 'Jaipur');
+  const [city, setCity] = useState(queryCity || 'all');
   const [area, setArea] = useState(queryArea || '');
   const [subAreas, setSubAreas] = useState([]); // multiselect
   const [propertyType, setPropertyType] = useState(queryPropertyType || 'all');
@@ -141,7 +141,17 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   // Compute available areas for selected city
   const availableAreas = useMemo(() => {
     if (!city || city === 'all') {
-      return DEFAULT_JAIPUR_AREAS;
+      const allAreas = new Set(DEFAULT_JAIPUR_AREAS);
+      locationsData.forEach((l) => {
+        if (Array.isArray(l.areas)) {
+          l.areas.forEach((a) => allAreas.add(a));
+        }
+      });
+      properties.forEach((p) => {
+        if (p.locality) allAreas.add(p.locality);
+        if (Array.isArray(p.areas)) p.areas.forEach((a) => allAreas.add(a));
+      });
+      return Array.from(allAreas);
     }
     const matched = locationsData.find(
       (l) => l.city.toLowerCase().trim() === city.toLowerCase().trim()
@@ -153,7 +163,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
       return DEFAULT_JAIPUR_AREAS;
     }
     return ['Central Area', 'Main Market', 'Civil Lines', 'Model Town', 'Industrial Area', 'Green Park'];
-  }, [locationsData, city]);
+  }, [locationsData, city, properties]);
 
   // Filtered areas inside dropdown search box (like Image 1)
   const filteredAreasList = useMemo(() => {
@@ -541,7 +551,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                         !area ? 'bg-[#fff1f2] text-[#D62839]' : 'text-slate-700 hover:bg-slate-100'
                       }`}
                     >
-                      <span>All Areas in {city || 'City'}</span>
+                      <span>{city && city !== 'all' ? `All Areas in ${city}` : 'All Areas (All India)'}</span>
                       {!area && <span className="text-[#D62839]">✓</span>}
                     </button>
 
