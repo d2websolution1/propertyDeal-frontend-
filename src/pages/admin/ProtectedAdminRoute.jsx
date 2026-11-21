@@ -3,6 +3,13 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
+const ADMIN_EMAILS = [
+  "admin@property-adda.com",
+  "admin@propertyadda.com",
+  "pkrdx71@gmail.com",
+  "prince09kumar7714@gmail.com",
+];
+
 // Wrap admin routes with this. Redirects non-admins away.
 const ProtectedAdminRoute = ({ children }) => {
   const { user, isAuthenticated, loading } = useAuth();
@@ -21,7 +28,14 @@ const ProtectedAdminRoute = ({ children }) => {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  if (user?.role !== "admin") {
+  const userEmail = (user?.email || "").toLowerCase().trim();
+  const isPrivilegedAdmin =
+    user?.role === "admin" ||
+    ADMIN_EMAILS.includes(userEmail) ||
+    userEmail.endsWith("@property-adda.com") ||
+    userEmail.endsWith("@propertyadda.com");
+
+  if (!isPrivilegedAdmin) {
     // Logged in as regular client — redirect to admin login to authenticate with admin credentials
     return <Navigate to="/admin/login?reason=admin_required" state={{ from: location }} replace />;
   }

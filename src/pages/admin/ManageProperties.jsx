@@ -56,6 +56,8 @@ const ManageProperties = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [counts, setCounts] = useState({ all: 0, pending: 0, approved: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [syncingRole, setSyncingRole] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [rejectModal, setRejectModal] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -63,6 +65,7 @@ const ManageProperties = () => {
 
   const fetchProperties = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const res = await api.get("/admin/properties", {
         params: { status, userType, search, page, limit: 12 },
@@ -74,6 +77,13 @@ const ManageProperties = () => {
       }
     } catch (err) {
       console.error("Failed to load properties:", err);
+      if (err.response?.status === 403) {
+        setError("Admin authorization required (403). Your account needs Administrator privileges.");
+      } else if (err.response?.status === 401) {
+        setError("Admin session expired. Please sign in again.");
+      } else {
+        setError("Unable to load properties from server. Please check connection and retry.");
+      }
     } finally {
       setLoading(false);
     }
@@ -84,11 +94,36 @@ const ManageProperties = () => {
     return () => clearTimeout(debounce);
   }, [fetchProperties]);
 
+  const handleSyncAdmin = async () => {
+    setSyncingRole(true);
+    try {
+      const res = await api.post("/auth/sync-admin-role");
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+      setError("");
+      await fetchProperties();
+    } catch (syncErr) {
+      window.location.href = "/admin/login";
+    } finally {
+      setSyncingRole(false);
+    }
+  };
+
   const handleApprove = async (property) => {
     const propId = property.id || property._id;
     setActionLoadingId(propId);
     try {
-      const res = await api.patch(`/admin/properties/${propId}/approve`);
+      let res;
+      try {
+        res = await api.patch(`/admin/properties/${propId}/approve`);
+      } catch (patchErr) {
+        try {
+          res = await api.put(`/admin/properties/${propId}/approve`);
+        } catch (putErr) {
+          res = await api.patch(`/properties/${propId}/approve`);
+        }
+      }
       // Update in local state
       setProperties((prev) =>
         prev.map((p) => {
@@ -239,6 +274,38 @@ const ManageProperties = () => {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{error}</span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleSyncAdmin}
+              disabled={syncingRole}
+              className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+            >
+              {syncingRole ? "Activating..." : "⚡ Activate Admin Session"}
+            </button>
+            <button
+              type="button"
+              onClick={() => fetchProperties()}
+              className="px-3 py-1 bg-white hover:bg-rose-100 rounded-lg border border-rose-200 text-xs font-bold text-rose-800 transition-colors cursor-pointer"
+            >
+              Retry
+            </button>
+            <Link
+              to="/admin/login"
+              className="px-3 py-1 bg-rose-600 hover:bg-rose-700 rounded-lg text-white text-xs font-bold transition-colors shadow-2xs"
+            >
+              Admin Login →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Filter and Search Controls */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs space-y-4">

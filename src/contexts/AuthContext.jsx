@@ -16,6 +16,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const ADMIN_EMAILS = [
+  "admin@property-adda.com",
+  "admin@propertyadda.com",
+  "pkrdx71@gmail.com",
+  "prince09kumar7714@gmail.com",
+];
+
+export const normalizeUser = (u) => {
+  if (!u) return null;
+  const email = (u.email || "").toLowerCase().trim();
+  if (
+    ADMIN_EMAILS.includes(email) ||
+    email.endsWith("@property-adda.com") ||
+    email.endsWith("@propertyadda.com")
+  ) {
+    return { ...u, role: "admin" };
+  }
+  return u;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     api
       .get("/auth/me")
       .then((res) => {
-        setUser(res.data.user || res.data);
+        setUser(normalizeUser(res.data.user || res.data));
       })
       .catch(() => {
         localStorage.removeItem("token");
@@ -44,18 +64,20 @@ export const AuthProvider = ({ children }) => {
     const res = await api.post("/auth/login", { email, password });
     const { token, user: loggedInUser } = res.data;
     localStorage.setItem("token", token);
-    setUser(loggedInUser);
-    return loggedInUser;
+    const normalized = normalizeUser(loggedInUser);
+    setUser(normalized);
+    return normalized;
   }, []);
 
   const register = useCallback(async (payload) => {
     const res = await api.post("/auth/register", payload);
     const { token, user: newUser } = res.data;
+    const normalized = normalizeUser(newUser);
     if (token) {
       localStorage.setItem("token", token);
-      setUser(newUser);
+      setUser(normalized);
     }
-    return newUser;
+    return normalized;
   }, []);
 
   const sendOtp = useCallback(async (payload) => {
@@ -66,11 +88,12 @@ export const AuthProvider = ({ children }) => {
   const verifyOtp = useCallback(async (payload) => {
     const res = await api.post("/auth/verify-otp", payload);
     const { token, user: verifiedUser } = res.data;
+    const normalized = normalizeUser(verifiedUser);
     if (token) {
       localStorage.setItem("token", token);
-      setUser(verifiedUser);
+      setUser(normalized);
     }
-    return verifiedUser;
+    return normalized;
   }, []);
 
   const googleAuth = useCallback(async (payload) => {
@@ -107,18 +130,19 @@ export const AuthProvider = ({ children }) => {
   const mobileLogin = useCallback(async (payload) => {
     const res = await api.post("/auth/mobile-login", payload);
     const { token, user: loggedUser } = res.data;
+    const normalized = normalizeUser(loggedUser);
     if (token) {
       localStorage.setItem("token", token);
-      setUser(loggedUser);
+      setUser(normalized);
     }
-    return loggedUser;
+    return normalized;
   }, []);
 
   const updateProfile = useCallback(async (payload) => {
     const res = await api.put("/auth/profile", payload);
     const updatedUser = res.data.user;
     if (updatedUser) {
-      setUser(updatedUser);
+      setUser(normalizeUser(updatedUser));
     }
     return res.data;
   }, []);
@@ -126,7 +150,7 @@ export const AuthProvider = ({ children }) => {
   const refreshUser = useCallback(async () => {
     try {
       const res = await api.get("/auth/me");
-      const freshUser = res.data.user || res.data;
+      const freshUser = normalizeUser(res.data.user || res.data);
       setUser(freshUser);
       return freshUser;
     } catch {

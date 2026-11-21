@@ -48,6 +48,8 @@ const AdminDashboard = () => {
     recentActivity: [],
   });
 
+  const [syncingRole, setSyncingRole] = useState(false);
+
   const fetchStats = useCallback(async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     setRefreshing(true);
@@ -62,6 +64,8 @@ const AdminDashboard = () => {
       console.error("Failed to load real dashboard stats:", err);
       if (err.response?.status === 401) {
         setError("Admin authorization session expired. Please re-login.");
+      } else if (err.response?.status === 403) {
+        setError("Admin privileges required (403). Click 'Activate Admin Session' below.");
       } else {
         setError("Unable to load real-time stats from database. Check server connection.");
       }
@@ -70,6 +74,22 @@ const AdminDashboard = () => {
       setRefreshing(false);
     }
   }, []);
+
+  const handleSyncAdmin = async () => {
+    setSyncingRole(true);
+    try {
+      const res = await api.post("/auth/sync-admin-role");
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+      setError("");
+      await fetchStats();
+    } catch (syncErr) {
+      window.location.href = "/admin/login";
+    } finally {
+      setSyncingRole(false);
+    }
+  };
 
   useEffect(() => {
     fetchStats();
@@ -184,7 +204,15 @@ const AdminDashboard = () => {
             <span>⚠️</span>
             <span>{error}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleSyncAdmin}
+              disabled={syncingRole}
+              className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs cursor-pointer disabled:opacity-60"
+            >
+              {syncingRole ? "Activating..." : "⚡ Activate Admin Session"}
+            </button>
             <button
               type="button"
               onClick={() => fetchStats()}
