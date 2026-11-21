@@ -1102,26 +1102,70 @@ export default function PostPropertyPage() {
               </div>
             )}
 
-            {/* Title & Description */}
-            <div className="space-y-3 pt-2">
+            {/* Title & Description with Dropdown Options */}
+            <div className="space-y-4 pt-2">
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Property Title (Text) <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-[#334155]">
+                    Property Title <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-[11px] text-[#2563eb] font-semibold">Select from dropdown or type below</span>
+                </div>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setTitle(e.target.value);
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/60 text-xs font-semibold text-[#142D4E] outline-none focus:border-[#2563eb] cursor-pointer mb-2"
+                >
+                  <option value="">-- Select Property Title from Dropdown Options --</option>
+                  <option value="Spacious 3 BHK Luxury Apartment with Open Garden View">Spacious 3 BHK Luxury Apartment with Open Garden View</option>
+                  <option value="2 BHK Well-Ventilated Ready to Move Flat">2 BHK Well-Ventilated Ready to Move Flat</option>
+                  <option value="Prime Residential Plot in Gated Township near Main Road">Prime Residential Plot in Gated Township near Main Road</option>
+                  <option value="Independent House / Villa with Personal Car Parking">Independent House / Villa with Personal Car Parking</option>
+                  <option value="Commercial Retail Shop / Office Space in Main Market">Commercial Retail Shop / Office Space in Main Market</option>
+                  <option value="Corner Plot with Wide Road Facing & Immediate Registry">Corner Plot with Wide Road Facing & Immediate Registry</option>
+                  <option value="Luxury 4 BHK Penthouse with Private Terrace">Luxury 4 BHK Penthouse with Private Terrace</option>
+                  <option value="Furnished 1 BHK Studio Apartment in Prime Locality">Furnished 1 BHK Studio Apartment in Prime Locality</option>
+                  <option value="Industrial Plot / Warehouse Space near Highway">Industrial Plot / Warehouse Space near Highway</option>
+                  <option value="Agricultural Farm House Land with Water Connection">Agricultural Farm House Land with Water Connection</option>
+                </select>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Spacious 3 BHK Luxury Apartment with Open Garden View"
+                  placeholder="Or type custom title, e.g. Spacious 3 BHK Luxury Apartment..."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Description (Text) <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-[#334155]">
+                    Description <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-[11px] text-[#2563eb] font-semibold">Select template or type custom</span>
+                </div>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setDescription(e.target.value);
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/60 text-xs font-semibold text-[#142D4E] outline-none focus:border-[#2563eb] cursor-pointer mb-2"
+                >
+                  <option value="">-- Select Description Template from Dropdown Options --</option>
+                  <option value="Premium residential apartment featuring spacious well-ventilated rooms, vastu-compliant layout, modular kitchen, branded fittings, 24/7 power backup, CCTV security, covered parking and excellent connectivity to nearby metro and top schools.">
+                    Residential Apartment Template (Modular kitchen, 24/7 security, metro connectivity)
+                  </option>
+                  <option value="Prime residential plot situated in an approved gated society. Clear title with immediate registry, 40 ft wide road facing, complete electricity & water supply, boundary wall demarcated, high appreciation potential.">
+                    Residential Plot Template (Clear title, wide road, gated colony, immediate registry)
+                  </option>
+                  <option value="Independent house / luxury kothi with modern construction, personal car porch, private open terrace, spacious bedrooms, peaceful green locality, close to markets, banks and healthcare centers.">
+                    Independent House / Villa Template (Personal parking, terrace, green colony)
+                  </option>
+                  <option value="Prime commercial space / retail shop on main arterial road with high footfall, wide frontage, ample customer parking, 100% power backup, ideal for banks, retail brands, clinics or corporate offices.">
+                    Commercial Space Template (Main road frontage, high footfall, parking)
+                  </option>
+                </select>
                 <textarea
                   rows={3}
                   required
@@ -1143,7 +1187,7 @@ export default function PostPropertyPage() {
               <h2 className="text-base font-bold text-[#0f172a]">Size, Dimensions & Facing</h2>
             </div>
 
-            {/* Size Type, Value, Unit */}
+            {/* Size Type, Value, Unit with Dropdowns */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1.5">
@@ -1161,15 +1205,41 @@ export default function PostPropertyPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1.5">
+                <label className="block text-xs font-bold text-[#334155] mb-1">
                   Size Value <span className="text-rose-500">*</span>
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setSizeValue(e.target.value);
+                  }}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Select Standard Size --</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="111.11">111.11 (100 Gaj)</option>
+                  <option value="150">150</option>
+                  <option value="166.67">166.67 (150 Gaj)</option>
+                  <option value="200">200</option>
+                  <option value="222.22">222.22 (200 Gaj)</option>
+                  <option value="250">250</option>
+                  <option value="500">500</option>
+                  <option value="800">800</option>
+                  <option value="1000">1000</option>
+                  <option value="1200">1200</option>
+                  <option value="1500">1500</option>
+                  <option value="1800">1800</option>
+                  <option value="2000">2000</option>
+                  <option value="2500">2500</option>
+                  <option value="3000">3000</option>
+                  <option value="5000">5000</option>
+                </select>
                 <input
                   type="number"
                   required
                   value={sizeValue}
                   onChange={(e) => setSizeValue(e.target.value)}
-                  placeholder="e.g. 1500"
+                  placeholder="Or type size e.g. 1500"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -1190,17 +1260,36 @@ export default function PostPropertyPage() {
               </div>
             </div>
 
-            {/* Plot Dimensions & Road Size */}
+            {/* Plot Dimensions & Road Size with Dropdowns */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1">
                   Front in ft (Plot dimensions)
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setPlotFrontFt(e.target.value);
+                  }}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Select Front (ft) --</option>
+                  <option value="15">15 ft</option>
+                  <option value="20">20 ft</option>
+                  <option value="25">25 ft</option>
+                  <option value="30">30 ft</option>
+                  <option value="35">35 ft</option>
+                  <option value="40">40 ft</option>
+                  <option value="45">45 ft</option>
+                  <option value="50">50 ft</option>
+                  <option value="60">60 ft</option>
+                  <option value="80">80 ft</option>
+                  <option value="100">100 ft</option>
+                </select>
                 <input
                   type="number"
                   value={plotFrontFt}
                   onChange={(e) => setPlotFrontFt(e.target.value)}
-                  placeholder="e.g. 30"
+                  placeholder="Or type front e.g. 30"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -1209,11 +1298,30 @@ export default function PostPropertyPage() {
                 <label className="block text-xs font-bold text-[#334155] mb-1">
                   Depth in ft (Plot dimensions)
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setPlotDepthFt(e.target.value);
+                  }}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Select Depth (ft) --</option>
+                  <option value="30">30 ft</option>
+                  <option value="35">35 ft</option>
+                  <option value="40">40 ft</option>
+                  <option value="45">45 ft</option>
+                  <option value="50">50 ft</option>
+                  <option value="55">55 ft</option>
+                  <option value="60">60 ft</option>
+                  <option value="70">70 ft</option>
+                  <option value="80">80 ft</option>
+                  <option value="90">90 ft</option>
+                  <option value="100">100 ft</option>
+                </select>
                 <input
                   type="number"
                   value={plotDepthFt}
                   onChange={(e) => setPlotDepthFt(e.target.value)}
-                  placeholder="e.g. 50"
+                  placeholder="Or type depth e.g. 50"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -1222,11 +1330,28 @@ export default function PostPropertyPage() {
                 <label className="block text-xs font-bold text-[#334155] mb-1">
                   Front Road size in ft
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setFrontRoadFt(e.target.value);
+                  }}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Select Road Size (ft) --</option>
+                  <option value="20">20 ft Road</option>
+                  <option value="30">30 ft Road</option>
+                  <option value="40">40 ft Road</option>
+                  <option value="60">60 ft Road</option>
+                  <option value="80">80 ft Sector Road</option>
+                  <option value="100">100 ft Main Road</option>
+                  <option value="120">120 ft Express Road</option>
+                  <option value="160">160 ft Highway Road</option>
+                  <option value="200">200 ft Bypass Road</option>
+                </select>
                 <input
                   type="number"
                   value={frontRoadFt}
                   onChange={(e) => setFrontRoadFt(e.target.value)}
-                  placeholder="e.g. 40"
+                  placeholder="Or type road size e.g. 40"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -1310,6 +1435,47 @@ export default function PostPropertyPage() {
                   {purpose === 'Rent' ? 'Rent value / month' : 'Expected Sale Price'}{' '}
                   <span className="text-rose-500">*</span>
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setExpectedPrice(e.target.value);
+                  }}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Select Price Budget or Type Below --</option>
+                  {purpose === 'Rent' ? (
+                    <>
+                      <option value="8000">₹8,000 / month</option>
+                      <option value="12000">₹12,000 / month</option>
+                      <option value="15000">₹15,000 / month</option>
+                      <option value="20000">₹20,000 / month</option>
+                      <option value="25000">₹25,000 / month</option>
+                      <option value="35000">₹35,000 / month</option>
+                      <option value="50000">₹50,000 / month</option>
+                      <option value="75000">₹75,000 / month</option>
+                      <option value="100000">₹1,00,000 / month</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="1000000">₹10 Lakh</option>
+                      <option value="1500000">₹15 Lakh</option>
+                      <option value="2000000">₹20 Lakh</option>
+                      <option value="2500000">₹25 Lakh</option>
+                      <option value="3000000">₹30 Lakh</option>
+                      <option value="3500000">₹35 Lakh</option>
+                      <option value="4000000">₹40 Lakh</option>
+                      <option value="5000000">₹50 Lakh</option>
+                      <option value="6000000">₹60 Lakh</option>
+                      <option value="7500000">₹75 Lakh</option>
+                      <option value="10000000">₹1 Crore</option>
+                      <option value="12500000">₹1.25 Crore</option>
+                      <option value="15000000">₹1.5 Crore</option>
+                      <option value="20000000">₹2 Crore</option>
+                      <option value="25000000">₹2.5 Crore</option>
+                      <option value="30000000">₹3 Crore</option>
+                      <option value="50000000">₹5 Crore</option>
+                    </>
+                  )}
+                </select>
                 <div className="relative">
                   <span className="absolute left-3.5 top-2.5 text-[#64748b] font-bold text-sm">₹</span>
                   <input
@@ -1339,6 +1505,21 @@ export default function PostPropertyPage() {
                 <label className="block text-xs font-bold text-[#334155] mb-1">
                   Booking / Security Amount (Optional)
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setBookingAmount(e.target.value);
+                  }}
+                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Select Common Booking Amount --</option>
+                  <option value="11000">₹11,000</option>
+                  <option value="21000">₹21,000</option>
+                  <option value="51000">₹51,000</option>
+                  <option value="100000">₹1,00,000</option>
+                  <option value="200000">₹2,00,000</option>
+                  <option value="500000">₹5,00,000</option>
+                  <option value="1000000">₹10,00,000</option>
+                </select>
                 <div className="relative">
                   <span className="absolute left-3.5 top-2.5 text-[#64748b] font-bold text-sm">₹</span>
                   <input
@@ -1606,16 +1787,37 @@ export default function PostPropertyPage() {
                 </select>
               </div>
 
-              {/* Township / Apartment / Project Name */}
+              {/* Township / Apartment / Project Name with Dropdown */}
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1.5">
+                <label className="block text-xs font-bold text-[#334155] mb-1">
                   Township / Apartment / Project Name
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) setProjectName(e.target.value);
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Choose Township / Project from Dropdown --</option>
+                  <option value="ATS Knightsbridge">ATS Knightsbridge</option>
+                  <option value="Gaur City">Gaur City</option>
+                  <option value="DLF Phase 5">DLF Phase 5</option>
+                  <option value="Mahima Panorama">Mahima Panorama</option>
+                  <option value="Vatika Infotech City">Vatika Infotech City</option>
+                  <option value="Ashiana Town">Ashiana Town</option>
+                  <option value="Omaxe City">Omaxe City</option>
+                  <option value="Eldeco Township">Eldeco Township</option>
+                  <option value="Godrej Woods">Godrej Woods</option>
+                  <option value="Supertech Eco Village">Supertech Eco Village</option>
+                  <option value="Green Meadows">Green Meadows</option>
+                  <option value="Dream City">Dream City</option>
+                  <option value="Royal Enclave">Royal Enclave</option>
+                </select>
                 <input
                   type="text"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  placeholder="e.g. ATS Knightsbridge, Gaur City, DLF Phase 5"
+                  placeholder="Or type custom township / project e.g. ATS Knightsbridge..."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -1624,7 +1826,7 @@ export default function PostPropertyPage() {
             {/* Area Multi-select */}
             <div>
               <label className="block text-xs font-bold text-[#334155] mb-1.5">
-                Area (Multi-select from available areas in {city || 'City'})
+                Area (Select from available areas in {city || 'City'})
               </label>
               <div className="flex flex-wrap gap-2">
                 {currentCityAreas.map((areaName) => {
@@ -1647,12 +1849,32 @@ export default function PostPropertyPage() {
               </div>
             </div>
 
-            {/* Sub area & Address */}
+            {/* Sub area & Address with Dropdown */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Sub Area (Multi-select / comma-separated)
+                  Sub Area / Block / Sector
                 </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setSubAreas((prev) => (prev ? `${prev}, ${e.target.value}` : e.target.value));
+                    }
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
+                >
+                  <option value="">-- Choose Sub Area / Block from Dropdown --</option>
+                  <option value="Block A">Block A</option>
+                  <option value="Block B">Block B</option>
+                  <option value="Block C">Block C</option>
+                  <option value="Phase 1">Phase 1</option>
+                  <option value="Phase 2">Phase 2</option>
+                  <option value="Extension">Extension</option>
+                  <option value="Main Road Facing">Main Road Facing</option>
+                  <option value="Near Metro Station">Near Metro Station</option>
+                  <option value="Sector 62">Sector 62</option>
+                  <option value="Sector 18 Pocket 2">Sector 18 Pocket 2</option>
+                </select>
                 <input
                   type="text"
                   value={subAreas}

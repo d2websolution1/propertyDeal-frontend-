@@ -6,11 +6,9 @@ import { useAuth } from "../../hooks/useAuth";
 const ADMIN_EMAILS = [
   "admin@property-adda.com",
   "admin@propertyadda.com",
-  "pkrdx71@gmail.com",
-  "prince09kumar7714@gmail.com",
 ];
 
-// Wrap admin routes with this. Redirects non-admins away.
+// Wrap admin routes with this. Strictly restricts admin panel to the site administrator.
 const ProtectedAdminRoute = ({ children }) => {
   const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -30,14 +28,14 @@ const ProtectedAdminRoute = ({ children }) => {
 
   const userEmail = (user?.email || "").toLowerCase().trim();
   const isPrivilegedAdmin =
-    user?.role === "admin" ||
-    ADMIN_EMAILS.includes(userEmail) ||
-    userEmail.endsWith("@property-adda.com") ||
-    userEmail.endsWith("@propertyadda.com");
+    user?.role === "admin" &&
+    (ADMIN_EMAILS.includes(userEmail) ||
+      userEmail.endsWith("@property-adda.com") ||
+      userEmail.endsWith("@propertyadda.com"));
 
   if (!isPrivilegedAdmin) {
-    // Logged in as regular client — redirect to admin login to authenticate with admin credentials
-    return <Navigate to="/admin/login?reason=admin_required" state={{ from: location }} replace />;
+    // Logged in as regular client (Owner, Dealer, Agent) — redirect to user dashboard
+    return <Navigate to="/my-listings" replace />;
   }
 
   return children;

@@ -437,7 +437,10 @@ const Header = () => {
                     <span>📑</span>
                     <span>My Listings</span>
                   </Link>
-                  {user?.role === "admin" && (
+                  {user?.role === "admin" &&
+                    (user?.email?.toLowerCase().includes("admin@property") ||
+                      user?.email?.toLowerCase().endsWith("@property-adda.com") ||
+                      user?.email?.toLowerCase().endsWith("@propertyadda.com")) && (
                     <Link
                       to="/admin"
                       className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#D62839] hover:bg-[#fff1f2] rounded-lg transition-colors"

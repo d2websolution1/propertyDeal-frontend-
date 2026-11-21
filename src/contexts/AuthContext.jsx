@@ -19,8 +19,6 @@ api.interceptors.request.use((config) => {
 const ADMIN_EMAILS = [
   "admin@property-adda.com",
   "admin@propertyadda.com",
-  "pkrdx71@gmail.com",
-  "prince09kumar7714@gmail.com",
 ];
 
 export const normalizeUser = (u) => {
