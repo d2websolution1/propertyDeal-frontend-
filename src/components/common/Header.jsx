@@ -460,29 +460,6 @@ const Header = () => {
                   </div>
                 )}
 
-                {/* 2. City Switcher Row */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">📍</span>
-                    <div>
-                      <span className="text-[10px] font-bold text-[#64748b] uppercase block">Selected City</span>
-                      <strong className="text-xs font-bold text-[#0f172a]">{selectedCity}</strong>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setCityModalOpen(true);
-                    }}
-                    className="text-xs font-bold text-[#2563eb] hover:bg-[#eff6ff] px-2.5 py-1 rounded-lg border border-[#bfdbfe] transition-colors"
-                  >
-                    Change
-                  </button>
-                </div>
-
-
-
                 {/* Admin Access if applicable */}
                 {user?.role === "admin" && (
                   <Link
