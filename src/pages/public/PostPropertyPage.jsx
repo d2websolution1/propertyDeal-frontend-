@@ -180,6 +180,11 @@ export default function PostPropertyPage() {
   const [maintenanceCharges, setMaintenanceCharges] = useState('');
   const [isNegotiable, setIsNegotiable] = useState(false);
 
+  // Rate & Price Calculator states (Per Gaj / Per Sq.Ft calculation)
+  const [calcInputGajRate, setCalcInputGajRate] = useState('');
+  const [calcInputSqftRate, setCalcInputSqftRate] = useState('');
+  const [calcActiveMode, setCalcActiveMode] = useState('gaj'); // 'gaj' | 'sqft'
+
   // 4. Status, Furnishing, Facilities & Amenities
   const [constructionStatus, setConstructionStatus] = useState('Ready to move'); // 'Ready to move' | 'Under construction'
   const [furnishing, setFurnishing] = useState('Semi-furnished'); // 'Non-furnished' | 'Semi-furnished' | 'Fully furnished'
@@ -361,7 +366,55 @@ export default function PostPropertyPage() {
       .catch(() => {});
   }, []);
 
-  // Calculate Price Per Unit (Real-time calculation even for small amounts)
+  // Area Conversions & Real Estate Rate Calculator
+  const areaBreakdown = useMemo(() => {
+    const s = Number(sizeValue);
+    if (!s || s <= 0) return null;
+    let sqft = 0;
+    let gaj = 0;
+    if (sizeUnit === 'sqft') {
+      sqft = s;
+      gaj = s / 9;
+    } else if (sizeUnit === 'sq yard') {
+      gaj = s;
+      sqft = s * 9;
+    } else if (sizeUnit === 'acre') {
+      sqft = s * 43560;
+      gaj = s * 4840;
+    }
+    return {
+      sqft: parseFloat(sqft.toFixed(2)),
+      gaj: parseFloat(gaj.toFixed(2)),
+    };
+  }, [sizeValue, sizeUnit]);
+
+  // Rates Calculated (Per Gaj & Per Sq.Ft)
+  const ratesCalculated = useMemo(() => {
+    const p = Number(expectedPrice);
+    if (!p || p <= 0 || !areaBreakdown) return null;
+    const rateSqft = areaBreakdown.sqft > 0 ? p / areaBreakdown.sqft : 0;
+    const rateGaj = areaBreakdown.gaj > 0 ? p / areaBreakdown.gaj : 0;
+    return {
+      rateSqft: rateSqft >= 1 ? Math.round(rateSqft) : parseFloat(rateSqft.toFixed(2)),
+      rateGaj: rateGaj >= 1 ? Math.round(rateGaj) : parseFloat(rateGaj.toFixed(2)),
+    };
+  }, [expectedPrice, areaBreakdown]);
+
+  // Calculated Total Amount from Gaj Rate input
+  const totalFromGaj = useMemo(() => {
+    const r = Number(calcInputGajRate);
+    if (!r || r <= 0 || !areaBreakdown?.gaj) return null;
+    return Math.round(r * areaBreakdown.gaj);
+  }, [calcInputGajRate, areaBreakdown]);
+
+  // Calculated Total Amount from Sq.Ft Rate input
+  const totalFromSqft = useMemo(() => {
+    const r = Number(calcInputSqftRate);
+    if (!r || r <= 0 || !areaBreakdown?.sqft) return null;
+    return Math.round(r * areaBreakdown.sqft);
+  }, [calcInputSqftRate, areaBreakdown]);
+
+  // Price Per Unit for legacy compatibility
   const pricePerUnit = useMemo(() => {
     const p = Number(expectedPrice);
     const s = Number(sizeValue);
@@ -565,11 +618,34 @@ export default function PostPropertyPage() {
     }
   };
 
-  // Plan Click Handler: Redirect to Contact Us / WhatsApp for payment & Admin activation
+  // Plan Click Handler: Send request to Admin Panel & Redirect directly to WhatsApp
   const handleUpgradePlan = (plan) => {
-    navigate(
-      `/contact-us?plan=${encodeURIComponent(plan.name || 'Listing Plan')}&price=${encodeURIComponent(plan.price || '')}`
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    // 1. Send details to Admin Panel
+    axios
+      .post(
+        `${API_BASE_URL}/subscriptions/request`,
+        {
+          planName: plan.name,
+          planPrice: plan.price,
+          userName: user?.name,
+          userEmail: user?.email,
+          userPhone: user?.phone,
+          userType: user?.userType || 'Owner',
+        },
+        { headers }
+      )
+      .catch((err) => console.warn('Could not log subscription request:', err));
+
+    // 2. Redirect directly to WhatsApp
+    const adminPhone = '919509505892';
+    const pPrice = plan.price === '₹0' || plan.price === 0 ? 'Free' : plan.price;
+    const msg = encodeURIComponent(
+      `Hello Property Adda Admin,\n\nI want to subscribe to this listing plan:\n• Plan: ${plan.name}\n• Price: ${pPrice}\n• Name: ${user?.name || 'Property Owner'}\n• Phone: ${user?.phone || 'N/A'}\n• Email: ${user?.email || 'N/A'}\n• Account Role: ${user?.userType || 'Owner'}\n\nPlease share payment details and approve my posted property listings.`
     );
+    window.open(`https://wa.me/${adminPhone}?text=${msg}`, '_blank');
   };
 
   // Success view
@@ -1001,14 +1077,13 @@ export default function PostPropertyPage() {
 
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1.5">
-                  Description <span className="text-rose-500">* (Compulsory)</span>
+                  Description <span className="text-[#64748b] font-medium">(Optional)</span>
                 </label>
                 <textarea
                   rows={3}
-                  required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe your property, ventilation, society amenities, nearby metro/schools, etc."
+                  placeholder="Describe your property, ventilation, society amenities, nearby metro/schools, etc. (Optional)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs font-medium outline-none focus:border-[#2563eb] resize-none"
                 />
               </div>
@@ -1288,9 +1363,9 @@ export default function PostPropertyPage() {
                     <span className="font-extrabold text-[#2563eb]">
                       {formatIndianPrice(expectedPrice)} {purpose === 'Rent' ? '/ month' : ''}
                     </span>
-                    {purpose !== 'Rent' && pricePerUnit && (
+                    {purpose !== 'Rent' && ratesCalculated && (
                       <span className="text-[#059669] font-bold bg-[#ecfdf5] px-2 py-0.5 rounded">
-                        ⚡ Rate: ₹{pricePerUnit.toLocaleString('en-IN')} / {sizeUnit}
+                        ⚡ ₹{ratesCalculated.rateGaj.toLocaleString('en-IN')}/गज • ₹{ratesCalculated.rateSqft.toLocaleString('en-IN')}/sqft
                       </span>
                     )}
                   </div>
@@ -1313,6 +1388,171 @@ export default function PostPropertyPage() {
                 </div>
               </div>
             </div>
+
+            {/* Real Estate Rate & Price Calculator (प्रति वर्ग गज / प्रति वर्ग फुट कैलकुलेटर) */}
+            {purpose !== 'Rent' && (
+              <div className="mt-3 p-4 rounded-2xl bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-slate-50 border border-blue-200 shadow-2xs">
+                <div className="flex items-center justify-between flex-wrap gap-2 pb-2.5 border-b border-blue-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🧮</span>
+                    <div>
+                      <h4 className="text-xs font-black text-[#142D4E] uppercase tracking-wide">
+                        Property Rate & Price Calculator (रियल एस्टेट कैलकुलेटर)
+                      </h4>
+                      <p className="text-[11px] text-slate-500">
+                        प्रति वर्ग फुट (Sq.Ft) व प्रति गज (Gaj) दर निकालें या दर से कुल कीमत कैलकुलेट करें
+                      </p>
+                    </div>
+                  </div>
+                  {areaBreakdown ? (
+                    <span className="text-[11px] font-bold text-[#2563eb] bg-white px-2.5 py-1 rounded-lg border border-blue-200">
+                      📐 Area: {sizeValue} {sizeUnit} ≈ <strong>{areaBreakdown.gaj} Gaj</strong> (वर्ग गज) | <strong>{areaBreakdown.sqft} Sq.Ft</strong>
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-semibold text-slate-400 bg-white px-2 py-0.5 rounded">
+                      Section 2 me area enter karein
+                    </span>
+                  )}
+                </div>
+
+                {/* Live Rates Display */}
+                {expectedPrice && areaBreakdown && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 my-3">
+                    <div className="p-2.5 bg-white rounded-xl border border-blue-100 text-center shadow-2xs">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Rate per Gaj (प्रति गज)</span>
+                      <span className="text-sm font-black text-[#2563eb]">
+                        ₹ {ratesCalculated?.rateGaj ? ratesCalculated.rateGaj.toLocaleString('en-IN') : '0'} / गज
+                      </span>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-xl border border-blue-100 text-center shadow-2xs">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Rate per Sq.Ft (प्रति वर्ग फुट)</span>
+                      <span className="text-sm font-black text-[#059669]">
+                        ₹ {ratesCalculated?.rateSqft ? ratesCalculated.rateSqft.toLocaleString('en-IN') : '0'} / sq.ft
+                      </span>
+                    </div>
+                    <div className="p-2.5 bg-white rounded-xl border border-blue-100 text-center shadow-2xs col-span-2 sm:col-span-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Price (कुल राशि)</span>
+                      <span className="text-sm font-black text-[#D62839]">
+                        {formatIndianPrice(expectedPrice)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Interactive Rate-to-Price calculation tools */}
+                <div className="mt-3 pt-2.5 border-t border-blue-100">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="text-xs font-bold text-[#142D4E]">Calculate Total Price by Rate:</span>
+                    <button
+                      type="button"
+                      onClick={() => setCalcActiveMode('gaj')}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all ${
+                        calcActiveMode === 'gaj'
+                          ? 'bg-[#2563eb] text-white shadow-xs'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      By Rate per Gaj (प्रति गज दर)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCalcActiveMode('sqft')}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all ${
+                        calcActiveMode === 'sqft'
+                          ? 'bg-[#2563eb] text-white shadow-xs'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      By Rate per Sq.Ft (प्रति वर्ग फुट दर)
+                    </button>
+                  </div>
+
+                  {calcActiveMode === 'gaj' ? (
+                    <div className="p-3 bg-white rounded-xl border border-blue-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Enter Rate per Gaj (₹ प्रति गज दर डालें)
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">₹</span>
+                          <input
+                            type="number"
+                            value={calcInputGajRate}
+                            onChange={(e) => setCalcInputGajRate(e.target.value)}
+                            placeholder="e.g. 25000"
+                            className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
+                          />
+                        </div>
+                      </div>
+                      {totalFromGaj ? (
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <span className="text-[10px] text-slate-500 block">Calculated Total Amount</span>
+                            <span className="text-sm font-black text-[#D62839]">
+                              ₹ {totalFromGaj.toLocaleString('en-IN')} ({formatIndianPrice(totalFromGaj)})
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExpectedPrice(String(totalFromGaj));
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
+                          >
+                            ✓ Apply as Price
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-slate-400">
+                          {areaBreakdown?.gaj ? `Multiplies with ${areaBreakdown.gaj} Gaj` : 'Enter size in Section 2 to calculate'}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-white rounded-xl border border-blue-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Enter Rate per Sq.Ft (₹ प्रति वर्ग फुट दर डालें)
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">₹</span>
+                          <input
+                            type="number"
+                            value={calcInputSqftRate}
+                            onChange={(e) => setCalcInputSqftRate(e.target.value)}
+                            placeholder="e.g. 3500"
+                            className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
+                          />
+                        </div>
+                      </div>
+                      {totalFromSqft ? (
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <span className="text-[10px] text-slate-500 block">Calculated Total Amount</span>
+                            <span className="text-sm font-black text-[#D62839]">
+                              ₹ {totalFromSqft.toLocaleString('en-IN')} ({formatIndianPrice(totalFromSqft)})
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExpectedPrice(String(totalFromSqft));
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
+                          >
+                            ✓ Apply as Price
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-slate-400">
+                          {areaBreakdown?.sqft ? `Multiplies with ${areaBreakdown.sqft} Sq.Ft` : 'Enter size in Section 2 to calculate'}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center justify-between flex-wrap gap-4 pt-1">
               <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold">

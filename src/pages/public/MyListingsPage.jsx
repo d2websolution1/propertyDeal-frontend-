@@ -171,11 +171,34 @@ export default function MyListingsPage() {
     }
   };
 
-  // Subscribe / Buy Plan -> Redirect to Contact Us / WhatsApp with Admin for direct payment & approval
+  // Subscribe / Buy Plan -> Send details to Admin Panel & Redirect directly to WhatsApp
   const handleSubscribe = (plan) => {
-    const planName = encodeURIComponent(plan.name || 'Listing Plan');
-    const planPrice = encodeURIComponent(plan.price !== undefined ? (plan.price === 0 ? 'Free' : `₹${plan.price}`) : 'Free');
-    navigate(`/contact-us?plan=${planName}&price=${planPrice}`);
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    // 1. Send details to Admin Panel simultaneously
+    axios
+      .post(
+        `${API_BASE_URL}/subscriptions/request`,
+        {
+          planName: plan.name,
+          planPrice: plan.price,
+          userName: user?.name,
+          userEmail: user?.email,
+          userPhone: user?.phone,
+          userType: user?.userType || 'Owner',
+        },
+        { headers }
+      )
+      .catch((err) => console.warn('Could not log subscription request:', err));
+
+    // 2. Redirect directly to WhatsApp for Admin payment & listing approval
+    const adminPhone = '919509505892';
+    const planPrice = plan.price !== undefined ? (plan.price === 0 ? 'Free' : `₹${plan.price}`) : 'Free';
+    const msg = encodeURIComponent(
+      `Hello Property Adda Admin,\n\nI want to subscribe to this listing plan:\n• Plan: ${plan.name}\n• Price: ${planPrice}\n• Name: ${user?.name || 'Property Owner'}\n• Phone: ${user?.phone || 'N/A'}\n• Email: ${user?.email || 'N/A'}\n• Account Role: ${user?.userType || 'Owner'}\n\nPlease share payment details and approve my posted property listings.`
+    );
+    window.open(`https://wa.me/${adminPhone}?text=${msg}`, '_blank');
   };
 
   // Submit Agent Upgrade Request
