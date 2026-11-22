@@ -14,7 +14,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState('Owner');
-  const [selectedPlan, setSelectedPlan] = useState({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -42,15 +41,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
       document.body.style.overflow = prevOverflow;
     };
   }, [isOpen, initialMode, onClose]);
-
-  // Adjust default plan when userType changes
-  useEffect(() => {
-    if (userType === 'Dealer / Agent') {
-      setSelectedPlan({ name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹999' });
-    } else {
-      setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
-    }
-  }, [userType]);
 
   if (!isOpen) return null;
 
@@ -121,8 +111,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         password: password.trim(),
         phone: cleanPhone,
         userType: userType || 'Owner',
-        activePlan: selectedPlan.name,
-        validityDays: selectedPlan.days,
       });
 
       setSuccessMsg(`Welcome ${name}! Your account has been created successfully.`);
@@ -374,17 +362,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                     <div className="text-[10px] text-slate-500">Broker / Real Estate</div>
                   </button>
                 </div>
-              </div>
-
-              {/* Selected Plan Badge */}
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-500 block">Starter Plan</span>
-                  <strong className="text-[#142D4E]">{selectedPlan.name}</strong>
-                </div>
-                <span className="bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full text-xs">
-                  {selectedPlan.price}
-                </span>
               </div>
 
               <button

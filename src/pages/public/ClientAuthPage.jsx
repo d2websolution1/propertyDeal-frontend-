@@ -17,7 +17,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState('Owner');
-  const [selectedPlan, setSelectedPlan] = useState({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -38,15 +37,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
       }
     }
   }, [isAuthenticated, user, navigate, nextParam]);
-
-  // Adjust default plan when userType changes
-  useEffect(() => {
-    if (userType === 'Dealer / Agent') {
-      setSelectedPlan({ name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹999' });
-    } else {
-      setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
-    }
-  }, [userType]);
 
   // Direct Login (Gmail & Password)
   const handleLoginSubmit = async (e) => {
@@ -114,8 +104,6 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
         password: password.trim(),
         phone: cleanPhone,
         userType: userType || 'Owner',
-        activePlan: selectedPlan.name,
-        validityDays: selectedPlan.days,
       });
 
       setSuccessMsg(`Welcome ${name}! Your account has been created.`);

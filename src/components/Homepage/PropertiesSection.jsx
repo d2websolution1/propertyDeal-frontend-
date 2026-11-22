@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import sliderSaleImg from '../../assets/slider-sale-investment.jpg';
+import sliderRentalImg from '../../assets/slider-rental-home.jpg';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
@@ -21,43 +23,21 @@ const CATEGORY_DATA = {
     slides: [
       {
         id: 1,
-        title: 'Trump Towers & Luxury Residences',
-        subtitle: 'Ultra-luxury 3 & 4 BHK branded residences with private decks',
-        location: 'Sector 94 · Expressway Corridor',
-        price: 'From ₹2.5 Cr*',
-        tag: 'FEATURED',
-        bg: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80',
-        link: '/commercial',
+        title: 'Find Your Perfect Property',
+        subtitle: 'Plots, homes and investment properties',
+        buttonText: 'Explore',
+        link: '/?purpose=sale',
+        tag: 'FOR SALE & INVESTMENT',
+        bg: sliderSaleImg,
       },
       {
         id: 2,
-        title: 'Modern High-Rise Apartments',
-        subtitle: 'Ready-to-move homes with world-class clubhouse & sports arenas',
-        location: 'Noida · Greater Noida · Gurgaon · Mumbai',
-        price: 'From ₹45 Lakh*',
-        tag: 'BEST VALUE',
-        bg: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80',
+        title: 'Find Your Perfect Rental Home',
+        subtitle: 'Explore homes and commercial spaces',
+        buttonText: 'Explore',
         link: '/rent',
-      },
-      {
-        id: 3,
-        title: 'Premium Plots & Land Investments',
-        subtitle: 'High-growth residential & commercial plots near upcoming airport',
-        location: 'Yamuna Expressway (YEIDA)',
-        price: 'From ₹35 Lakh*',
-        tag: 'HIGH ROI',
-        bg: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80',
-        link: '/plots',
-      },
-      {
-        id: 4,
-        title: 'Post Free Property on Property Adda',
-        subtitle: 'Direct enquiries on WhatsApp & phone with zero brokerage',
-        location: 'All India · Verified Network',
-        price: '100% Free',
-        tag: 'FOR OWNERS',
-        bg: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80',
-        link: '/post-property',
+        tag: 'FOR RENT & COMMERCIAL',
+        bg: sliderRentalImg,
       },
     ],
     tiles: [
@@ -106,33 +86,21 @@ const CATEGORY_DATA = {
     slides: [
       {
         id: 1,
-        title: 'Fully Furnished Flats for Rent',
-        subtitle: 'Modern apartments with AC, modular kitchen, sofa & power backup',
-        location: 'Mumbai · Bangalore · Pune · Delhi NCR',
-        price: 'From ₹15,000/mo*',
-        tag: 'READY TO MOVE',
-        bg: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80',
+        title: 'Find Your Perfect Rental Home',
+        subtitle: 'Explore homes and commercial spaces',
+        buttonText: 'Explore',
         link: '/rent',
+        tag: 'FOR RENT & COMMERCIAL',
+        bg: sliderRentalImg,
       },
       {
         id: 2,
-        title: 'Gated Society Rental Homes',
-        subtitle: '24x7 security, swimming pool, gym & dedicated car parking',
-        location: 'Gaur City · Sector 16B · Noida Expressway',
-        price: 'From ₹12,000/mo*',
-        tag: 'FAMILY FRIENDLY',
-        bg: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80',
-        link: '/rent',
-      },
-      {
-        id: 3,
-        title: 'Direct Owner Rentals (Zero Brokerage)',
-        subtitle: 'Connect straight with property owners with transparent rental agreements',
-        location: 'All Top Localities',
-        price: 'Save Brokerage',
-        tag: 'ZERO BROKERAGE',
-        bg: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80',
-        link: '/post-property',
+        title: 'Find Your Perfect Property',
+        subtitle: 'Plots, homes and investment properties',
+        buttonText: 'Explore',
+        link: '/?purpose=sale',
+        tag: 'FOR SALE & INVESTMENT',
+        bg: sliderSaleImg,
       },
     ],
     tiles: [
@@ -498,14 +466,17 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
     setCurrentSlide(0);
   }, [resolvedCategory]);
 
-  // Auto carousel rotation (continuous horizontal slide)
+  // Auto carousel rotation (continuous horizontal slide with pause on hover)
+  const [isHovered, setIsHovered] = useState(false);
+
   useEffect(() => {
+    if (isHovered) return;
     const count = data.slides?.length || 1;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % count);
-    }, 2800);
+    }, 4500);
     return () => clearInterval(timer);
-  }, [resolvedCategory, data.slides?.length]);
+  }, [resolvedCategory, data.slides?.length, isHovered]);
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
@@ -552,100 +523,102 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
         {/* ── 1. Top Featured Carousel Banner (Category-Specific) ── */}
         <div
-          className="relative rounded-2xl overflow-hidden shadow-md border border-[#e2e8f0] h-[220px] sm:h-[280px] md:h-[330px]"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 h-[260px] sm:h-[340px] md:h-[400px] lg:h-[430px] group/slider"
         >
           {/* Horizontal Sliding Track */}
           <div
             className="flex h-full w-full transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
-            {data.slides.map((slide) => (
-              <div
-                key={slide.id}
-                className="relative w-full h-full flex-shrink-0"
-              >
-                <img
-                  src={slide.bg}
-                  alt={slide.title}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#142D4E]/95 via-[#142D4E]/65 to-transparent"></div>
+            {data.slides.map((slide, sIdx) => {
+              const isActive = sIdx === currentSlide;
+              return (
+                <div
+                  key={slide.id}
+                  className="relative w-full h-full flex-shrink-0 select-none overflow-hidden"
+                >
+                  <img
+                    src={slide.bg}
+                    alt={slide.title}
+                    className={`w-full h-full object-cover object-center transition-transform duration-1000 ease-out ${
+                      isActive ? 'scale-105' : 'scale-100'
+                    }`}
+                    loading="eager"
+                  />
+                  {/* Subtle dark gradient overlay on left for razor-sharp typography */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/60 to-transparent sm:via-[#0a1628]/45"></div>
 
-                {/* Slide text */}
-                <div className="absolute inset-0 p-4 sm:p-8 md:p-12 flex flex-col justify-between max-w-2xl text-white">
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#f59e0b] text-[#142D4E] text-[10px] sm:text-[11px] font-black tracking-wider uppercase mb-1.5 sm:mb-2">
-                      <span>{slide.tag}</span>
+                  {/* Slide text with beautiful enter animations */}
+                  <div className="absolute inset-0 p-5 sm:p-8 md:p-14 flex flex-col justify-center max-w-2xl text-white">
+                    <div
+                      className={`transition-all duration-700 ease-out ${
+                        isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                      }`}
+                    >
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f59e0b] text-[#0f172a] text-[10px] sm:text-xs font-black tracking-wider uppercase mb-2.5 sm:mb-3 shadow-md">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping"></span>
+                        <span>{slide.tag || 'FEATURED'}</span>
+                      </div>
+                      <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white mb-2 sm:mb-3 leading-[1.15] drop-shadow-md">
+                        {slide.title}
+                      </h2>
+                      <p className="text-xs sm:text-base md:text-lg font-medium text-slate-100 max-w-xl mb-4 sm:mb-6 drop-shadow-sm leading-relaxed">
+                        {slide.subtitle}
+                      </p>
                     </div>
-                    <span className="block text-xs sm:text-sm font-medium text-blue-200 tracking-wide mb-1">
-                      {slide.location}
-                    </span>
-                    <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-1.5 sm:mb-2 leading-tight">
-                      {slide.title}
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-200 line-clamp-2 max-w-lg mb-2">
-                      {slide.subtitle}
-                    </p>
-                  </div>
 
-                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                    <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
-                      <span className="text-[9.5px] sm:text-[10px] text-gray-300 block uppercase font-bold">Price</span>
-                      <strong className="text-sm sm:text-lg font-extrabold text-[#fde047]">
-                        {slide.price}
-                      </strong>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div
+                      className={`transition-all duration-700 delay-150 ease-out ${
+                        isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                      }`}
+                    >
                       <Link
-                        to="/?purpose=sale"
-                        className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
+                        to={slide.link}
+                        className="inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-2xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm md:text-base font-extrabold shadow-lg hover:shadow-2xl transition-all hover:scale-105 active:scale-95 group/btn"
                       >
-                        <span>For Buy</span>
-                        <span>→</span>
-                      </Link>
-                      <Link
-                        to="/rent"
-                        className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white text-[#142D4E] hover:bg-slate-100 text-xs sm:text-sm font-bold shadow-md transition-all hover:scale-105 active:scale-95"
-                      >
-                        <span>For Rent</span>
-                        <span>→</span>
+                        <span>{slide.buttonText || 'Explore'}</span>
+                        <span className="transition-transform duration-200 group-hover/btn:translate-x-1.5 font-bold">
+                          →
+                        </span>
                       </Link>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {/* Prev/Next arrows */}
+          {/* Prev/Next arrows with sleek glassmorphism */}
           <button
             type="button"
             onClick={() => setCurrentSlide((prev) => (prev === 0 ? data.slides.length - 1 : prev - 1))}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold cursor-pointer"
-            aria-label="Previous"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/35 hover:bg-[#D62839] text-white flex items-center justify-center backdrop-blur-md transition-all text-xl font-bold cursor-pointer opacity-70 group-hover/slider:opacity-100 shadow-md hover:scale-110 active:scale-90"
+            aria-label="Previous Slide"
           >
             ‹
           </button>
           <button
             type="button"
             onClick={() => setCurrentSlide((prev) => (prev + 1) % data.slides.length)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold cursor-pointer"
-            aria-label="Next"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/35 hover:bg-[#D62839] text-white flex items-center justify-center backdrop-blur-md transition-all text-xl font-bold cursor-pointer opacity-70 group-hover/slider:opacity-100 shadow-md hover:scale-110 active:scale-90"
+            aria-label="Next Slide"
           >
             ›
           </button>
 
-          {/* Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+          {/* Animated Indicator Dots */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
             {data.slides.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
-                  idx === currentSlide ? 'w-6 bg-[#D62839]' : 'w-2 bg-white/50 hover:bg-white'
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === currentSlide
+                    ? 'w-7 bg-[#D62839] shadow-sm'
+                    : 'w-2 bg-white/60 hover:bg-white'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
