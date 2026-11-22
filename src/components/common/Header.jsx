@@ -267,13 +267,13 @@ const Header = () => {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
-          {/* Post Property Quick Button for sm+ */}
+          {/* Post Property Quick Button (Mobile & Desktop Responsive) */}
           <Link
             to="/post-property"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D62839] text-white text-xs font-bold hover:bg-[#b81d2c] shadow-xs transition-all active:scale-95"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-[#D62839] text-white text-[11px] sm:text-xs font-bold hover:bg-[#b81d2c] shadow-xs transition-all active:scale-95"
           >
             <span>Post Property</span>
-            <span className="bg-white/20 text-white text-[9.5px] px-1.5 py-0.2 rounded font-black">
+            <span className="bg-white/20 text-white text-[9px] sm:text-[9.5px] px-1.5 py-0.2 rounded font-black">
               FREE
             </span>
           </Link>
@@ -483,64 +483,17 @@ const Header = () => {
 
 
 
-                {/* 4. Quick Direct Links Grid */}
-                <div>
-                  <span className="text-[10px] font-black text-[#64748b] uppercase tracking-wider block mb-2">
-                    Quick Navigation
-                  </span>
-                  <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-                    <Link
-                      to="/about-us"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
-                    >
-                      <span>ℹ️ About Us</span>
-                      <span>→</span>
-                    </Link>
-                    <Link
-                      to="/contact-us"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
-                    >
-                      <span>📞 Contact Support</span>
-                      <span>→</span>
-                    </Link>
-                    <Link
-                      to="/privacy-policy"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
-                    >
-                      <span>🔒 Privacy Policy</span>
-                      <span>→</span>
-                    </Link>
-                    <Link
-                      to="/commercial"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
-                    >
-                      <span>🏢 Commercial</span>
-                      <span>→</span>
-                    </Link>
-                    <Link
-                      to="/plots"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] flex items-center justify-between hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors"
-                    >
-                      <span>🧭 Plots & Land</span>
-                      <span>→</span>
-                    </Link>
-                    {user?.role === "admin" && (
-                      <Link
-                        to="/admin"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="p-3 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] flex items-center justify-between hover:bg-blue-100 transition-colors"
-                      >
-                        <span>🛡️ Admin Dashboard</span>
-                        <span>🔑</span>
-                      </Link>
-                    )}
-                  </div>
-                </div>
+                {/* Admin Access if applicable */}
+                {user?.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-3 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] text-xs font-bold flex items-center justify-between hover:bg-blue-100 transition-colors"
+                  >
+                    <span>🛡️ Admin Dashboard</span>
+                    <span>🔑</span>
+                  </Link>
+                )}
               </div>
 
               {/* Drawer Fixed Footer */}

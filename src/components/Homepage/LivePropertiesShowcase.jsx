@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://propertydeal-backend-w3yk.onrender.com/api';
 
@@ -74,6 +75,7 @@ const formatPrice = (price, listingType) => {
 const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Properties Across India' }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const queryQ = searchParams.get('q') || '';
@@ -332,8 +334,39 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
     return list;
   }, [properties, sortBy]);
 
+  // Handle Contact button click on property card
+  const handleContactClick = (prop) => {
+    const targetPhone = prop.contactPhone || prop.ownerPhone || prop.phone || '9509505892';
+    const cleanPhone = String(targetPhone).replace(/[^\d+]/g, '');
+
+    const savedPhone = user?.phone || localStorage.getItem('user_contact_phone');
+    const savedName = user?.name || user?.firstName || localStorage.getItem('user_contact_name');
+
+    if (savedPhone) {
+      // Background submit enquiry lead & directly dial
+      axios.post(`${API_BASE_URL}/enquiries`, {
+        userName: savedName || 'Interested Buyer',
+        userPhone: savedPhone,
+        message: 'Direct phone contact initiated from homepage.',
+        propertyId: prop._id || prop.id,
+        propertyTitle: prop.title || 'Property',
+        propertyLocation: prop.locality || prop.city || '',
+      }).catch(() => {});
+      window.location.href = `tel:${cleanPhone}`;
+    } else {
+      setSelectedProperty(prop);
+      setEnquiryData((prev) => ({
+        ...prev,
+        name: user?.name || user?.firstName || prev.name || '',
+      }));
+    }
+  };
+
   const handleEnquirySubmit = async (e) => {
     e.preventDefault();
+    const targetPhone = selectedProperty?.contactPhone || selectedProperty?.ownerPhone || selectedProperty?.phone || '9509505892';
+    const cleanPhone = String(targetPhone).replace(/[^\d+]/g, '');
+
     try {
       setSubmittingEnquiry(true);
       await axios.post(`${API_BASE_URL}/enquiries`, {
@@ -344,20 +377,33 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
         propertyTitle: selectedProperty?.title || 'Property',
         propertyLocation: selectedProperty?.locality || selectedProperty?.city || '',
       });
+      if (enquiryData.phone) {
+        localStorage.setItem('user_contact_phone', enquiryData.phone);
+      }
+      if (enquiryData.name) {
+        localStorage.setItem('user_contact_name', enquiryData.name);
+      }
       setEnquirySuccess(true);
+      // Auto dial the property phone number immediately
+      setTimeout(() => {
+        window.location.href = `tel:${cleanPhone}`;
+      }, 400);
       setTimeout(() => {
         setSelectedProperty(null);
         setEnquirySuccess(false);
         setEnquiryData({ name: '', phone: '', note: '' });
-      }, 2200);
+      }, 2000);
     } catch (err) {
       console.error('Failed to submit enquiry:', err);
+      setTimeout(() => {
+        window.location.href = `tel:${cleanPhone}`;
+      }, 400);
       setEnquirySuccess(true);
       setTimeout(() => {
         setSelectedProperty(null);
         setEnquirySuccess(false);
         setEnquiryData({ name: '', phone: '', note: '' });
-      }, 2200);
+      }, 2000);
     } finally {
       setSubmittingEnquiry(false);
     }
@@ -947,7 +993,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                           </div>
                         </div>
 
-                        {/* Action Buttons (Including Direct Chat as shown in Image 3) */}
+                        {/* Action Buttons: Details & Contact (Calls Owner & logs lead, WhatsApp Chat removed per requirement) */}
                         <div className="pt-3 border-t border-slate-100 flex items-center gap-2 mt-2">
                           <Link
                             to={`/property/${prop._id || prop.id}`}
@@ -958,26 +1004,12 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
 
                           <button
                             type="button"
-                            onClick={() => setSelectedProperty(prop)}
-                            className="flex-1 py-2 px-2.5 rounded-xl bg-[#142D4E] hover:bg-[#0f233d] text-white text-xs font-bold flex items-center justify-center gap-1 shadow-xs transition-colors"
+                            onClick={() => handleContactClick(prop)}
+                            className="flex-1 py-2 px-3 rounded-xl bg-[#142D4E] hover:bg-[#0f233d] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                           >
                             <span>📞</span>
                             <span>Contact</span>
                           </button>
-
-                          {/* Direct Chat / WhatsApp (Matching Image 3) */}
-                          <a
-                            href={`https://wa.me/919509505892?text=Hi,%20I%20am%20interested%20in%20Property%20Adda%20listing:%20${encodeURIComponent(
-                              prop.title
-                            )}%20(${prop.uniqueCode || ''})`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1 shadow-xs transition-colors"
-                            title="Direct WhatsApp Chat"
-                          >
-                            <span>💬</span>
-                            <span>Chat</span>
-                          </a>
                         </div>
                       </div>
                     </div>
@@ -1096,7 +1128,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                     disabled={submittingEnquiry}
                     className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
                   >
-                    {submittingEnquiry ? 'Sending Details...' : 'Request Callback / Site Visit →'}
+                    {submittingEnquiry ? 'Submitting & Dialing...' : '📞 Submit & Call Owner Now'}
                   </button>
                 </form>
               )}

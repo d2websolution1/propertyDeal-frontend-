@@ -1409,10 +1409,72 @@ export default function PostPropertyPage() {
                       📐 Area: {sizeValue} {sizeUnit} ≈ <strong>{areaBreakdown.gaj} Gaj</strong> (वर्ग गज) | <strong>{areaBreakdown.sqft} Sq.Ft</strong>
                     </span>
                   ) : (
-                    <span className="text-[11px] font-semibold text-slate-400 bg-white px-2 py-0.5 rounded">
-                      Section 2 me area enter karein
+                    <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      Area size dalein ya neeche quick click karein
                     </span>
                   )}
+                </div>
+
+                {/* Direct Area / Size input inside calculator for 100% instant calculation */}
+                <div className="bg-white p-3 rounded-xl border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 my-3 shadow-2xs">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold text-[#142D4E] flex items-center gap-1">
+                      <span>📐</span> Plot / Flat Area (साइज):
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        value={sizeValue}
+                        onChange={(e) => setSizeValue(e.target.value)}
+                        placeholder="e.g. 100"
+                        className="w-24 px-2.5 py-1 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
+                      />
+                      <select
+                        value={sizeUnit}
+                        onChange={(e) => setSizeUnit(e.target.value)}
+                        className="px-2 py-1 rounded-lg border border-slate-300 text-xs font-semibold bg-white outline-none focus:border-[#2563eb]"
+                      >
+                        <option value="sq yard">Gaj (वर्ग गज)</option>
+                        <option value="sqft">Sq.Ft (वर्ग फुट)</option>
+                        <option value="acre">Acre</option>
+                      </select>
+                    </div>
+                  </div>
+                  {/* Quick Preset Buttons */}
+                  <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
+                    <span className="text-slate-400 font-semibold text-[10px]">Quick Size:</span>
+                    {['50', '100', '150', '200', '250', '500'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => {
+                          setSizeValue(preset);
+                          setSizeUnit('sq yard');
+                        }}
+                        className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold cursor-pointer transition-colors ${
+                          sizeValue === preset && sizeUnit === 'sq yard'
+                            ? 'bg-[#2563eb] text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {preset} गज
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSizeValue('1000');
+                        setSizeUnit('sqft');
+                      }}
+                      className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold cursor-pointer transition-colors ${
+                        sizeValue === '1000' && sizeUnit === 'sqft'
+                          ? 'bg-[#2563eb] text-white'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      1000 sqft
+                    </button>
+                  </div>
                 </div>
 
                 {/* Live Rates Display */}
@@ -1502,9 +1564,29 @@ export default function PostPropertyPage() {
                             ✓ Apply as Price
                           </button>
                         </div>
+                      ) : expectedPrice && calcInputGajRate && Number(calcInputGajRate) > 0 ? (
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <span className="text-[10px] text-slate-500 block">Calculated Plot Size at this Rate</span>
+                            <span className="text-sm font-black text-[#2563eb]">
+                              {parseFloat((Number(expectedPrice) / Number(calcInputGajRate)).toFixed(1))} गज ({Math.round((Number(expectedPrice) / Number(calcInputGajRate)) * 9)} sqft)
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const calcGaj = parseFloat((Number(expectedPrice) / Number(calcInputGajRate)).toFixed(1));
+                              setSizeValue(String(calcGaj));
+                              setSizeUnit('sq yard');
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
+                          >
+                            ✓ Set Size
+                          </button>
+                        </div>
                       ) : (
                         <div className="text-[11px] text-slate-400">
-                          {areaBreakdown?.gaj ? `Multiplies with ${areaBreakdown.gaj} Gaj` : 'Enter size in Section 2 to calculate'}
+                          {areaBreakdown?.gaj ? `Multiplies with ${areaBreakdown.gaj} Gaj` : 'Type size above to calculate amount'}
                         </div>
                       )}
                     </div>
@@ -1520,7 +1602,7 @@ export default function PostPropertyPage() {
                             type="number"
                             value={calcInputSqftRate}
                             onChange={(e) => setCalcInputSqftRate(e.target.value)}
-                            placeholder="e.g. 3500"
+                            placeholder="e.g. 2000"
                             className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
                           />
                         </div>
@@ -1543,9 +1625,29 @@ export default function PostPropertyPage() {
                             ✓ Apply as Price
                           </button>
                         </div>
+                      ) : expectedPrice && calcInputSqftRate && Number(calcInputSqftRate) > 0 ? (
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <span className="text-[10px] text-slate-500 block">Calculated Area at this Rate</span>
+                            <span className="text-sm font-black text-[#2563eb]">
+                              {Math.round(Number(expectedPrice) / Number(calcInputSqftRate))} sq.ft ({parseFloat(((Number(expectedPrice) / Number(calcInputSqftRate)) / 9).toFixed(1))} गज)
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const calcArea = Math.round(Number(expectedPrice) / Number(calcInputSqftRate));
+                              setSizeValue(String(calcArea));
+                              setSizeUnit('sqft');
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
+                          >
+                            ✓ Set Size
+                          </button>
+                        </div>
                       ) : (
                         <div className="text-[11px] text-slate-400">
-                          {areaBreakdown?.sqft ? `Multiplies with ${areaBreakdown.sqft} Sq.Ft` : 'Enter size in Section 2 to calculate'}
+                          {areaBreakdown?.sqft ? `Multiplies with ${areaBreakdown.sqft} Sq.Ft` : 'Type size above to calculate amount'}
                         </div>
                       )}
                     </div>
