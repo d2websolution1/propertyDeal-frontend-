@@ -171,39 +171,11 @@ export default function MyListingsPage() {
     }
   };
 
-  // Subscribe / Buy Plan
-  const handleSubscribe = async (plan) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please log in first.');
-      return;
-    }
-
-    try {
-      setSubscribingPlanId(plan.id || plan._id);
-      setSubSuccessMsg('');
-      const res = await axios.post(
-        `${API_BASE_URL}/subscriptions/subscribe`,
-        {
-          planId: plan.id || plan._id,
-          paymentMethod: 'Online UPI / Card (Mock Gateway)',
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (res.data?.success) {
-        setSubSuccessMsg(res.data.message || `Subscribed to ${plan.name} successfully!`);
-        // Refresh listings and update user in window/local
-        fetchMyListings();
-        setTimeout(() => {
-          window.location.reload();
-        }, 1200);
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Payment / Subscription failed.');
-    } finally {
-      setSubscribingPlanId(null);
-    }
+  // Subscribe / Buy Plan -> Redirect to Contact Us / WhatsApp with Admin for direct payment & approval
+  const handleSubscribe = (plan) => {
+    const planName = encodeURIComponent(plan.name || 'Listing Plan');
+    const planPrice = encodeURIComponent(plan.price !== undefined ? (plan.price === 0 ? 'Free' : `₹${plan.price}`) : 'Free');
+    navigate(`/contact-us?plan=${planName}&price=${planPrice}`);
   };
 
   // Submit Agent Upgrade Request
@@ -632,7 +604,7 @@ export default function MyListingsPage() {
                   Subscription Plans & Listing Limits
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  Broker & Owner subscription flow: Select plan → Online payment → Instant activation → Listing limit update.
+                  Select your plan below to connect directly with Admin on WhatsApp for instant payment & listing approval.
                 </p>
               </div>
 
@@ -668,11 +640,10 @@ export default function MyListingsPage() {
                 </div>
                 <button
                   type="button"
-                  disabled={subscribingPlanId !== null}
-                  onClick={() => handleSubscribe({ _id: plans[0]?._id || 'free', name: 'Free Starter' })}
-                  className="mt-6 w-full py-3 rounded-2xl border border-slate-300 font-bold text-xs text-slate-800 hover:bg-white cursor-pointer"
+                  onClick={() => handleSubscribe({ _id: plans[0]?._id || 'free', name: 'Free Starter (1 Month)', price: 0 })}
+                  className="mt-6 w-full py-3 rounded-2xl border border-slate-300 font-bold text-xs text-slate-800 hover:bg-white cursor-pointer transition-all hover:scale-102"
                 >
-                  Activate Free
+                  Select Plan / Contact Admin →
                 </button>
               </div>
 
@@ -690,11 +661,10 @@ export default function MyListingsPage() {
                 </div>
                 <button
                   type="button"
-                  disabled={subscribingPlanId !== null}
-                  onClick={() => handleSubscribe(plans.find((p) => p.price === 99) || { price: 99, name: 'Featured Boost' })}
-                  className="mt-6 w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md cursor-pointer"
+                  onClick={() => handleSubscribe(plans.find((p) => p.price === 99) || { price: 99, name: 'Featured Boost (1 Listing)' })}
+                  className="mt-6 w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102"
                 >
-                  {subscribingPlanId ? 'Processing...' : 'Pay ₹99 Online →'}
+                  Pay ₹99 via WhatsApp / Admin →
                 </button>
               </div>
 
@@ -715,11 +685,10 @@ export default function MyListingsPage() {
                 </div>
                 <button
                   type="button"
-                  disabled={subscribingPlanId !== null}
-                  onClick={() => handleSubscribe(plans.find((p) => p.price === 499) || { price: 499, name: 'Standard Quarterly' })}
-                  className="mt-6 w-full py-3 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs shadow-md cursor-pointer"
+                  onClick={() => handleSubscribe(plans.find((p) => p.price === 499) || { price: 499, name: 'Standard Quarterly (10 Listings)' })}
+                  className="mt-6 w-full py-3 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102"
                 >
-                  {subscribingPlanId ? 'Processing...' : 'Pay ₹499 Online →'}
+                  Pay ₹499 via WhatsApp / Admin →
                 </button>
               </div>
 
@@ -737,11 +706,10 @@ export default function MyListingsPage() {
                 </div>
                 <button
                   type="button"
-                  disabled={subscribingPlanId !== null}
-                  onClick={() => handleSubscribe(plans.find((p) => p.price === 999) || { price: 999, name: 'Agency Pro (9 Months)' })}
-                  className="mt-6 w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md cursor-pointer"
+                  onClick={() => handleSubscribe(plans.find((p) => p.price === 999) || { price: 999, name: 'Agency Pro (30 Listings)' })}
+                  className="mt-6 w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102"
                 >
-                  {subscribingPlanId ? 'Processing...' : 'Pay ₹999 Online →'}
+                  Pay ₹999 via WhatsApp / Admin →
                 </button>
               </div>
             </div>

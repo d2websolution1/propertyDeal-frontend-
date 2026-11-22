@@ -17,6 +17,7 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState('Owner');
+  const [selectedPlan, setSelectedPlan] = useState({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,15 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
       }
     }
   }, [isAuthenticated, user, navigate, nextParam]);
+
+  // Adjust default plan when userType changes
+  useEffect(() => {
+    if (userType === 'Dealer / Agent') {
+      setSelectedPlan({ name: 'Pro Agent Plan (90 Days)', days: 90, price: '₹999' });
+    } else {
+      setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
+    }
+  }, [userType]);
 
   // Direct Login (Gmail & Password)
   const handleLoginSubmit = async (e) => {
@@ -104,6 +114,8 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
         password: password.trim(),
         phone: cleanPhone,
         userType: userType || 'Owner',
+        activePlan: selectedPlan.name,
+        validityDays: selectedPlan.days,
       });
 
       setSuccessMsg(`Welcome ${name}! Your account has been created.`);
@@ -369,13 +381,23 @@ const ClientAuthPage = ({ initialMode = 'login' }) => {
         {/* Footer info */}
         <div className="pt-2 text-center text-[10.5px] text-[#64748B] border-t border-slate-100">
           By proceeding, you agree to Property Adda's{' '}
-          <Link to="/terms-and-conditions" className="text-[#142D4E] font-bold underline">
-            Terms of Service
-          </Link>{' '}
+          <a
+            href="/terms-and-conditions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#142D4E] font-bold underline hover:text-[#D62839]"
+          >
+            Terms of Use
+          </a>{' '}
           and{' '}
-          <Link to="/privacy-policy" className="text-[#142D4E] font-bold underline">
+          <a
+            href="/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#142D4E] font-bold underline hover:text-[#D62839]"
+          >
             Privacy Policy
-          </Link>
+          </a>
           .
         </div>
       </div>

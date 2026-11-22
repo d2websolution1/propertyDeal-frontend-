@@ -214,6 +214,7 @@ export default function PostPropertyPage() {
     'Freehold / Registry Ready',
   ]);
   const [approvedAuthority, setApprovedAuthority] = useState('JDA Approved');
+  const [customAuthority, setCustomAuthority] = useState('');
 
   // Dynamic locations from Admin
   const [locationsData, setLocationsData] = useState([]);
@@ -360,12 +361,13 @@ export default function PostPropertyPage() {
       .catch(() => {});
   }, []);
 
-  // Calculate Price Per Unit
+  // Calculate Price Per Unit (Real-time calculation even for small amounts)
   const pricePerUnit = useMemo(() => {
     const p = Number(expectedPrice);
     const s = Number(sizeValue);
     if (!p || !s || s <= 0) return null;
-    return Math.round(p / s);
+    const rate = p / s;
+    return rate >= 1 ? Math.round(rate) : parseFloat(rate.toFixed(2));
   }, [expectedPrice, sizeValue]);
 
   useEffect(() => {
@@ -525,7 +527,10 @@ export default function PostPropertyPage() {
         areas: selectedAreas,
         subAreas: subAreas ? subAreas.split(',').map((s) => s.trim()).filter(Boolean) : [],
         projectName: projectName.trim(),
-        approvedAuthority,
+        approvedAuthority:
+          approvedAuthority === 'Other'
+            ? (customAuthority.trim() || 'Other Approved')
+            : (approvedAuthority || 'None / Not Applicable'),
         address: address.trim(),
         reraNumber: reraNumber.trim(),
         contactName: contactName.trim() || user?.name || 'Property Adda Partner',
@@ -560,58 +565,21 @@ export default function PostPropertyPage() {
     }
   };
 
-  // 1-Click Subscribe Handler for Quota Modal
-  const handleUpgradePlan = async (plan) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please log in first to activate your subscription plan.');
-      navigate('/login?next=/post-property');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      let success = false;
-      if (plan._id || (plan.id && !plan.id.startsWith('owner-') && !plan.id.startsWith('agent-'))) {
-        try {
-          const res = await axios.post(
-            `${API_BASE_URL}/subscriptions/subscribe`,
-            { planId: plan.id || plan._id },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          alert(res.data?.message || 'Plan activated successfully!');
-          success = true;
-        } catch {
-          // fallback to direct profile update
-        }
-      }
-
-      if (!success) {
-        await axios.put(
-          `${API_BASE_URL}/auth/profile`,
-          {
-            activePlan: plan.name,
-            validityDays: plan.days || 30,
-            listingLimit: plan.limit || (user?.userType === 'Dealer / Agent' ? 50 : 2),
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        alert(`Plan "${plan.name}" activated successfully!`);
-      }
-
-      if (refreshUser) await refreshUser();
-      setShowSubscriptionModal(false);
-      setSubmitError('');
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to activate plan.');
-    } finally {
-      setSubmitting(false);
-    }
+  // Plan Click Handler: Redirect to Contact Us / WhatsApp for payment & Admin activation
+  const handleUpgradePlan = (plan) => {
+    navigate(
+      `/contact-us?plan=${encodeURIComponent(plan.name || 'Listing Plan')}&price=${encodeURIComponent(plan.price || '')}`
+    );
   };
 
   // Success view
   if (successData) {
     const isApproved = successData.status === 'approved';
+    const propCode = successData.uniqueCode || autoPropertyId;
+    const waText = encodeURIComponent(
+      `Hello Admin, I have submitted property listing (ID: ${propCode}) on Property Adda and want to activate my plan and approve my listing.`
+    );
+
     return (
       <div className="min-h-screen bg-[#f8fafc] py-14 px-4 sm:px-6 font-sans">
         <div className="max-w-xl mx-auto bg-white rounded-3xl border border-emerald-200 p-8 text-center shadow-xl">
@@ -619,19 +587,25 @@ export default function PostPropertyPage() {
             🎉
           </div>
           <h2 className="text-2xl font-black text-[#0f172a]">
-            {isApproved ? 'Property Posted & Live!' : 'Property Submitted for Review!'}
+            {isApproved ? 'Property Posted & Live!' : 'Property Sent to Admin for Review & Approval!'}
           </h2>
-          <p className="text-sm text-[#475569] mt-2">
+          <p className="text-sm text-[#475569] mt-2 leading-relaxed">
             {isApproved
               ? 'Your listing is live on Property Adda. Buyers and tenants can now view and contact you.'
-              : 'Your listing is submitted successfully and is under verification. Once approved, it will be visible to thousands of buyers and tenants across India.'}
+              : 'Aapki property admin verification queue me successfully submit ho gayi hai. Admin team aapse WhatsApp / Call par contact karegi, ya aap turant neeche WhatsApp par chat karke plan select aur listing approve karwa sakte hain.'}
           </p>
 
           <div className="my-6 p-4 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] text-left w-full space-y-2">
             <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
               <span className="text-xs text-[#64748b]">Property ID / Code:</span>
               <span className="text-xs font-black text-[#005744] bg-[#ecfdf5] px-2.5 py-0.5 rounded-md font-mono">
-                {successData.uniqueCode || autoPropertyId}
+                {propCode}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
+              <span className="text-xs text-[#64748b]">Listing Status:</span>
+              <span className="text-xs font-black px-2 py-0.5 rounded uppercase bg-amber-100 text-amber-800">
+                {successData.status || 'Pending Approval'}
               </span>
             </div>
             <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
@@ -646,18 +620,36 @@ export default function PostPropertyPage() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Link
-              to={`/property/${successData.uniqueCode || successData._id || autoPropertyId}`}
-              className="w-full py-3 px-4 rounded-xl bg-[#D62839] text-white font-bold text-xs hover:bg-[#b81d2c] shadow-md transition-all text-center"
+          {/* Direct WhatsApp Contact Button for Plan Payment & Approval */}
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-left">
+            <h4 className="text-xs font-bold text-emerald-900 mb-1 flex items-center gap-1.5">
+              <span>💬</span> Chat with Admin for Plan & Instant Approval
+            </h4>
+            <p className="text-[11px] text-emerald-700 mb-3">
+              Admin team will guide you on the best plan options and activate your listing promptly upon payment confirmation.
+            </p>
+            <a
+              href={`https://wa.me/919509505892?text=${waText}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs shadow-md transition-all cursor-pointer"
             >
-              View Property Details Page →
-            </Link>
+              <span>💬</span> Chat with Admin on WhatsApp Now →
+            </a>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
             <Link
               to="/my-listings"
               className="w-full py-3 px-4 rounded-xl bg-[#142D4E] text-white font-bold text-xs hover:bg-[#0f233d] shadow-md transition-all text-center"
             >
               Manage in My Listings →
+            </Link>
+            <Link
+              to={`/property/${propCode}`}
+              className="w-full py-3 px-4 rounded-xl bg-[#D62839] text-white font-bold text-xs hover:bg-[#b81d2c] shadow-md transition-all text-center"
+            >
+              Preview Property Page →
             </Link>
             <button
               onClick={() => {
@@ -788,117 +780,6 @@ export default function PostPropertyPage() {
     : 'Valid for 30 Days';
 
   const rolePlans = user?.userType === 'Dealer / Agent' ? AGENT_PLANS : OWNER_PLANS;
-
-  // Step 2 Gate: If user has no active plan and not editing, require selecting plan first!
-  if (!hasActivePlan && !isEditMode) {
-    return (
-      <div className="min-h-screen bg-[#F3F5F8] py-12 px-4 sm:px-6 font-sans">
-        <div className="max-w-4xl mx-auto">
-          {/* User Status Bar */}
-          <div className="mb-6 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#142D4E] text-white flex items-center justify-center font-bold text-sm">
-                {(user?.name || user?.firstName || 'U').charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#142D4E]">
-                    Posting as: <strong className="text-[#D62839]">{user?.name}</strong>
-                  </span>
-                  <span className="text-[10px] font-extrabold uppercase bg-[#fff1f2] text-[#D62839] px-2 py-0.5 rounded">
-                    {user?.userType || 'Owner'}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500">{user?.email || user?.phone}</p>
-              </div>
-            </div>
-            <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
-              {isPlanExpired ? 'Plan Expired — Renewal Required' : 'No Active Plan Selected'}
-            </span>
-          </div>
-
-          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-            <div className="text-center max-w-xl mx-auto mb-8">
-              <span className="text-[11px] font-black uppercase tracking-wider text-[#2563eb] bg-[#eff6ff] px-3 py-1 rounded-full">
-                Step 2 · Select Listing Plan
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#142D4E] mt-3">
-                Select Your Plan to Post Property
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
-                Post property se pehle apna plan select aur purchase/activate karein. Plan activate hote hi property post karne ka form open ho jayega.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-              {rolePlans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`p-5 rounded-2xl border-2 flex flex-col justify-between transition-all ${
-                    plan.tag === 'POPULAR' || plan.tag === 'MOST POPULAR'
-                      ? 'border-[#2563eb] bg-blue-50/40 shadow-md relative'
-                      : 'border-slate-200 hover:border-slate-300 bg-white shadow-xs'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-black uppercase bg-[#2563eb] text-white px-2 py-0.5 rounded-full">
-                        {plan.tag}
-                      </span>
-                      <span className="text-[11px] font-bold text-slate-500">
-                        {plan.days} Days Validity
-                      </span>
-                    </div>
-                    <h3 className="font-extrabold text-base text-[#142D4E] mt-1">{plan.name}</h3>
-                    <div className="flex items-baseline gap-2 my-2.5">
-                      <span className="text-3xl font-black text-[#D62839]">{plan.price}</span>
-                      <span className="text-xs text-slate-400 line-through">{plan.originalPrice}</span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mb-3 bg-white p-2 rounded-lg border border-slate-100">
-                      <span>📅 Start Date: <strong>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
-                    </div>
-                    <ul className="text-xs text-slate-600 space-y-2 mb-4">
-                      <li className="flex items-center gap-1.5">
-                        <span className="text-emerald-600 font-bold">✓</span>
-                        <span><strong>{plan.limit}</strong> Property Listings Allowed</span>
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <span className="text-emerald-600 font-bold">✓</span>
-                        <span><strong>{plan.days} Days</strong> Active Expiry Window</span>
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <span className="text-emerald-600 font-bold">✓</span>
-                        <span>Direct Buyer & Tenant Inquiries</span>
-                      </li>
-                      {plan.featured > 0 && (
-                        <li className="flex items-center gap-1.5">
-                          <span className="text-emerald-600 font-bold">✓</span>
-                          <span><strong>{plan.featured}</strong> Featured High-Visibility Tags</span>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={submitting}
-                    onClick={() => handleUpgradePlan(plan)}
-                    className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
-                  >
-                    {submitting ? 'Activating Plan...' : `Activate ${plan.price === '₹0' ? 'Free' : plan.price} & Post Property →`}
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center text-[11px] text-slate-400">
-              * Plan is valid immediately upon activation with live inquiry routing to your dashboard.
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] py-8 px-4 sm:px-6 font-sans text-[#0f172a]">
@@ -1102,77 +983,33 @@ export default function PostPropertyPage() {
               </div>
             )}
 
-            {/* Title & Description with Dropdown Options */}
+            {/* Title & Description (Manual Inputs - Compulsory) */}
             <div className="space-y-4 pt-2">
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-[#334155]">
-                    Property Title <span className="text-rose-500">*</span>
-                  </label>
-                  <span className="text-[11px] text-[#2563eb] font-semibold">Select from dropdown or type below</span>
-                </div>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setTitle(e.target.value);
-                  }}
-                  className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/60 text-xs font-semibold text-[#142D4E] outline-none focus:border-[#2563eb] cursor-pointer mb-2"
-                >
-                  <option value="">-- Select Property Title from Dropdown Options --</option>
-                  <option value="Spacious 3 BHK Luxury Apartment with Open Garden View">Spacious 3 BHK Luxury Apartment with Open Garden View</option>
-                  <option value="2 BHK Well-Ventilated Ready to Move Flat">2 BHK Well-Ventilated Ready to Move Flat</option>
-                  <option value="Prime Residential Plot in Gated Township near Main Road">Prime Residential Plot in Gated Township near Main Road</option>
-                  <option value="Independent House / Villa with Personal Car Parking">Independent House / Villa with Personal Car Parking</option>
-                  <option value="Commercial Retail Shop / Office Space in Main Market">Commercial Retail Shop / Office Space in Main Market</option>
-                  <option value="Corner Plot with Wide Road Facing & Immediate Registry">Corner Plot with Wide Road Facing & Immediate Registry</option>
-                  <option value="Luxury 4 BHK Penthouse with Private Terrace">Luxury 4 BHK Penthouse with Private Terrace</option>
-                  <option value="Furnished 1 BHK Studio Apartment in Prime Locality">Furnished 1 BHK Studio Apartment in Prime Locality</option>
-                  <option value="Industrial Plot / Warehouse Space near Highway">Industrial Plot / Warehouse Space near Highway</option>
-                  <option value="Agricultural Farm House Land with Water Connection">Agricultural Farm House Land with Water Connection</option>
-                </select>
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
+                  Property Title <span className="text-rose-500">* (Compulsory)</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Or type custom title, e.g. Spacious 3 BHK Luxury Apartment..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
+                  placeholder="e.g. Spacious 3 BHK Luxury Apartment with Open Garden View..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs font-medium outline-none focus:border-[#2563eb]"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-[#334155]">
-                    Description <span className="text-rose-500">*</span>
-                  </label>
-                  <span className="text-[11px] text-[#2563eb] font-semibold">Select template or type custom</span>
-                </div>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setDescription(e.target.value);
-                  }}
-                  className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/60 text-xs font-semibold text-[#142D4E] outline-none focus:border-[#2563eb] cursor-pointer mb-2"
-                >
-                  <option value="">-- Select Description Template from Dropdown Options --</option>
-                  <option value="Premium residential apartment featuring spacious well-ventilated rooms, vastu-compliant layout, modular kitchen, branded fittings, 24/7 power backup, CCTV security, covered parking and excellent connectivity to nearby metro and top schools.">
-                    Residential Apartment Template (Modular kitchen, 24/7 security, metro connectivity)
-                  </option>
-                  <option value="Prime residential plot situated in an approved gated society. Clear title with immediate registry, 40 ft wide road facing, complete electricity & water supply, boundary wall demarcated, high appreciation potential.">
-                    Residential Plot Template (Clear title, wide road, gated colony, immediate registry)
-                  </option>
-                  <option value="Independent house / luxury kothi with modern construction, personal car porch, private open terrace, spacious bedrooms, peaceful green locality, close to markets, banks and healthcare centers.">
-                    Independent House / Villa Template (Personal parking, terrace, green colony)
-                  </option>
-                  <option value="Prime commercial space / retail shop on main arterial road with high footfall, wide frontage, ample customer parking, 100% power backup, ideal for banks, retail brands, clinics or corporate offices.">
-                    Commercial Space Template (Main road frontage, high footfall, parking)
-                  </option>
-                </select>
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
+                  Description <span className="text-rose-500">* (Compulsory)</span>
+                </label>
                 <textarea
                   rows={3}
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe your property, ventilation, society amenities, nearby metro/schools, etc."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb] resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs font-medium outline-none focus:border-[#2563eb] resize-none"
                 />
               </div>
             </div>
@@ -1431,51 +1268,10 @@ export default function PostPropertyPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
                   {purpose === 'Rent' ? 'Rent value / month' : 'Expected Sale Price'}{' '}
                   <span className="text-rose-500">*</span>
                 </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setExpectedPrice(e.target.value);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
-                >
-                  <option value="">-- Select Price Budget or Type Below --</option>
-                  {purpose === 'Rent' ? (
-                    <>
-                      <option value="8000">₹8,000 / month</option>
-                      <option value="12000">₹12,000 / month</option>
-                      <option value="15000">₹15,000 / month</option>
-                      <option value="20000">₹20,000 / month</option>
-                      <option value="25000">₹25,000 / month</option>
-                      <option value="35000">₹35,000 / month</option>
-                      <option value="50000">₹50,000 / month</option>
-                      <option value="75000">₹75,000 / month</option>
-                      <option value="100000">₹1,00,000 / month</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="1000000">₹10 Lakh</option>
-                      <option value="1500000">₹15 Lakh</option>
-                      <option value="2000000">₹20 Lakh</option>
-                      <option value="2500000">₹25 Lakh</option>
-                      <option value="3000000">₹30 Lakh</option>
-                      <option value="3500000">₹35 Lakh</option>
-                      <option value="4000000">₹40 Lakh</option>
-                      <option value="5000000">₹50 Lakh</option>
-                      <option value="6000000">₹60 Lakh</option>
-                      <option value="7500000">₹75 Lakh</option>
-                      <option value="10000000">₹1 Crore</option>
-                      <option value="12500000">₹1.25 Crore</option>
-                      <option value="15000000">₹1.5 Crore</option>
-                      <option value="20000000">₹2 Crore</option>
-                      <option value="25000000">₹2.5 Crore</option>
-                      <option value="30000000">₹3 Crore</option>
-                      <option value="50000000">₹5 Crore</option>
-                    </>
-                  )}
-                </select>
                 <div className="relative">
                   <span className="absolute left-3.5 top-2.5 text-[#64748b] font-bold text-sm">₹</span>
                   <input
@@ -1492,7 +1288,7 @@ export default function PostPropertyPage() {
                     <span className="font-extrabold text-[#2563eb]">
                       {formatIndianPrice(expectedPrice)} {purpose === 'Rent' ? '/ month' : ''}
                     </span>
-                    {pricePerUnit && purpose !== 'Rent' && (
+                    {purpose !== 'Rent' && pricePerUnit && (
                       <span className="text-[#059669] font-bold bg-[#ecfdf5] px-2 py-0.5 rounded">
                         ⚡ Rate: ₹{pricePerUnit.toLocaleString('en-IN')} / {sizeUnit}
                       </span>
@@ -1502,24 +1298,9 @@ export default function PostPropertyPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
                   Booking / Security Amount (Optional)
                 </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setBookingAmount(e.target.value);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
-                >
-                  <option value="">-- Select Common Booking Amount --</option>
-                  <option value="11000">₹11,000</option>
-                  <option value="21000">₹21,000</option>
-                  <option value="51000">₹51,000</option>
-                  <option value="100000">₹1,00,000</option>
-                  <option value="200000">₹2,00,000</option>
-                  <option value="500000">₹5,00,000</option>
-                  <option value="1000000">₹10,00,000</option>
-                </select>
                 <div className="relative">
                   <span className="absolute left-3.5 top-2.5 text-[#64748b] font-bold text-sm">₹</span>
                   <input
@@ -1886,19 +1667,30 @@ export default function PostPropertyPage() {
 
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Property Approved / Recognised By
+                  Property Approved / Recognised By (Optional)
                 </label>
                 <select
                   value={approvedAuthority}
                   onChange={(e) => setApprovedAuthority(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] bg-white text-xs font-semibold text-[#0f172a] outline-none focus:border-[#2563eb]"
                 >
+                  <option value="">None / Not Applicable (Optional)</option>
                   {authoritiesList.map((auth) => (
                     <option key={auth} value={auth}>
                       {auth}
                     </option>
                   ))}
+                  <option value="Other">Other (Type Manually)</option>
                 </select>
+                {approvedAuthority === 'Other' && (
+                  <input
+                    type="text"
+                    value={customAuthority}
+                    onChange={(e) => setCustomAuthority(e.target.value)}
+                    placeholder="Type authority name manually (e.g. HUDA, Collector, Gram Panchayat)"
+                    className="mt-2 w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
+                  />
+                )}
               </div>
             </div>
 
@@ -2106,7 +1898,7 @@ export default function PostPropertyPage() {
                 <span>
                   I confirm that all details provided are accurate and I agree to{' '}
                   <a
-                    href="/cms/terms-and-conditions"
+                    href="/terms-and-conditions"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[#2563eb] underline hover:text-[#1d4ed8]"

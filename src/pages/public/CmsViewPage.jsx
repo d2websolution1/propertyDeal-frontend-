@@ -1,6 +1,6 @@
 // frontend/src/pages/public/CmsViewPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://propertydeal-backend-w3yk.onrender.com/api';
@@ -174,6 +174,11 @@ const CmsViewPage = ({ defaultSlug }) => {
   const isContactPage = slug === 'contact-us' || slug === 'contact';
   const isAboutPage = slug === 'about-us' || slug === 'about';
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const planParam = searchParams.get('plan');
+  const priceParam = searchParams.get('price');
+
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-800 font-sans pb-16">
       {/* Hero Banner */}
@@ -273,6 +278,36 @@ const CmsViewPage = ({ defaultSlug }) => {
           {/* If Contact Page: Interactive Contact Form & Help Desk Cards */}
           {isContactPage && (
             <div className="mt-10 pt-10 border-t border-gray-100">
+              {planParam && (
+                <div className="mb-8 p-5 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-300 text-emerald-950 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10.5px] font-black uppercase bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full">
+                        Selected Plan
+                      </span>
+                      {priceParam && (
+                        <strong className="text-base font-black text-emerald-800">{priceParam}</strong>
+                      )}
+                    </div>
+                    <h4 className="text-base font-extrabold text-slate-900">
+                      {planParam}
+                    </h4>
+                    <p className="text-xs text-slate-600 leading-relaxed max-w-xl">
+                      Aapne yeh subscription plan select kiya hai. Admin se direct WhatsApp par chat karke payment confirm karein aur apni property approve karwayein!
+                    </p>
+                  </div>
+                  <a
+                    href={`https://wa.me/919509505892?text=${encodeURIComponent(
+                      `Hello Property Adda Admin, I want to activate plan: ${planParam} (${priceParam || ''}). Please share payment details and activate my property listing.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 px-5 py-3 rounded-2xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                  >
+                    <span>💬 Chat on WhatsApp for Plan Payment →</span>
+                  </a>
+                </div>
+              )}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Contact Cards */}
                 <div className="space-y-4">
