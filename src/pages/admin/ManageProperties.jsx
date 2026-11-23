@@ -570,22 +570,41 @@ const ManageProperties = () => {
                       )}
 
                       {/* Selected Listing Plan Box (User Requirement: Admin can see selected plan and confirm payment) */}
-                      <div className="mt-2 p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider flex items-center gap-1">
-                            <span>📦</span> Selected Plan
-                          </span>
-                          <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                            {property.selectedPlan?.price || "₹0"}
-                          </span>
-                        </div>
-                        <p className="font-extrabold text-slate-900 mt-1 text-xs">
-                          {property.selectedPlan?.name || owner.activePlan || "Free Starter (30 Days)"}
-                        </p>
-                        <p className="text-[10.5px] text-slate-600 mt-0.5">
-                          Validity: <strong>{property.selectedPlan?.days || 30} Days</strong>
-                        </p>
-                      </div>
+                      {(() => {
+                        const hasOwnerPlan = owner.activePlan && owner.activePlan !== "Free Starter (30 Days)";
+                        const planTitle = hasOwnerPlan
+                          ? owner.activePlan
+                          : property.selectedPlan?.name || owner.activePlan || "Free Starter (30 Days)";
+                        const planPrice = hasOwnerPlan
+                          ? owner.activePlan.includes("499")
+                            ? "₹499"
+                            : owner.activePlan.includes("1499")
+                            ? "₹1499"
+                            : owner.activePlan.includes("999")
+                            ? "₹999"
+                            : "₹0"
+                          : property.selectedPlan?.price || (planTitle.includes("499") ? "₹499" : planTitle.includes("1499") ? "₹1499" : "₹0");
+                        const validityDays = property.selectedPlan?.days || (planTitle.includes("60") ? 60 : planTitle.includes("365") ? 365 : 30);
+
+                        return (
+                          <div className="mt-2 p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider flex items-center gap-1">
+                                <span>📦</span> Selected Plan
+                              </span>
+                              <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                                {planPrice}
+                              </span>
+                            </div>
+                            <p className="font-extrabold text-slate-900 mt-1 text-xs">
+                              {planTitle}
+                            </p>
+                            <p className="text-[10.5px] text-slate-600 mt-0.5">
+                              Validity: <strong>{validityDays} Days</strong>
+                            </p>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Rejection notice if rejected */}

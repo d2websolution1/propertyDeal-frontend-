@@ -13,28 +13,6 @@ api.interceptors.request.use((config) => {
 
 const PLAN_PRESETS = [
   {
-    id: "owner-gold",
-    name: "Gold Owner Plan (60 Days)",
-    price: 499,
-    priceLabel: "₹499",
-    limit: 5,
-    days: 60,
-    featured: 1,
-    tag: "POPULAR",
-    desc: "5 Listings Quota • 60 Days Validity • 1 Featured Boost",
-  },
-  {
-    id: "owner-annual",
-    name: "Annual Owner Plan (365 Days)",
-    price: 1499,
-    priceLabel: "₹1499",
-    limit: 20,
-    days: 365,
-    featured: 5,
-    tag: "BEST VALUE",
-    desc: "20 Listings Quota • 365 Days Validity • 5 Featured Boosts",
-  },
-  {
     id: "owner-starter",
     name: "Free Starter (30 Days)",
     price: 0,
@@ -46,6 +24,28 @@ const PLAN_PRESETS = [
     desc: "2 Listings Quota • 30 Days Validity",
   },
   {
+    id: "owner-gold",
+    name: "Gold Owner Plan (60 Days)",
+    price: 499,
+    priceLabel: "₹499",
+    limit: 5,
+    days: 60,
+    featured: 1,
+    tag: "POPULAR",
+    desc: "5 Listings Quota • 60 Days Validity • Direct inquiries",
+  },
+  {
+    id: "owner-annual",
+    name: "Annual Owner Plan (365 Days)",
+    price: 1499,
+    priceLabel: "₹1499",
+    limit: 20,
+    days: 365,
+    featured: 5,
+    tag: "BEST VALUE",
+    desc: "20 Listings Quota • 365 Days Validity • Direct inquiries",
+  },
+  {
     id: "agent-std",
     name: "Standard Agent Plan (45 Days)",
     price: 999,
@@ -53,7 +53,7 @@ const PLAN_PRESETS = [
     limit: 20,
     days: 45,
     featured: 2,
-    tag: "STARTER",
+    tag: "AGENT PACK",
     desc: "20 Listings Quota • 45 Days Validity • 2 Featured Boosts",
   },
   {
@@ -126,7 +126,7 @@ const ManageUsers = () => {
   const openPlanModal = (user) => {
     setPlanModalUser(user);
     const isAg = user.userType === "Dealer / Agent" || user.role === "vendor";
-    const defaultPreset = isAg ? PLAN_PRESETS[3] : PLAN_PRESETS[0];
+    const defaultPreset = isAg ? PLAN_PRESETS[3] : PLAN_PRESETS[1];
     setSelectedPlanPreset(defaultPreset.id);
     setCustomPlanForm({
       planName: defaultPreset.name,
@@ -149,27 +149,34 @@ const ManageUsers = () => {
     });
   };
 
-  const handleActivatePlanSubmit = async (e) => {
-    e.preventDefault();
+  const handleActivatePlanSubmit = async (e, overridePlanForm) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (!planModalUser) return;
-    const uid = planModalUser.id || planModalUser._id;
+    const uid = planModalUser.id || planModalUser._id || planModalUser.email;
+    const formToSend = overridePlanForm || customPlanForm;
     setActivatingPlan(true);
     try {
-      const res = await api.put(`/admin/users/${uid}/activate-plan`, customPlanForm);
-      const updatedUser = res.data.user;
+      const res = await api.put(`/admin/users/${uid}/activate-plan`, formToSend);
+      const updatedUser = res.data.user || {};
 
       setUsers((prev) =>
-        prev.map((u) => ((u.id || u._id) === uid ? { ...u, ...updatedUser } : u))
+        prev.map((u) =>
+          (u.id || u._id) === uid || (updatedUser.email && u.email === updatedUser.email)
+            ? { ...u, ...updatedUser }
+            : u
+        )
       );
       setPlanSuccessMsg(
-        `Plan "${customPlanForm.planName}" activated successfully! Quota updated to ${customPlanForm.listingLimit} listings.`
+        `Plan "${formToSend.planName}" activated successfully! Quota updated to ${formToSend.listingLimit} listings.`
       );
       setTimeout(() => {
         setPlanSuccessMsg("");
         setPlanModalUser(null);
-      }, 1200);
+      }, 1000);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to activate plan");
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || "Failed to activate plan";
+      alert(msg);
     } finally {
       setActivatingPlan(false);
     }
@@ -1002,6 +1009,27 @@ const ManageUsers = () => {
                         </div>
                         <h4 className="text-xs font-extrabold text-gray-900 mt-1">{preset.name}</h4>
                         <p className="text-[11px] text-gray-500 mt-0.5">{preset.desc}</p>
+                        <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between">
+                          <span className="text-[10px] text-gray-400 font-medium">Click to select</span>
+                          <button
+                            type="button"
+                            disabled={activatingPlan}
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              handleSelectPreset(preset);
+                              handleActivatePlanSubmit(null, {
+                                planName: preset.name,
+                                listingLimit: preset.limit,
+                                validityDays: preset.days,
+                                featuredLimit: preset.featured,
+                                price: preset.price,
+                              });
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10.5px] font-bold shadow-xs cursor-pointer transition-transform active:scale-95 flex items-center gap-1"
+                          >
+                            <span>⚡ Activate</span>
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
