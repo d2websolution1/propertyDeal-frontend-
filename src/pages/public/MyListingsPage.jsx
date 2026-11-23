@@ -336,7 +336,7 @@ export default function MyListingsPage() {
   const filteredListings = listings.filter((item) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'active') return item.status === 'approved';
-    if (activeTab === 'pending') return item.status === 'pending';
+    if (activeTab === 'pending') return item.status === 'pending' || item.hasPendingEdit;
     if (activeTab === 'rejected') return item.status === 'rejected';
     return true;
   });
@@ -632,12 +632,17 @@ export default function MyListingsPage() {
                           <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
                             <img src={imgUrl} alt={prop.title} className="w-full h-full object-cover" />
                             <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                              {prop.status === 'approved' && (
+                              {prop.status === 'approved' && !prop.hasPendingEdit && (
                                 <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-600 text-white">
                                   LIVE
                                 </span>
                               )}
-                              {prop.status === 'pending' && (
+                              {prop.hasPendingEdit && (
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-500 text-white shadow-xs">
+                                  LIVE • EDIT UNDER REVIEW
+                                </span>
+                              )}
+                              {prop.status === 'pending' && !prop.hasPendingEdit && (
                                 <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-500 text-white">
                                   UNDER REVIEW
                                 </span>

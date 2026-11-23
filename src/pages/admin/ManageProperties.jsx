@@ -430,10 +430,14 @@ const ManageProperties = () => {
                     {/* Status Badge */}
                     <span
                       className={`absolute top-3 left-3 text-[11px] font-black px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs capitalize ${
-                        STATUS_STYLES[property.status] || "bg-gray-100 text-gray-800"
+                        property.hasPendingEdit
+                          ? "bg-amber-500 text-white"
+                          : STATUS_STYLES[property.status] || "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {property.status === "pending"
+                      {property.hasPendingEdit
+                        ? "📝 Edit Pending Approval"
+                        : property.status === "pending"
                         ? "⏳ Pending Review"
                         : property.status === "approved"
                         ? "● Live on Site"
@@ -484,6 +488,25 @@ const ManageProperties = () => {
                           )}
                         </div>
                       </div>
+
+                      {property.hasPendingEdit && property.pendingEdit && (
+                        <div className="mt-2 p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-xs space-y-1">
+                          <div className="font-black text-amber-800 text-[10.5px] uppercase tracking-wider flex items-center gap-1">
+                            <span>📝</span> Changes Pending Approval
+                          </div>
+                          <p className="text-[11px] text-gray-600">
+                            Live Title: <strong className="text-gray-900">{property.title}</strong>
+                          </p>
+                          <p className="text-[11px] text-emerald-800 font-bold">
+                            Edited Title: "{property.pendingEdit.title || property.title}"
+                          </p>
+                          {property.pendingEdit.price !== undefined && property.pendingEdit.price !== property.price && (
+                            <p className="text-[11px] text-amber-900">
+                              Edited Price: <strong>₹{Number(property.pendingEdit.price).toLocaleString('en-IN')}</strong>
+                            </p>
+                          )}
+                        </div>
+                      )}
 
                       <p className="text-gray-500 text-xs mt-1 flex items-center gap-1">
                         <span>📍</span>
@@ -618,7 +641,7 @@ const ManageProperties = () => {
 
                 {/* Card Actions */}
                 <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-2 flex-wrap">
-                  {property.status === "pending" ? (
+                  {property.status === "pending" || property.hasPendingEdit ? (
                     <div className="flex items-center gap-2 w-full">
                       <button
                         onClick={() => handleApprove(property)}
@@ -626,7 +649,13 @@ const ManageProperties = () => {
                         className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                       >
                         <i className="fas fa-check"></i>
-                        <span>{actionLoadingId === propId ? "Approving..." : "Approve & Publish"}</span>
+                        <span>
+                          {actionLoadingId === propId
+                            ? "Approving..."
+                            : property.hasPendingEdit
+                            ? "Approve Edits & Publish"
+                            : "Approve & Publish"}
+                        </span>
                       </button>
 
                       <button
@@ -634,7 +663,8 @@ const ManageProperties = () => {
                         disabled={actionLoadingId === propId}
                         className="px-3.5 py-2.5 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
                       >
-                        <i className="fas fa-times mr-1"></i>Reject
+                        <i className="fas fa-times mr-1"></i>
+                        {property.hasPendingEdit ? "Discard Edit" : "Reject"}
                       </button>
                     </div>
                   ) : (
