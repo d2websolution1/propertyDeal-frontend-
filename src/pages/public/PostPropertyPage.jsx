@@ -1585,17 +1585,6 @@ export default function PostPropertyPage() {
                 />
                 <span>Price is Negotiable</span>
               </label>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#64748b]">Monthly maintenance:</span>
-                <input
-                  type="number"
-                  value={maintenanceCharges}
-                  onChange={(e) => setMaintenanceCharges(e.target.value)}
-                  placeholder="₹ Optional"
-                  className="w-28 px-2 py-1 rounded-lg border border-[#cbd5e1] text-xs outline-none"
-                />
-              </div>
             </div>
           </div>
 
