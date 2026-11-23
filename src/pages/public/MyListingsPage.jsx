@@ -21,6 +21,84 @@ const formatIndianPrice = (price, listingType) => {
   return `₹ ${num.toLocaleString('en-IN')}`;
 };
 
+const STANDARDIZED_OWNER_PLANS = [
+  {
+    id: 'owner-starter',
+    name: 'Free Starter (30 Days)',
+    price: '₹0',
+    priceNum: 0,
+    originalPrice: '₹999',
+    days: 30,
+    limit: 2,
+    featured: 0,
+    tag: 'FREE',
+    desc: 'Post 2 properties completely free with 30 days validity.',
+  },
+  {
+    id: 'owner-gold',
+    name: 'Gold Owner Plan (60 Days)',
+    price: '₹499',
+    priceNum: 499,
+    originalPrice: '₹1499',
+    days: 60,
+    limit: 5,
+    featured: 1,
+    tag: 'POPULAR',
+    desc: '5 active listings for 60 days validity + 1 featured boost slot.',
+  },
+  {
+    id: 'owner-annual',
+    name: 'Annual Owner Plan (365 Days)',
+    price: '₹1499',
+    priceNum: 1499,
+    originalPrice: '₹3999',
+    days: 365,
+    limit: 20,
+    featured: 5,
+    tag: 'BEST VALUE',
+    desc: '20 active listings for 365 days (1 full year) + 5 featured boosts.',
+  },
+];
+
+const STANDARDIZED_AGENT_PLANS = [
+  {
+    id: 'agent-std',
+    name: 'Standard Agent Plan (45 Days)',
+    price: '₹999',
+    priceNum: 999,
+    originalPrice: '₹1999',
+    days: 45,
+    limit: 20,
+    featured: 2,
+    tag: 'STARTER',
+    desc: '20 listings for 45 days + 2 featured boosts & direct buyer leads.',
+  },
+  {
+    id: 'agent-pro',
+    name: 'Pro Agent Plan (90 Days)',
+    price: '₹1999',
+    priceNum: 1999,
+    originalPrice: '₹3999',
+    days: 90,
+    limit: 50,
+    featured: 5,
+    tag: 'MOST POPULAR',
+    desc: '50 listings for 90 days + 5 featured boosts & verified badge.',
+  },
+  {
+    id: 'agent-annual',
+    name: 'Annual Agent Plan (365 Days)',
+    price: '₹4999',
+    priceNum: 4999,
+    originalPrice: '₹9999',
+    days: 365,
+    limit: 200,
+    featured: 20,
+    tag: 'UNLIMITED LEADS',
+    desc: '200 listings for 365 days + 20 featured slots & top search ranking.',
+  },
+];
+
 export default function MyListingsPage() {
   const { user } = useAuth();
 
@@ -647,94 +725,80 @@ export default function MyListingsPage() {
               </div>
             )}
 
-            {/* Plans Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {/* Plan 1 */}
-              <div className="p-6 rounded-3xl border-2 border-slate-200 bg-slate-50 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-black text-slate-600 uppercase bg-slate-200 px-2 py-0.5 rounded">
-                    STARTER
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 mt-3">फ्री में दो लिस्टिंग for 1 month</h4>
-                  <p className="text-xs text-slate-600 mt-1.5">
-                    Post 2 properties completely free with 30 days validity.
-                  </p>
-                  <p className="text-3xl font-black text-slate-900 mt-4">₹0</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleSubscribe({ _id: plans[0]?._id || 'free', name: 'Free Starter (1 Month)', price: 0 })}
-                  className="mt-6 w-full py-3 rounded-2xl border border-slate-300 font-bold text-xs text-slate-800 hover:bg-white cursor-pointer transition-all hover:scale-102"
-                >
-                  Select Plan / Contact Admin →
-                </button>
-              </div>
+            {/* Standardized Plans Grid (Consistent Across All Pages) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {(isAgent ? STANDARDIZED_AGENT_PLANS : STANDARDIZED_OWNER_PLANS).map((plan) => {
+                const userPlanStr = (user?.activePlan || 'Free Starter').toLowerCase();
+                const isPlanActive =
+                  (plan.priceNum === 0 && (userPlanStr.includes('free') || !user?.activePlan)) ||
+                  userPlanStr.includes(plan.name.toLowerCase()) ||
+                  plan.name.toLowerCase().includes(userPlanStr);
 
-              {/* Plan 2 */}
-              <div className="p-6 rounded-3xl border-2 border-amber-300 bg-amber-50/40 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-black text-amber-800 uppercase bg-amber-200 px-2 py-0.5 rounded">
-                    FEATURED BOOST
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 mt-3">₹99 में 1 featured लिस्टिंग</h4>
-                  <p className="text-xs text-slate-600 mt-1.5">
-                    1 premium featured listing tag with up to 5x higher enquiries for 30 days.
-                  </p>
-                  <p className="text-3xl font-black text-amber-700 mt-4">₹99</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleSubscribe(plans.find((p) => p.price === 99) || { price: 99, name: 'Featured Boost (1 Listing)' })}
-                  className="mt-6 w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102"
-                >
-                  Pay ₹99 via WhatsApp / Admin →
-                </button>
-              </div>
+                return (
+                  <div
+                    key={plan.id}
+                    className={`p-6 rounded-3xl border-2 flex flex-col justify-between transition-all relative ${
+                      isPlanActive
+                        ? 'border-emerald-500 bg-emerald-50/40 shadow-sm'
+                        : plan.tag === 'POPULAR'
+                        ? 'border-blue-500 bg-blue-50/30 shadow-sm'
+                        : 'border-slate-200 bg-white'
+                    }`}
+                  >
+                    {plan.tag && (
+                      <span
+                        className={`absolute top-4 right-4 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
+                          isPlanActive
+                            ? 'bg-emerald-600 text-white'
+                            : plan.tag === 'FREE'
+                            ? 'bg-slate-200 text-slate-800'
+                            : plan.tag === 'POPULAR'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-amber-500 text-white'
+                        }`}
+                      >
+                        {isPlanActive ? 'ACTIVE NOW' : plan.tag}
+                      </span>
+                    )}
 
-              {/* Plan 3 */}
-              <div className="p-6 rounded-3xl border-2 border-blue-500 bg-blue-50/40 flex flex-col justify-between relative shadow-sm">
-                <span className="absolute -top-3 right-4 bg-blue-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-xs">
-                  MOST POPULAR
-                </span>
-                <div>
-                  <span className="text-[10px] font-black text-blue-800 uppercase bg-blue-200 px-2 py-0.5 rounded">
-                    QUARTERLY
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 mt-3">₹499 में 10 लिस्टिंग for 3 months</h4>
-                  <p className="text-xs text-slate-600 mt-1.5">
-                    10 active listings for 90 days validity + 2 featured boosts included.
-                  </p>
-                  <p className="text-3xl font-black text-blue-700 mt-4">₹499</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleSubscribe(plans.find((p) => p.price === 499) || { price: 499, name: 'Standard Quarterly (10 Listings)' })}
-                  className="mt-6 w-full py-3 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102"
-                >
-                  Pay ₹499 via WhatsApp / Admin →
-                </button>
-              </div>
+                    <div>
+                      <h4 className="text-base font-extrabold text-slate-900 pr-16">{plan.name}</h4>
+                      <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{plan.desc}</p>
+                      <div className="flex items-baseline gap-2 mt-4">
+                        <span className="text-3xl font-black text-[#142D4E]">{plan.price}</span>
+                        {plan.originalPrice && (
+                          <span className="text-sm line-through text-slate-400 font-semibold">{plan.originalPrice}</span>
+                        )}
+                      </div>
+                      <div className="mt-2 text-xs font-semibold text-slate-600">
+                        Validity: <strong>{plan.days} Days</strong> • Max {plan.limit} Listings
+                      </div>
+                    </div>
 
-              {/* Plan 4 */}
-              <div className="p-6 rounded-3xl border-2 border-emerald-500 bg-emerald-50/40 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-black text-emerald-800 uppercase bg-emerald-200 px-2 py-0.5 rounded">
-                    BEST VALUE (9 MONTHS)
-                  </span>
-                  <h4 className="text-base font-bold text-slate-900 mt-3">₹999 में 30 लिस्टिंग for 9 months</h4>
-                  <p className="text-xs text-slate-600 mt-1.5">
-                    30 active listings for 270 days (9 months) + 5 featured boosts included.
-                  </p>
-                  <p className="text-3xl font-black text-emerald-700 mt-4">₹999</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleSubscribe(plans.find((p) => p.price === 999) || { price: 999, name: 'Agency Pro (30 Listings)' })}
-                  className="mt-6 w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102"
-                >
-                  Pay ₹999 via WhatsApp / Admin →
-                </button>
-              </div>
+                    <div className="mt-6">
+                      {isPlanActive ? (
+                        <button
+                          type="button"
+                          disabled
+                          className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-extrabold text-xs shadow-sm cursor-default flex items-center justify-center gap-1.5"
+                        >
+                          <span>✓</span>
+                          <span>Active</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSubscribe(plan)}
+                          className="w-full py-3 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102 flex items-center justify-center gap-1.5"
+                        >
+                          <span>Contact Property Adda</span>
+                          <span>→</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

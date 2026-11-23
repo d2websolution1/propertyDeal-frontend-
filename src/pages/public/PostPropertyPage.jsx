@@ -134,6 +134,32 @@ const AGENT_PLANS = [
   { id: 'agent-annual', name: 'Annual Agent Plan (365 Days)', price: '₹4999', originalPrice: '₹9999', days: 365, limit: 200, featured: 20, tag: 'UNLIMITED LEADS' },
 ];
 
+const CITY_STATE_MAP = {
+  'jaipur': 'Rajasthan',
+  'noida': 'Uttar Pradesh',
+  'greater noida': 'Uttar Pradesh',
+  'ghaziabad': 'Uttar Pradesh',
+  'lucknow': 'Uttar Pradesh',
+  'delhi': 'Delhi',
+  'delhi ncr': 'Delhi',
+  'gurgaon': 'Haryana',
+  'gurugram': 'Haryana',
+  'faridabad': 'Haryana',
+  'mumbai': 'Maharashtra',
+  'pune': 'Maharashtra',
+  'bangalore': 'Karnataka',
+  'hyderabad': 'Telangana',
+};
+
+const CITY_TOWNSHIPS = {
+  'Jaipur': ['Mahima Panorama', 'Mahima Florenza', 'Vatika Infotech City', 'Ashiana Town', 'Omaxe City', 'Manglam Grand City', 'UDB Greens', 'Unique Sapphire', 'Green Meadows', 'Siddhi Homes', 'Trimurty Ariana'],
+  'Noida': ['ATS Knightsbridge', 'Gaur City', 'Godrej Woods', 'Supertech Eco Village', 'Ace Platinum', 'Gulshan Bellina', 'Prateek Laurel', 'Jaypee Greens', 'Paras Tierea', 'Mahagun Moderne'],
+  'Gurgaon': ['DLF Phase 5', 'DLF Cybercity', 'Godrej Meridien', 'Tata Primanti', 'M3M Golfestate', 'Emaar Palm Hills', 'Sobha City', 'Vipul Greens', 'Bestech Park View'],
+  'Delhi NCR': ['DLF Capital Greens', 'Unity The Amaryllis', 'Godrej South Estate', 'DDA SFS Flats', 'Parsvnath La Tropicana', 'Commonwealth Games Village'],
+  'Mumbai': ['Hiranandani Gardens', 'Lodha Bellissimo', 'Godrej The Trees', 'Rustomjee Seasons', 'Piramal Mahalaxmi', 'Kalpataru Sparkle', 'Oberoi Splendor', 'Runwal Bliss'],
+  'Pune': ['Amanora Park Town', 'Kolte Patil Life Republic', 'Magarpatta City', 'Blue Ridge Hinjewadi', 'Godrej Infinity'],
+};
+
 export default function PostPropertyPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -268,7 +294,7 @@ export default function PostPropertyPage() {
     'RERA Registered',
     'Freehold / Registry Ready',
   ]);
-  const [approvedAuthority, setApprovedAuthority] = useState('JDA Approved');
+  const [approvedAuthority, setApprovedAuthority] = useState('');
   const [customAuthority, setCustomAuthority] = useState('');
 
   // Dynamic locations from Admin
@@ -280,8 +306,10 @@ export default function PostPropertyPage() {
         if (res.data?.locations?.length > 0) {
           setLocationsData(res.data.locations);
           if (!city && res.data.locations[0]?.city) {
-            setCity(res.data.locations[0].city);
-            if (res.data.locations[0].state) setState(res.data.locations[0].state);
+            const firstCity = res.data.locations[0].city;
+            setCity(firstCity);
+            const firstState = res.data.locations[0].state || CITY_STATE_MAP[firstCity.toLowerCase()] || '';
+            setState(firstState);
           }
         }
       })
@@ -633,7 +661,7 @@ export default function PostPropertyPage() {
         approvedAuthority:
           approvedAuthority === 'Other'
             ? (customAuthority.trim() || 'Other Approved')
-            : (approvedAuthority || 'None / Not Applicable'),
+            : (approvedAuthority ? approvedAuthority.trim() : ''),
         address: address.trim(),
         reraNumber: reraNumber.trim(),
         contactName: contactName.trim() || user?.name || 'Property Adda Partner',
@@ -651,7 +679,7 @@ export default function PostPropertyPage() {
 
       if (isEditMode) {
         await axios.put(`${API_BASE_URL}/properties/user/${editId}`, payload, { headers });
-        alert('Property listing updated successfully!');
+        alert('Property changes saved! Your listing has been submitted for admin re-approval before going live.');
         navigate('/my-listings');
         return;
       }
@@ -1202,7 +1230,7 @@ export default function PostPropertyPage() {
             <div className="space-y-4 pt-2">
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1.5">
-                  Property Title <span className="text-rose-500">* (Compulsory)</span>
+                  Property Title <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1447,269 +1475,20 @@ export default function PostPropertyPage() {
               </div>
             </div>
 
-            {/* Real Estate Rate & Price Calculator (प्रति वर्ग गज / प्रति वर्ग फुट कैलकुलेटर) */}
-            {purpose !== 'Rent' && (
-              <div className="mt-3 p-4 rounded-2xl bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-slate-50 border border-blue-200 shadow-2xs">
-                <div className="flex items-center justify-between flex-wrap gap-2 pb-2.5 border-b border-blue-100">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">🧮</span>
-                    <div>
-                      <h4 className="text-xs font-black text-[#142D4E] uppercase tracking-wide">
-                        Property Rate & Price Calculator (रियल एस्टेट कैलकुलेटर)
-                      </h4>
-                      <p className="text-[11px] text-slate-500">
-                        प्रति वर्ग फुट (Sq.Ft) व प्रति गज (Gaj) दर निकालें या दर से कुल कीमत कैलकुलेट करें
-                      </p>
-                    </div>
-                  </div>
-                  {areaBreakdown ? (
-                    <span className="text-[11px] font-bold text-[#2563eb] bg-white px-2.5 py-1 rounded-lg border border-blue-200">
-                      📐 Area: {sizeValue} {sizeUnit} ≈ <strong>{areaBreakdown.gaj} Gaj</strong> (वर्ग गज) | <strong>{areaBreakdown.sqft} Sq.Ft</strong>
-                    </span>
-                  ) : (
-                    <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                      Area size dalein ya neeche quick click karein
-                    </span>
-                  )}
+            {/* Live Calculated Rates & Total Price (Clean values display, calculator structure hidden) */}
+            {purpose !== 'Rent' && expectedPrice && ratesCalculated && (
+              <div className="mt-2.5 p-3 rounded-xl bg-blue-50/70 border border-blue-200 flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-slate-600">Calculated Rates:</span>
+                  <span className="text-xs font-extrabold text-[#2563eb] bg-white px-2.5 py-1 rounded-lg border border-blue-100 shadow-2xs">
+                    ₹{ratesCalculated.rateGaj ? ratesCalculated.rateGaj.toLocaleString('en-IN') : '0'} / गज (Gaj)
+                  </span>
+                  <span className="text-xs font-extrabold text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-emerald-100 shadow-2xs">
+                    ₹{ratesCalculated.rateSqft ? ratesCalculated.rateSqft.toLocaleString('en-IN') : '0'} / sq.ft
+                  </span>
                 </div>
-
-                {/* Direct Area / Size input inside calculator for 100% instant calculation */}
-                <div className="bg-white p-3 rounded-xl border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 my-3 shadow-2xs">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-[#142D4E] flex items-center gap-1">
-                      <span>📐</span> Plot / Flat Area (साइज):
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="number"
-                        value={sizeValue}
-                        onChange={(e) => setSizeValue(e.target.value)}
-                        placeholder="e.g. 100"
-                        className="w-24 px-2.5 py-1 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
-                      />
-                      <select
-                        value={sizeUnit}
-                        onChange={(e) => setSizeUnit(e.target.value)}
-                        className="px-2 py-1 rounded-lg border border-slate-300 text-xs font-semibold bg-white outline-none focus:border-[#2563eb]"
-                      >
-                        <option value="sq yard">Gaj (वर्ग गज)</option>
-                        <option value="sqft">Sq.Ft (वर्ग फुट)</option>
-                        <option value="acre">Acre</option>
-                      </select>
-                    </div>
-                  </div>
-                  {/* Quick Preset Buttons */}
-                  <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
-                    <span className="text-slate-400 font-semibold text-[10px]">Quick Size:</span>
-                    {['50', '100', '150', '200', '250', '500'].map((preset) => (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => {
-                          setSizeValue(preset);
-                          setSizeUnit('sq yard');
-                        }}
-                        className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold cursor-pointer transition-colors ${
-                          sizeValue === preset && sizeUnit === 'sq yard'
-                            ? 'bg-[#2563eb] text-white'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        {preset} गज
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSizeValue('1000');
-                        setSizeUnit('sqft');
-                      }}
-                      className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold cursor-pointer transition-colors ${
-                        sizeValue === '1000' && sizeUnit === 'sqft'
-                          ? 'bg-[#2563eb] text-white'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      }`}
-                    >
-                      1000 sqft
-                    </button>
-                  </div>
-                </div>
-
-                {/* Live Rates Display */}
-                {expectedPrice && areaBreakdown && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 my-3">
-                    <div className="p-2.5 bg-white rounded-xl border border-blue-100 text-center shadow-2xs">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Rate per Gaj (प्रति गज)</span>
-                      <span className="text-sm font-black text-[#2563eb]">
-                        ₹ {ratesCalculated?.rateGaj ? ratesCalculated.rateGaj.toLocaleString('en-IN') : '0'} / गज
-                      </span>
-                    </div>
-                    <div className="p-2.5 bg-white rounded-xl border border-blue-100 text-center shadow-2xs">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Rate per Sq.Ft (प्रति वर्ग फुट)</span>
-                      <span className="text-sm font-black text-[#059669]">
-                        ₹ {ratesCalculated?.rateSqft ? ratesCalculated.rateSqft.toLocaleString('en-IN') : '0'} / sq.ft
-                      </span>
-                    </div>
-                    <div className="p-2.5 bg-white rounded-xl border border-blue-100 text-center shadow-2xs col-span-2 sm:col-span-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Price (कुल राशि)</span>
-                      <span className="text-sm font-black text-[#D62839]">
-                        {formatIndianPrice(expectedPrice)}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Interactive Rate-to-Price calculation tools */}
-                <div className="mt-3 pt-2.5 border-t border-blue-100">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-xs font-bold text-[#142D4E]">Calculate Total Price by Rate:</span>
-                    <button
-                      type="button"
-                      onClick={() => setCalcActiveMode('gaj')}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all ${
-                        calcActiveMode === 'gaj'
-                          ? 'bg-[#2563eb] text-white shadow-xs'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      By Rate per Gaj (प्रति गज दर)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCalcActiveMode('sqft')}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all ${
-                        calcActiveMode === 'sqft'
-                          ? 'bg-[#2563eb] text-white shadow-xs'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      By Rate per Sq.Ft (प्रति वर्ग फुट दर)
-                    </button>
-                  </div>
-
-                  {calcActiveMode === 'gaj' ? (
-                    <div className="p-3 bg-white rounded-xl border border-blue-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                      <div className="flex-1">
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                          Enter Rate per Gaj (₹ प्रति गज दर डालें)
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">₹</span>
-                          <input
-                            type="number"
-                            value={calcInputGajRate}
-                            onChange={(e) => setCalcInputGajRate(e.target.value)}
-                            placeholder="e.g. 25000"
-                            className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
-                          />
-                        </div>
-                      </div>
-                      {totalFromGaj ? (
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <span className="text-[10px] text-slate-500 block">Calculated Total Amount</span>
-                            <span className="text-sm font-black text-[#D62839]">
-                              ₹ {totalFromGaj.toLocaleString('en-IN')} ({formatIndianPrice(totalFromGaj)})
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setExpectedPrice(String(totalFromGaj));
-                            }}
-                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
-                          >
-                            ✓ Apply as Price
-                          </button>
-                        </div>
-                      ) : expectedPrice && calcInputGajRate && Number(calcInputGajRate) > 0 ? (
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <span className="text-[10px] text-slate-500 block">Calculated Plot Size at this Rate</span>
-                            <span className="text-sm font-black text-[#2563eb]">
-                              {parseFloat((Number(expectedPrice) / Number(calcInputGajRate)).toFixed(1))} गज ({Math.round((Number(expectedPrice) / Number(calcInputGajRate)) * 9)} sqft)
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const calcGaj = parseFloat((Number(expectedPrice) / Number(calcInputGajRate)).toFixed(1));
-                              setSizeValue(String(calcGaj));
-                              setSizeUnit('sq yard');
-                            }}
-                            className="px-3 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
-                          >
-                            ✓ Set Size
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="text-[11px] text-slate-400">
-                          {areaBreakdown?.gaj ? `Multiplies with ${areaBreakdown.gaj} Gaj` : 'Type size above to calculate amount'}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="p-3 bg-white rounded-xl border border-blue-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                      <div className="flex-1">
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                          Enter Rate per Sq.Ft (₹ प्रति वर्ग फुट दर डालें)
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">₹</span>
-                          <input
-                            type="number"
-                            value={calcInputSqftRate}
-                            onChange={(e) => setCalcInputSqftRate(e.target.value)}
-                            placeholder="e.g. 2000"
-                            className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold outline-none focus:border-[#2563eb]"
-                          />
-                        </div>
-                      </div>
-                      {totalFromSqft ? (
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <span className="text-[10px] text-slate-500 block">Calculated Total Amount</span>
-                            <span className="text-sm font-black text-[#D62839]">
-                              ₹ {totalFromSqft.toLocaleString('en-IN')} ({formatIndianPrice(totalFromSqft)})
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setExpectedPrice(String(totalFromSqft));
-                            }}
-                            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
-                          >
-                            ✓ Apply as Price
-                          </button>
-                        </div>
-                      ) : expectedPrice && calcInputSqftRate && Number(calcInputSqftRate) > 0 ? (
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <span className="text-[10px] text-slate-500 block">Calculated Area at this Rate</span>
-                            <span className="text-sm font-black text-[#2563eb]">
-                              {Math.round(Number(expectedPrice) / Number(calcInputSqftRate))} sq.ft ({parseFloat(((Number(expectedPrice) / Number(calcInputSqftRate)) / 9).toFixed(1))} गज)
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const calcArea = Math.round(Number(expectedPrice) / Number(calcInputSqftRate));
-                              setSizeValue(String(calcArea));
-                              setSizeUnit('sqft');
-                            }}
-                            className="px-3 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs cursor-pointer shadow-xs transition-all whitespace-nowrap"
-                          >
-                            ✓ Set Size
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="text-[11px] text-slate-400">
-                          {areaBreakdown?.sqft ? `Multiplies with ${areaBreakdown.sqft} Sq.Ft` : 'Type size above to calculate amount'}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                <div className="text-xs font-black text-[#D62839] bg-white px-3 py-1 rounded-lg border border-rose-100 shadow-2xs">
+                  Total Price: {formatIndianPrice(expectedPrice)}
                 </div>
               </div>
             )}
@@ -1939,55 +1718,62 @@ export default function PostPropertyPage() {
                 </label>
                 <select
                   value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  onChange={(e) => {
+                    const selCity = e.target.value;
+                    setCity(selCity);
+                    const matchedLoc = locationsData.find((l) => l.city === selCity);
+                    if (matchedLoc?.state) {
+                      setState(matchedLoc.state);
+                    } else if (CITY_STATE_MAP[selCity.toLowerCase()]) {
+                      setState(CITY_STATE_MAP[selCity.toLowerCase()]);
+                    }
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs font-bold outline-none focus:border-[#2563eb]"
                 >
                   <option value="">-- Select City --</option>
                   {locationsData.map((l) => (
                     <option key={l.id || l._id || l.city} value={l.city}>
-                      {l.city} ({l.state || 'India'})
+                      {l.city}
                     </option>
                   ))}
                   {/* Fallbacks */}
-                  {!locationsData.some((l) => l.city === 'Mumbai') && <option value="Mumbai">Mumbai</option>}
-                  {!locationsData.some((l) => l.city === 'Delhi NCR') && <option value="Delhi NCR">Delhi NCR</option>}
+                  {!locationsData.some((l) => l.city === 'Jaipur') && <option value="Jaipur">Jaipur</option>}
                   {!locationsData.some((l) => l.city === 'Noida') && <option value="Noida">Noida</option>}
                   {!locationsData.some((l) => l.city === 'Gurgaon') && <option value="Gurgaon">Gurgaon</option>}
-                  {!locationsData.some((l) => l.city === 'Jaipur') && <option value="Jaipur">Jaipur</option>}
+                  {!locationsData.some((l) => l.city === 'Delhi NCR') && <option value="Delhi NCR">Delhi NCR</option>}
+                  {!locationsData.some((l) => l.city === 'Mumbai') && <option value="Mumbai">Mumbai</option>}
                 </select>
               </div>
 
-              {/* Township / Apartment / Project Name with Dropdown */}
+              {/* Township / Apartment / Project Name with City-specific Dropdown */}
               <div>
                 <label className="block text-xs font-bold text-[#334155] mb-1">
                   Township / Apartment / Project Name
                 </label>
                 <select
+                  value={(CITY_TOWNSHIPS[city] || CITY_TOWNSHIPS['Jaipur'] || []).includes(projectName) ? projectName : (projectName ? 'Other' : '')}
                   onChange={(e) => {
-                    if (e.target.value) setProjectName(e.target.value);
+                    if (e.target.value === 'Other') {
+                      setProjectName('');
+                    } else if (e.target.value) {
+                      setProjectName(e.target.value);
+                    }
                   }}
                   className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
                 >
-                  <option value="">-- Choose Township / Project from Dropdown --</option>
-                  <option value="ATS Knightsbridge">ATS Knightsbridge</option>
-                  <option value="Gaur City">Gaur City</option>
-                  <option value="DLF Phase 5">DLF Phase 5</option>
-                  <option value="Mahima Panorama">Mahima Panorama</option>
-                  <option value="Vatika Infotech City">Vatika Infotech City</option>
-                  <option value="Ashiana Town">Ashiana Town</option>
-                  <option value="Omaxe City">Omaxe City</option>
-                  <option value="Eldeco Township">Eldeco Township</option>
-                  <option value="Godrej Woods">Godrej Woods</option>
-                  <option value="Supertech Eco Village">Supertech Eco Village</option>
-                  <option value="Green Meadows">Green Meadows</option>
-                  <option value="Dream City">Dream City</option>
-                  <option value="Royal Enclave">Royal Enclave</option>
+                  <option value="">-- Choose Township / Project ({city || 'City'}) --</option>
+                  {(CITY_TOWNSHIPS[city] || CITY_TOWNSHIPS['Jaipur'] || []).map((tName) => (
+                    <option key={tName} value={tName}>
+                      {tName}
+                    </option>
+                  ))}
+                  <option value="Other">Other / Type Manually Below</option>
                 </select>
                 <input
                   type="text"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  placeholder="Or type custom township / project e.g. ATS Knightsbridge..."
+                  placeholder="Or type township / project manually (e.g. Mahima Panorama, Gaur City...)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -2209,102 +1995,12 @@ export default function PostPropertyPage() {
             )}
           </div>
 
-          {/* ── 7. ADMIN BADGE NOTICE & CONTACT ── */}
-          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-[#f1f5f9]">
-              <span className="w-7 h-7 rounded-full bg-[#2563eb] text-white text-xs font-black flex items-center justify-center">
-                7
-              </span>
-              <h2 className="text-base font-bold text-[#0f172a]">Contact & Admin Badges</h2>
-            </div>
-
-            {/* Featured / Verified Notice */}
-            <div className="p-3.5 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-xs flex items-center gap-3">
-              <span className="text-xl">🛡️</span>
-              <div>
-                <p className="font-bold text-[#1e40af]">
-                  Featured & Verified Badges — Reviewed by Admin Only
-                </p>
-                <p className="text-[11px] text-[#3b82f6] mt-0.5">
-                  To ensure quality & authenticity for buyers, only verified accounts and properties inspected by Property Adda administrators carry the Verified & Featured badges.
-                </p>
-              </div>
-            </div>
-
-            {/* Contact details */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-              <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Contact Name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  placeholder="e.g. Ramesh Sharma"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
-                  Phone Number <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  placeholder="e.g. 9672056670"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
-                  RERA Registration No. (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={reraNumber}
-                  onChange={(e) => setReraNumber(e.target.value)}
-                  placeholder="e.g. RAJ/P/2023/1234"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-2">
-              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#0f172a]">
-                <input
-                  type="checkbox"
-                  required
-                  checked={agreeTerms}
-                  onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#2563eb]"
-                />
-                <span>
-                  I confirm that all details provided are accurate and I agree to{' '}
-                  <a
-                    href="/terms-and-conditions"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#2563eb] underline hover:text-[#1d4ed8]"
-                  >
-                    Property Adda Terms of Use
-                  </a>.
-                </span>
-              </label>
-            </div>
-          </div>
-
-          {/* ── 6. SELECT LISTING PLAN (User Requirement: Send selected plan with property to admin) ── */}
+          {/* ── 7. SELECT LISTING PLAN (User Requirement: Send selected plan with property to admin) ── */}
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9] flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
                 <span className="w-7 h-7 rounded-full bg-[#2563eb] text-white text-xs font-black flex items-center justify-center">
-                  6
+                  7
                 </span>
                 <h2 className="text-base font-bold text-[#0f172a]">Select Listing Plan</h2>
               </div>
@@ -2363,6 +2059,30 @@ export default function PostPropertyPage() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Terms & Confirmation Checkbox */}
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 shadow-2xs">
+            <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#0f172a]">
+              <input
+                type="checkbox"
+                required
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                className="w-4 h-4 rounded text-[#2563eb]"
+              />
+              <span>
+                I confirm that all details provided are accurate and I agree to{' '}
+                <a
+                  href="/terms-and-conditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#2563eb] underline hover:text-[#1d4ed8]"
+                >
+                  Property Adda Terms of Use
+                </a>.
+              </span>
+            </label>
           </div>
 
           {/* Submit CTA Button */}
@@ -2444,7 +2164,7 @@ export default function PostPropertyPage() {
                         : 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white'
                     }`}
                   >
-                    {user?.activePlan === plan.name ? '✓ Currently Active' : `Select ${plan.price} Plan →`}
+                    {user?.activePlan === plan.name ? '✓ Active' : 'Contact Property Adda →'}
                   </button>
                 </div>
               ))}

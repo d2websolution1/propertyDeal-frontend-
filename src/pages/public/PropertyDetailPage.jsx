@@ -433,16 +433,18 @@ export default function PropertyDetailPage() {
                   </span>
                 </div>
 
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 col-span-2 sm:col-span-4">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Approval Authority / Recognition</span>
-                  <span className="text-sm font-extrabold text-[#142D4E] mt-0.5 flex items-center gap-1.5">
-                    <span className="text-emerald-600">🏛️</span>
-                    <span>{property.approvedAuthority || 'JDA Approved'}</span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      Verified Authority
+                {property.approvedAuthority && property.approvedAuthority.trim() !== '' && property.approvedAuthority !== 'None / Not Applicable' && (
+                  <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 col-span-2 sm:col-span-4">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Approval Authority / Recognition</span>
+                    <span className="text-sm font-extrabold text-[#142D4E] mt-0.5 flex items-center gap-1.5">
+                      <span className="text-emerald-600">🏛️</span>
+                      <span>{property.approvedAuthority}</span>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Verified Authority
+                      </span>
                     </span>
-                  </span>
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 

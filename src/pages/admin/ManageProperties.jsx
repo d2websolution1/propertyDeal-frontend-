@@ -490,7 +490,6 @@ const ManageProperties = () => {
                         <span className="truncate">
                           {property.locality ? `${property.locality}, ` : ""}
                           {property.city}
-                          {property.state ? `, ${property.state}` : ""}
                         </span>
                       </p>
                     </div>
