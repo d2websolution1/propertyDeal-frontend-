@@ -100,7 +100,7 @@ const STANDARDIZED_AGENT_PLANS = [
 ];
 
 export default function MyListingsPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   // Navigation Tabs: 'listings' | 'favorites' | 'subscription' | 'agent-upgrade'
   const [navTab, setNavTab] = useState('listings');
@@ -224,7 +224,10 @@ export default function MyListingsPage() {
     fetchMyListings();
     fetchPlans();
     fetchMyEnquiries();
-  }, [fetchMyListings, fetchPlans, fetchMyEnquiries]);
+    if (typeof refreshUser === 'function') {
+      refreshUser();
+    }
+  }, [fetchMyListings, fetchPlans, fetchMyEnquiries, refreshUser]);
 
   useEffect(() => {
     if (navTab === 'favorites') {

@@ -324,6 +324,11 @@ export default function PostPropertyPage() {
         }
       })
       .catch(() => {});
+
+    // Refresh user profile so active plan and quota reflect latest DB state
+    if (typeof refreshUser === 'function') {
+      refreshUser();
+    }
   }, []);
 
   const currentCityAreas = useMemo(() => {

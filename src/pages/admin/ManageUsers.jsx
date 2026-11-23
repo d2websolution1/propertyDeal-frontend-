@@ -11,6 +11,75 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const PLAN_PRESETS = [
+  {
+    id: "owner-gold",
+    name: "Gold Owner Plan (60 Days)",
+    price: 499,
+    priceLabel: "₹499",
+    limit: 5,
+    days: 60,
+    featured: 1,
+    tag: "POPULAR",
+    desc: "5 Listings Quota • 60 Days Validity • 1 Featured Boost",
+  },
+  {
+    id: "owner-annual",
+    name: "Annual Owner Plan (365 Days)",
+    price: 1499,
+    priceLabel: "₹1499",
+    limit: 20,
+    days: 365,
+    featured: 5,
+    tag: "BEST VALUE",
+    desc: "20 Listings Quota • 365 Days Validity • 5 Featured Boosts",
+  },
+  {
+    id: "owner-starter",
+    name: "Free Starter (30 Days)",
+    price: 0,
+    priceLabel: "₹0",
+    limit: 2,
+    days: 30,
+    featured: 0,
+    tag: "FREE",
+    desc: "2 Listings Quota • 30 Days Validity",
+  },
+  {
+    id: "agent-std",
+    name: "Standard Agent Plan (45 Days)",
+    price: 999,
+    priceLabel: "₹999",
+    limit: 20,
+    days: 45,
+    featured: 2,
+    tag: "STARTER",
+    desc: "20 Listings Quota • 45 Days Validity • 2 Featured Boosts",
+  },
+  {
+    id: "agent-pro",
+    name: "Pro Agent Plan (90 Days)",
+    price: 1999,
+    priceLabel: "₹1999",
+    limit: 50,
+    days: 90,
+    featured: 5,
+    tag: "MOST POPULAR",
+    desc: "50 Listings Quota • 90 Days Validity • 5 Featured Boosts",
+  },
+  {
+    id: "agent-annual",
+    name: "Annual Agent Plan (365 Days)",
+    price: 4999,
+    priceLabel: "₹4999",
+    limit: 200,
+    days: 365,
+    featured: 20,
+    tag: "UNLIMITED",
+    desc: "200 Listings Quota • 365 Days Validity • 20 Featured Slots",
+  },
+];
+
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -40,6 +109,71 @@ const ManageUsers = () => {
   });
   const [savingProfile, setSavingProfile] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Activate Plan Modal State
+  const [planModalUser, setPlanModalUser] = useState(null);
+  const [selectedPlanPreset, setSelectedPlanPreset] = useState("owner-gold");
+  const [customPlanForm, setCustomPlanForm] = useState({
+    planName: "Gold Owner Plan (60 Days)",
+    listingLimit: 5,
+    validityDays: 60,
+    featuredLimit: 1,
+    price: 499,
+  });
+  const [activatingPlan, setActivatingPlan] = useState(false);
+  const [planSuccessMsg, setPlanSuccessMsg] = useState("");
+
+  const openPlanModal = (user) => {
+    setPlanModalUser(user);
+    const isAg = user.userType === "Dealer / Agent" || user.role === "vendor";
+    const defaultPreset = isAg ? PLAN_PRESETS[3] : PLAN_PRESETS[0];
+    setSelectedPlanPreset(defaultPreset.id);
+    setCustomPlanForm({
+      planName: defaultPreset.name,
+      listingLimit: defaultPreset.limit,
+      validityDays: defaultPreset.days,
+      featuredLimit: defaultPreset.featured,
+      price: defaultPreset.price,
+    });
+    setPlanSuccessMsg("");
+  };
+
+  const handleSelectPreset = (preset) => {
+    setSelectedPlanPreset(preset.id);
+    setCustomPlanForm({
+      planName: preset.name,
+      listingLimit: preset.limit,
+      validityDays: preset.days,
+      featuredLimit: preset.featured,
+      price: preset.price,
+    });
+  };
+
+  const handleActivatePlanSubmit = async (e) => {
+    e.preventDefault();
+    if (!planModalUser) return;
+    const uid = planModalUser.id || planModalUser._id;
+    setActivatingPlan(true);
+    try {
+      const res = await api.put(`/admin/users/${uid}/activate-plan`, customPlanForm);
+      const updatedUser = res.data.user;
+
+      setUsers((prev) =>
+        prev.map((u) => ((u.id || u._id) === uid ? { ...u, ...updatedUser } : u))
+      );
+      setPlanSuccessMsg(
+        `Plan "${customPlanForm.planName}" activated successfully! Quota updated to ${customPlanForm.listingLimit} listings.`
+      );
+      setTimeout(() => {
+        setPlanSuccessMsg("");
+        setPlanModalUser(null);
+      }, 1200);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to activate plan");
+    } finally {
+      setActivatingPlan(false);
+    }
+  };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -452,6 +586,18 @@ const ManageUsers = () => {
                             </button>
                           )}
 
+                          {/* Activate Plan Button */}
+                          {!isAdmin && (
+                            <button
+                              onClick={() => openPlanModal(u)}
+                              className="px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                              title="Activate / Upgrade User Plan"
+                            >
+                              <span>⚡</span>
+                              <span>Activate Plan</span>
+                            </button>
+                          )}
+
                           {/* Manage Profile Button */}
                           <button
                             onClick={() => openEditModal(u)}
@@ -701,12 +847,29 @@ const ManageUsers = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Active Subscription Plan</label>
-                  <input
-                    type="text"
+                  <select
                     value={editForm.activePlan}
-                    onChange={(e) => setEditForm({ ...editForm, activePlan: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-blue-600"
-                  />
+                    onChange={(e) => {
+                      const sel = e.target.value;
+                      const matched = PLAN_PRESETS.find((p) => p.name === sel);
+                      setEditForm({
+                        ...editForm,
+                        activePlan: sel,
+                        listingLimit: matched ? matched.limit : editForm.listingLimit,
+                      });
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-semibold outline-none focus:border-blue-600 bg-white"
+                  >
+                    <option value="Free Starter (30 Days)">Free Starter (30 Days) - 2 Listings</option>
+                    <option value="Gold Owner Plan (60 Days)">Gold Owner Plan (60 Days) - 5 Listings (₹499)</option>
+                    <option value="Annual Owner Plan (365 Days)">Annual Owner Plan (365 Days) - 20 Listings (₹1499)</option>
+                    <option value="Standard Agent Plan (45 Days)">Standard Agent Plan (45 Days) - 20 Listings (₹999)</option>
+                    <option value="Pro Agent Plan (90 Days)">Pro Agent Plan (90 Days) - 50 Listings (₹1999)</option>
+                    <option value="Annual Agent Plan (365 Days)">Annual Agent Plan (365 Days) - 200 Listings (₹4999)</option>
+                    {!PLAN_PRESETS.some((p) => p.name === editForm.activePlan) && (
+                      <option value={editForm.activePlan}>{editForm.activePlan}</option>
+                    )}
+                  </select>
                 </div>
 
                 <div>
@@ -715,7 +878,7 @@ const ManageUsers = () => {
                     type="number"
                     value={editForm.listingLimit}
                     onChange={(e) => setEditForm({ ...editForm, listingLimit: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-blue-600"
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs outline-none focus:border-blue-600 font-bold"
                   />
                 </div>
               </div>
@@ -757,6 +920,186 @@ const ManageUsers = () => {
                   className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-sm cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
                 >
                   {savingProfile ? "Saving..." : "Save Profile Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* ── ACTIVATE / UPGRADE USER PLAN MODAL ── */}
+      {planModalUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <span className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-sm">
+                  ⚡
+                </span>
+                <div>
+                  <h3 className="text-base font-extrabold text-gray-900">
+                    Activate / Upgrade User Plan
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Assign a paid listing package for <strong>{planModalUser.name || planModalUser.email}</strong>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPlanModalUser(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {planSuccessMsg && (
+              <div className="my-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                <span>🎉</span>
+                <span>{planSuccessMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleActivatePlanSubmit} className="space-y-4 pt-3">
+              {/* User Current Info Card */}
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <span className="text-gray-500 block">User Account:</span>
+                  <span className="font-extrabold text-gray-900">{planModalUser.email}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500 block">Current Active Plan:</span>
+                  <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    {planModalUser.activePlan || "Free Starter (30 Days)"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Select Preset Plan */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2">
+                  Select Subscription Package:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {PLAN_PRESETS.map((preset) => {
+                    const isSelected = selectedPlanPreset === preset.id;
+                    return (
+                      <div
+                        key={preset.id}
+                        onClick={() => handleSelectPreset(preset)}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                          isSelected
+                            ? "border-amber-500 bg-amber-50/70 shadow-xs ring-1 ring-amber-400"
+                            : "border-gray-200 bg-white hover:border-gray-300"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">
+                            {preset.tag}
+                          </span>
+                          <span className="text-sm font-black text-[#D62839]">
+                            {preset.priceLabel}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-extrabold text-gray-900 mt-1">{preset.name}</h4>
+                        <p className="text-[11px] text-gray-500 mt-0.5">{preset.desc}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Editable Plan Name, Quota, Days, & Price */}
+              <div className="space-y-2.5 pt-1">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                    Plan Name to Activate
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={customPlanForm.planName}
+                    onChange={(e) =>
+                      setCustomPlanForm({
+                        ...customPlanForm,
+                        planName: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                      Listing Limit
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      required
+                      value={customPlanForm.listingLimit}
+                      onChange={(e) =>
+                        setCustomPlanForm({
+                          ...customPlanForm,
+                          listingLimit: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                      Validity (Days)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      required
+                      value={customPlanForm.validityDays}
+                      onChange={(e) =>
+                        setCustomPlanForm({
+                          ...customPlanForm,
+                          validityDays: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                      Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={customPlanForm.price}
+                      onChange={(e) =>
+                        setCustomPlanForm({
+                          ...customPlanForm,
+                          price: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setPlanModalUser(null)}
+                  className="px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={activatingPlan}
+                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black shadow-md cursor-pointer disabled:opacity-60 flex items-center gap-1.5 transition-all"
+                >
+                  {activatingPlan ? "Activating..." : "Confirm & Activate Plan →"}
                 </button>
               </div>
             </form>
