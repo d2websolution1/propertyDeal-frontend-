@@ -63,7 +63,7 @@ const Header = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [selectedCity, setSelectedCity] = useState("All India");
   const [citySearch, setCitySearch] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [cityModalOpen, setCityModalOpen] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState(null);
   const [clientAuthModalOpen, setClientAuthModalOpen] = useState(false);
@@ -169,9 +169,9 @@ const Header = () => {
   const navRef = useRef(null);
   const timeoutRef = useRef(null);
 
-  // Lock body scroll when mobile drawer or city modal is open
+  // Lock body scroll when city modal is open
   useEffect(() => {
-    if (mobileMenuOpen || cityModalOpen) {
+    if (cityModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -179,7 +179,7 @@ const Header = () => {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [mobileMenuOpen, cityModalOpen]);
+  }, [cityModalOpen]);
 
   const handleMouseEnter = (menuKey) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -204,15 +204,16 @@ const Header = () => {
     const handleClickOutside = (e) => {
       if (navRef.current && !navRef.current.contains(e.target)) {
         setOpenMenu(null);
+        setProfileDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close mobile drawer on route navigation
+  // Close menus on route navigation
   useEffect(() => {
-    setMobileMenuOpen(false);
+    setProfileDropdownOpen(false);
     setOpenMenu(null);
   }, [location.pathname]);
 
@@ -281,7 +282,11 @@ const Header = () => {
           {/* User Auth state */}
           {isAuthenticated ? (
             <div className="relative group">
-              <button className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full border border-[#cbd5e1] bg-white hover:border-[#142D4E] shadow-2xs transition-all cursor-pointer">
+              <button
+                type="button"
+                onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 rounded-full border border-[#cbd5e1] bg-white hover:border-[#142D4E] shadow-2xs transition-all cursor-pointer"
+              >
                 <div className="w-7 h-7 rounded-full overflow-hidden bg-[#142D4E] text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
                   {user?.avatar ? (
                     <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
@@ -290,13 +295,17 @@ const Header = () => {
                   )}
                 </div>
                 <span className="text-xs font-semibold text-[#142D4E] max-w-[90px] truncate">
-                  {user?.firstName || user?.name?.split(" ")[0] || "Prince"}
+                  {user?.firstName || user?.name?.split(" ")[0] || "Profile"}
                 </span>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[#64748B]">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
-              <div className="absolute right-0 mt-1 w-52 bg-white border border-[#e2e8f0] rounded-2xl shadow-xl p-2 hidden group-hover:block z-50 animate-fade-in">
+              <div
+                className={`absolute right-0 mt-1 w-52 bg-white border border-[#e2e8f0] rounded-2xl shadow-xl p-2 z-50 animate-fade-in ${
+                  profileDropdownOpen ? "block" : "hidden group-hover:block"
+                }`}
+              >
                 <div className="px-3 py-2 border-b border-[#f1f5f9]">
                   <p className="text-xs font-bold text-[#142D4E] truncate">{user?.name || "Client"}</p>
                   <p className="text-[10px] text-[#64748B] truncate">{user?.email}</p>
@@ -307,6 +316,7 @@ const Header = () => {
                 <div className="py-1 space-y-0.5">
                   <Link
                     to="/profile"
+                    onClick={() => setProfileDropdownOpen(false)}
                     className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#142D4E] hover:bg-[#F3F5F8] hover:text-[#D62839] rounded-lg transition-colors"
                   >
                     <span>👤</span>
@@ -314,6 +324,7 @@ const Header = () => {
                   </Link>
                   <Link
                     to="/my-listings"
+                    onClick={() => setProfileDropdownOpen(false)}
                     className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#142D4E] hover:bg-[#F3F5F8] hover:text-[#D62839] rounded-lg transition-colors"
                   >
                     <span>📑</span>
@@ -325,6 +336,7 @@ const Header = () => {
                       user?.email?.toLowerCase().endsWith("@propertyadda.com")) && (
                     <Link
                       to="/admin"
+                      onClick={() => setProfileDropdownOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#D62839] hover:bg-[#fff1f2] rounded-lg transition-colors"
                     >
                       <span>🛡️</span>
@@ -334,7 +346,10 @@ const Header = () => {
                 </div>
                 <div className="pt-1 border-t border-[#f1f5f9]">
                   <button
-                    onClick={logout}
+                    onClick={() => {
+                      logout();
+                      setProfileDropdownOpen(false);
+                    }}
                     className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
                   >
                     🚪 Logout
@@ -354,149 +369,8 @@ const Header = () => {
               Login
             </button>
           )}
-
-          {/* Mobile Hamburger Toggle Button */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl border border-[#e2e8f0] bg-white text-[#0f172a] hover:bg-[#f8fafc] active:scale-95 transition-all shadow-xs cursor-pointer flex items-center justify-center"
-            aria-label="Toggle navigation menu"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              {mobileMenuOpen ? (
-                <path d="M18 6L6 18M6 6l12 12" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
         </div>
       </div>
-
-      {/* ── Slide-over Mobile Navigation Drawer ── */}
-      {mobileMenuOpen &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div className="fixed inset-0 z-50 flex justify-end">
-            {/* Backdrop Blur */}
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-
-            {/* Slide Panel */}
-            <div className="relative z-10 w-[88vw] max-w-[380px] bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-drawer-in">
-              {/* Drawer Top Header */}
-              <div className="p-4 border-b border-[#e2e8f0] flex items-center justify-between bg-white flex-shrink-0">
-                <PropertyDealLogo height={38} className="h-8 w-auto" />
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-8 h-8 rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#0f172a] flex items-center justify-center font-bold text-base transition-transform active:scale-90 cursor-pointer"
-                  aria-label="Close menu"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Drawer Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* 1. User Profile or Sign In Card */}
-                {isAuthenticated ? (
-                  <div className="p-3.5 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-full bg-[#2563eb] text-white font-bold text-sm flex items-center justify-center shadow-xs">
-                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-xs font-bold text-[#0f172a]">{user?.name}</p>
-                          <span className="text-[9.5px] uppercase font-black px-1.5 py-0.2 rounded bg-blue-100 text-[#2563eb]">
-                            {user?.role || "user"}
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-[#64748b] truncate max-w-[150px]">{user?.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {user?.role === "admin" && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="text-[11px] font-bold text-[#2563eb] bg-[#eff6ff] px-2 py-1 rounded-lg border border-[#bfdbfe]"
-                        >
-                          Admin
-                        </Link>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          logout();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="text-xs font-bold text-rose-600 hover:underline cursor-pointer"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 flex flex-col gap-2.5">
-                    <div>
-                      <p className="text-sm font-extrabold text-[#0f172a]">Client Sign In / Sign Up</p>
-                      <p className="text-[11px] text-[#64748b]">Post properties & connect with verified buyers</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setClientAuthModalOpen(true);
-                        setAuthInitialMode("login");
-                      }}
-                      className="w-full py-2.5 rounded-xl bg-[#2563eb] text-white font-bold text-xs shadow-sm hover:bg-[#1d4ed8] transition-colors cursor-pointer text-center"
-                    >
-                      Instant Gmail Sign In →
-                    </button>
-                  </div>
-                )}
-
-                {/* Admin Access if applicable */}
-                {user?.role === "admin" && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="p-3 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] text-xs font-bold flex items-center justify-between hover:bg-blue-100 transition-colors"
-                  >
-                    <span>🛡️ Admin Dashboard</span>
-                    <span>🔑</span>
-                  </Link>
-                )}
-              </div>
-
-              {/* Drawer Fixed Footer */}
-              <div className="p-4 border-t border-[#e2e8f0] bg-white flex-shrink-0 space-y-2.5">
-                <Link
-                  to="/post-property"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-bold text-sm shadow-md transition-all active:scale-98"
-                >
-                  <span>Post Property</span>
-                  <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.5 rounded font-black">
-                    FREE
-                  </span>
-                </Link>
-                <div className="flex items-center justify-center gap-3 text-[11px] font-semibold text-[#64748B]">
-                  <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#D62839]">
-                    📞 Need Help? Contact Us
-                  </Link>
-                  <span>•</span>
-                  <span>100% Verified</span>
-                </div>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
 
       {/* ── Dedicated Mobile & Desktop City Selector Modal ── */}
       {cityModalOpen &&
