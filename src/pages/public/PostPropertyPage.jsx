@@ -1117,41 +1117,15 @@ export default function PostPropertyPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
                   Size Value <span className="text-rose-500">*</span>
                 </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setSizeValue(e.target.value);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
-                >
-                  <option value="">-- Select Standard Size --</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                  <option value="111.11">111.11 (100 Gaj)</option>
-                  <option value="150">150</option>
-                  <option value="166.67">166.67 (150 Gaj)</option>
-                  <option value="200">200</option>
-                  <option value="222.22">222.22 (200 Gaj)</option>
-                  <option value="250">250</option>
-                  <option value="500">500</option>
-                  <option value="800">800</option>
-                  <option value="1000">1000</option>
-                  <option value="1200">1200</option>
-                  <option value="1500">1500</option>
-                  <option value="1800">1800</option>
-                  <option value="2000">2000</option>
-                  <option value="2500">2500</option>
-                  <option value="3000">3000</option>
-                  <option value="5000">5000</option>
-                </select>
                 <input
                   type="number"
                   required
                   value={sizeValue}
                   onChange={(e) => setSizeValue(e.target.value)}
-                  placeholder="Or type size e.g. 1500"
+                  placeholder="Enter size e.g. 1500"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
@@ -1172,98 +1146,43 @@ export default function PostPropertyPage() {
               </div>
             </div>
 
-            {/* Plot Dimensions & Road Size with Dropdowns */}
+            {/* Plot Dimensions & Road Size */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
                   Front in ft (Plot dimensions)
                 </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setPlotFrontFt(e.target.value);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
-                >
-                  <option value="">-- Select Front (ft) --</option>
-                  <option value="15">15 ft</option>
-                  <option value="20">20 ft</option>
-                  <option value="25">25 ft</option>
-                  <option value="30">30 ft</option>
-                  <option value="35">35 ft</option>
-                  <option value="40">40 ft</option>
-                  <option value="45">45 ft</option>
-                  <option value="50">50 ft</option>
-                  <option value="60">60 ft</option>
-                  <option value="80">80 ft</option>
-                  <option value="100">100 ft</option>
-                </select>
                 <input
                   type="number"
                   value={plotFrontFt}
                   onChange={(e) => setPlotFrontFt(e.target.value)}
-                  placeholder="Or type front e.g. 30"
+                  placeholder="Enter front e.g. 30"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
                   Depth in ft (Plot dimensions)
                 </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setPlotDepthFt(e.target.value);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
-                >
-                  <option value="">-- Select Depth (ft) --</option>
-                  <option value="30">30 ft</option>
-                  <option value="35">35 ft</option>
-                  <option value="40">40 ft</option>
-                  <option value="45">45 ft</option>
-                  <option value="50">50 ft</option>
-                  <option value="55">55 ft</option>
-                  <option value="60">60 ft</option>
-                  <option value="70">70 ft</option>
-                  <option value="80">80 ft</option>
-                  <option value="90">90 ft</option>
-                  <option value="100">100 ft</option>
-                </select>
                 <input
                   type="number"
                   value={plotDepthFt}
                   onChange={(e) => setPlotDepthFt(e.target.value)}
-                  placeholder="Or type depth e.g. 50"
+                  placeholder="Enter depth e.g. 50"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#334155] mb-1">
+                <label className="block text-xs font-bold text-[#334155] mb-1.5">
                   Front Road size in ft
                 </label>
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) setFrontRoadFt(e.target.value);
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
-                >
-                  <option value="">-- Select Road Size (ft) --</option>
-                  <option value="20">20 ft Road</option>
-                  <option value="30">30 ft Road</option>
-                  <option value="40">40 ft Road</option>
-                  <option value="60">60 ft Road</option>
-                  <option value="80">80 ft Sector Road</option>
-                  <option value="100">100 ft Main Road</option>
-                  <option value="120">120 ft Express Road</option>
-                  <option value="160">160 ft Highway Road</option>
-                  <option value="200">200 ft Bypass Road</option>
-                </select>
                 <input
                   type="number"
                   value={frontRoadFt}
                   onChange={(e) => setFrontRoadFt(e.target.value)}
-                  placeholder="Or type road size e.g. 40"
+                  placeholder="Enter road size e.g. 40"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs outline-none focus:border-[#2563eb]"
                 />
               </div>

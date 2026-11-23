@@ -923,11 +923,6 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                           <span className="px-2.5 py-0.5 rounded-md text-[10.5px] font-bold bg-[#142D4E] text-white shadow-xs capitalize">
                             {prop.listingType === 'rent' ? 'For Rent' : 'For Sale'}
                           </span>
-                          {prop.isFeatured && (
-                            <span className="px-2.5 py-0.5 rounded-md text-[10.5px] font-bold bg-[#D62839] text-white shadow-xs">
-                              Featured
-                            </span>
-                          )}
                           {prop.isVerified && (
                             <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-amber-600 text-white shadow-xs">
                               Verified

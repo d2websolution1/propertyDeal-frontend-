@@ -780,52 +780,6 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
             </div>
           </form>
         </div>
-
-        {/* ── 3. Page Context Headline ── */}
-        <div className="mt-7 text-center max-w-2xl mx-auto">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#142D4E] tracking-tight">
-            {dbHeadline ? (
-              dbHeadline.toLowerCase().includes(city.toLowerCase())
-                ? dbHeadline
-                : `${dbHeadline} in ${city} & Across India`
-            ) : (
-              `${data.headline} in ${city} & Across India`
-            )}
-          </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#64748B]">
-            {dbSlogan || data.slogan}{' '}
-            <Link to="/post-property" className="text-[#D62839] font-bold hover:underline">
-              Post your property free →
-            </Link>
-          </p>
-        </div>
-
-        {/* ── 4. Category-Specific Quick Tiles Grid ── */}
-        <div className="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4">
-          {(dbTiles || data.tiles).map((tile, i) => (
-            <Link
-              key={tile.id || i}
-              to={tile.link || '/'}
-              className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-[#e2e8f0] h-32 sm:h-38 p-4 flex flex-col justify-end text-white transition-transform hover:-translate-y-1"
-            >
-              <img
-                src={tile.image || tile.img || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80'}
-                alt={tile.title || 'Property Tile'}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#142D4E]/95 via-[#142D4E]/40 to-transparent"></div>
-              <div className="relative z-10">
-                <span className="text-lg sm:text-xl font-black text-[#fde047] leading-none block mb-1">
-                  {tile.badge || tile.tag || ''}
-                </span>
-                <strong className="text-xs sm:text-sm font-bold block text-white">{tile.title}</strong>
-                <span className="text-[10.5px] text-slate-200 block">
-                  {tile.desc || tile.description || tile.subtitle || ''}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
       </div>
     </section>
   );

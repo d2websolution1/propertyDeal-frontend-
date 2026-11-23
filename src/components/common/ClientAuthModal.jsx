@@ -372,17 +372,6 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                 </div>
               </div>
 
-              {/* Selected Plan Badge */}
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-500 block">Starter Plan</span>
-                  <strong className="text-[#142D4E]">{selectedPlan.name}</strong>
-                </div>
-                <span className="bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full text-xs">
-                  {selectedPlan.price}
-                </span>
-              </div>
-
               <button
                 type="submit"
                 disabled={loading}
