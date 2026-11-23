@@ -569,6 +569,24 @@ const ManageProperties = () => {
                           RERA: <span className="text-gray-800">{reraNumber}</span>
                         </p>
                       )}
+
+                      {/* Selected Listing Plan Box (User Requirement: Admin can see selected plan and confirm payment) */}
+                      <div className="mt-2 p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider flex items-center gap-1">
+                            <span>📦</span> Selected Plan
+                          </span>
+                          <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                            {property.selectedPlan?.price || "₹0"}
+                          </span>
+                        </div>
+                        <p className="font-extrabold text-slate-900 mt-1 text-xs">
+                          {property.selectedPlan?.name || owner.activePlan || "Free Starter (30 Days)"}
+                        </p>
+                        <p className="text-[10.5px] text-slate-600 mt-0.5">
+                          Validity: <strong>{property.selectedPlan?.days || 30} Days</strong>
+                        </p>
+                      </div>
                     </div>
 
                     {/* Rejection notice if rejected */}

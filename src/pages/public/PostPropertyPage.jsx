@@ -154,6 +154,56 @@ export default function PostPropertyPage() {
   // Auto-generated Property ID (display preview)
   const [autoPropertyId, setAutoPropertyId] = useState(() => 'PA-' + Math.floor(100000 + Math.random() * 900000));
 
+  // Plan Selection States (User Requirement: Select plan with property submission)
+  const isAgentRole = user?.userType === 'Dealer / Agent' || user?.role === 'agent' || selectedRole === 'Dealer / Agent';
+  const availablePlans = isAgentRole ? AGENT_PLANS : OWNER_PLANS;
+  const [selectedPlan, setSelectedPlan] = useState(OWNER_PLANS[0]);
+  const [updatingPlan, setUpdatingPlan] = useState(false);
+
+  useEffect(() => {
+    setSelectedPlan(isAgentRole ? AGENT_PLANS[0] : OWNER_PLANS[0]);
+  }, [isAgentRole]);
+
+  // Update Plan after property post on success view
+  const handleSelectSuccessPlan = async (plan, code, propId) => {
+    setSelectedPlan(plan);
+    try {
+      setUpdatingPlan(true);
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const targetId = propId || code;
+      if (targetId) {
+        await axios.patch(`${API_BASE_URL}/properties/${targetId}/plan`, {
+          planName: plan.name,
+          planPrice: plan.price,
+          planDays: plan.days,
+        }, { headers }).catch(() => {});
+      }
+
+      await axios.post(`${API_BASE_URL}/subscriptions/request`, {
+        planName: plan.name,
+        planPrice: plan.price,
+        planDays: plan.days,
+        propertyCode: code,
+        propertyId: propId,
+        userName: user?.name,
+        userEmail: user?.email,
+        userPhone: user?.phone,
+        userType: user?.userType || 'Owner',
+      }, { headers }).catch(() => {});
+
+      setSuccessData((prev) => ({
+        ...prev,
+        selectedPlan: plan,
+      }));
+    } catch (e) {
+      console.warn('Plan selection sync error:', e);
+    } finally {
+      setUpdatingPlan(false);
+    }
+  };
+
   // 1. Basic Details
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -274,7 +324,7 @@ export default function PostPropertyPage() {
   const [submitError, setSubmitError] = useState('');
   const [successData, setSuccessData] = useState(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [availablePlans, setAvailablePlans] = useState([]);
+  const [dbSubscriptionPlans, setDbSubscriptionPlans] = useState([]);
 
   // Fetch property details for Edit Mode
   useEffect(() => {
@@ -361,7 +411,7 @@ export default function PostPropertyPage() {
     axios
       .get(`${API_BASE_URL}/subscriptions/plans`)
       .then((res) => {
-        if (res.data?.plans) setAvailablePlans(res.data.plans);
+        if (res.data?.plans) setDbSubscriptionPlans(res.data.plans);
       })
       .catch(() => {});
   }, []);
@@ -592,6 +642,11 @@ export default function PostPropertyPage() {
         ownerPhone: contactPhone.trim() || user?.phone || '',
         ownerEmail: contactEmail.trim() || user?.email || '',
         postedByType: user?.userType || 'Owner',
+        selectedPlan: {
+          name: selectedPlan?.name || 'Free Starter (30 Days)',
+          price: selectedPlan?.price || '₹0',
+          days: selectedPlan?.days || 30,
+        },
       };
 
       if (isEditMode) {
@@ -602,7 +657,25 @@ export default function PostPropertyPage() {
       }
 
       const res = await axios.post(`${API_BASE_URL}/properties`, payload, { headers });
-      setSuccessData(res.data.property || { uniqueCode: autoPropertyId, status: 'pending' });
+      const createdProp = res.data.property || { uniqueCode: autoPropertyId, status: 'pending' };
+      setSuccessData({
+        ...createdProp,
+        selectedPlan: selectedPlan,
+      });
+
+      // Also log subscription request to admin billing in background
+      axios.post(`${API_BASE_URL}/subscriptions/request`, {
+        planName: selectedPlan?.name || 'Free Starter (30 Days)',
+        planPrice: selectedPlan?.price || '₹0',
+        planDays: selectedPlan?.days || 30,
+        propertyCode: createdProp.uniqueCode || autoPropertyId,
+        propertyId: createdProp._id || createdProp.id,
+        userName: user?.name,
+        userEmail: user?.email,
+        userPhone: user?.phone,
+        userType: user?.userType || 'Owner',
+      }, { headers }).catch(() => {});
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('Failed to post property:', err);
@@ -652,8 +725,9 @@ export default function PostPropertyPage() {
   if (successData) {
     const isApproved = successData.status === 'approved';
     const propCode = successData.uniqueCode || autoPropertyId;
+    const currentPlan = successData.selectedPlan || selectedPlan || OWNER_PLANS[0];
     const waText = encodeURIComponent(
-      `Hello Admin, I have submitted property listing (ID: ${propCode}) on Property Adda and want to activate my plan and approve my listing.`
+      `Hello Admin, I have submitted property listing (ID: ${propCode}) on Property Adda and selected the ${currentPlan.name} (${currentPlan.price}). Please verify payment and approve my listing.`
     );
 
     return (
@@ -690,10 +764,75 @@ export default function PostPropertyPage() {
                 {successData.propertyType} • {successData.purpose || successData.listingType}
               </span>
             </div>
-            <div className="flex items-center justify-between py-1">
+            <div className="flex items-center justify-between py-1 border-b border-[#f1f5f9]">
               <span className="text-xs text-[#64748b]">City:</span>
               <span className="text-xs font-bold text-[#0f172a]">{successData.city}</span>
             </div>
+            <div className="flex items-center justify-between py-1">
+              <span className="text-xs text-[#64748b]">Selected Plan:</span>
+              <span className="text-xs font-black text-[#2563eb] bg-blue-50 px-2.5 py-0.5 rounded-md">
+                {currentPlan.name} ({currentPlan.price})
+              </span>
+            </div>
+          </div>
+
+          {/* Plan Selection Section on Success View */}
+          <div className="mb-6 p-4 rounded-2xl bg-slate-50 border-2 border-blue-200 text-left">
+            <div className="flex items-center justify-between mb-1.5">
+              <h4 className="text-xs font-extrabold text-[#142D4E] uppercase tracking-wide">
+                📦 Choose / Confirm Plan for Admin Approval
+              </h4>
+              <span className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                {currentPlan.price === '₹0' ? 'FREE STARTER' : currentPlan.price}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 mb-3">
+              Yahan se aap plan select karein. Ye plan details turant Admin panel me send ho jayegi:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {availablePlans.map((plan) => {
+                const isSelected = (currentPlan?.id || currentPlan?.name) === (plan.id || plan.name);
+                return (
+                  <button
+                    key={plan.id}
+                    type="button"
+                    onClick={() => handleSelectSuccessPlan(plan, propCode, successData._id || successData.id)}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative ${
+                      isSelected
+                        ? 'border-blue-600 bg-blue-50/90 shadow-xs ring-2 ring-blue-500/20'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    {plan.tag && (
+                      <span className={`absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.2 rounded uppercase ${
+                        plan.tag === 'FREE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {plan.tag}
+                      </span>
+                    )}
+                    <p className="text-xs font-bold text-[#142D4E] pr-10">{plan.name}</p>
+                    <div className="flex items-baseline gap-1 mt-1">
+                      <span className="text-sm font-black text-[#D62839]">{plan.price}</span>
+                      {plan.originalPrice && (
+                        <span className="text-[10px] line-through text-slate-400">{plan.originalPrice}</span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">
+                      Validity: {plan.days} Days • {plan.limit} Listings
+                    </span>
+                    {isSelected && (
+                      <div className="mt-1.5 text-[10px] font-bold text-blue-600 flex items-center gap-1">
+                        <span>✓ Selected for Admin</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {updatingPlan && (
+              <p className="text-[11px] text-blue-600 mt-2 font-semibold">Updating plan with Admin...</p>
+            )}
           </div>
 
           {/* Direct WhatsApp Contact Button for Plan Payment & Approval */}
@@ -2157,6 +2296,72 @@ export default function PostPropertyPage() {
                   </a>.
                 </span>
               </label>
+            </div>
+          </div>
+
+          {/* ── 6. SELECT LISTING PLAN (User Requirement: Send selected plan with property to admin) ── */}
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9] flex-wrap gap-2">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-[#2563eb] text-white text-xs font-black flex items-center justify-center">
+                  6
+                </span>
+                <h2 className="text-base font-bold text-[#0f172a]">Select Listing Plan</h2>
+              </div>
+              <span className="text-xs font-bold text-[#2563eb] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                Selected: {selectedPlan?.name} ({selectedPlan?.price})
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-500">
+              Apni listing ke liye plan select karein. Ye details property post hone ke sath Admin panel me automatically submit ho jayegi:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {availablePlans.map((plan) => {
+                const isSelected = (selectedPlan?.id || selectedPlan?.name) === (plan.id || plan.name);
+                return (
+                  <div
+                    key={plan.id}
+                    onClick={() => setSelectedPlan(plan)}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all relative ${
+                      isSelected
+                        ? 'border-[#2563eb] bg-blue-50/70 shadow-sm ring-2 ring-blue-500/20'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    {plan.tag && (
+                      <span className={`absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.2 rounded uppercase ${
+                        plan.tag === 'FREE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {plan.tag}
+                      </span>
+                    )}
+                    <p className="text-xs font-black text-[#142D4E] pr-12">{plan.name}</p>
+                    <div className="flex items-baseline gap-1.5 mt-2">
+                      <span className="text-base font-black text-[#D62839]">{plan.price}</span>
+                      {plan.originalPrice && (
+                        <span className="text-[11px] line-through text-slate-400">{plan.originalPrice}</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Validity: <strong>{plan.days} Days</strong> • Max {plan.limit} Listings
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-1.5 text-xs font-bold">
+                      <input
+                        type="radio"
+                        name="selectedPlanRadio"
+                        checked={isSelected}
+                        onChange={() => setSelectedPlan(plan)}
+                        className="w-4 h-4 text-[#2563eb]"
+                      />
+                      <span className={isSelected ? 'text-[#2563eb]' : 'text-slate-600'}>
+                        {isSelected ? '✓ Selected' : 'Choose Plan'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
