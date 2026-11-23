@@ -26,7 +26,7 @@ const CATEGORY_DATA = {
         title: 'Find Your Perfect Property',
         subtitle: 'Plots, homes and investment properties',
         buttonText: 'Explore',
-        link: '/?purpose=sale',
+        link: '/?purpose=sale#live-properties',
         tag: 'FOR SALE & INVESTMENT',
         bg: sliderSaleImg,
       },
@@ -35,7 +35,7 @@ const CATEGORY_DATA = {
         title: 'Find Your Perfect Rental Home',
         subtitle: 'Explore homes and commercial spaces',
         buttonText: 'Explore',
-        link: '/rent',
+        link: '/rent?purpose=rent#live-properties',
         tag: 'FOR RENT & COMMERCIAL',
         bg: sliderRentalImg,
       },
@@ -89,7 +89,7 @@ const CATEGORY_DATA = {
         title: 'Find Your Perfect Rental Home',
         subtitle: 'Explore homes and commercial spaces',
         buttonText: 'Explore',
-        link: '/rent',
+        link: '/rent?purpose=rent#live-properties',
         tag: 'FOR RENT & COMMERCIAL',
         bg: sliderRentalImg,
       },
@@ -98,7 +98,7 @@ const CATEGORY_DATA = {
         title: 'Find Your Perfect Property',
         subtitle: 'Plots, homes and investment properties',
         buttonText: 'Explore',
-        link: '/?purpose=sale',
+        link: '/?purpose=sale#live-properties',
         tag: 'FOR SALE & INVESTMENT',
         bg: sliderSaleImg,
       },
@@ -498,11 +498,11 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
     else if (propertyType === 'Pg/hostel') targetPath = '/pg-co-living';
 
     const searchStr = params.toString();
-    navigate(searchStr ? `${targetPath}?${searchStr}` : targetPath);
+    navigate(searchStr ? `${targetPath}?${searchStr}#live-properties` : `${targetPath}#live-properties`);
 
     // Smooth scroll down to the properties inventory section
     setTimeout(() => {
-      const el = document.getElementById('properties-showcase');
+      const el = document.getElementById('live-properties') || document.getElementById('properties-showcase');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -576,6 +576,14 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                     >
                       <Link
                         to={slide.link}
+                        onClick={() => {
+                          setTimeout(() => {
+                            const el = document.getElementById('live-properties') || document.getElementById('properties-showcase');
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }, 150);
+                        }}
                         className="inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-2xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs sm:text-sm md:text-base font-extrabold shadow-lg hover:shadow-2xl transition-all hover:scale-105 active:scale-95 group/btn"
                       >
                         <span>{slide.buttonText || 'Explore'}</span>

@@ -85,6 +85,16 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   const queryCity = searchParams.get('city') || '';
   const queryArea = searchParams.get('area') || searchParams.get('locality') || '';
 
+  const parsePurpose = (raw) => {
+    if (!raw) return 'all';
+    const lower = String(raw).toLowerCase().trim();
+    if (lower.includes('rent') || lower.includes('lease')) return 'rent';
+    if (lower.includes('sale') || lower.includes('buy')) return 'sale';
+    if (lower === 'commercial') return 'commercial';
+    if (lower === 'plots' || lower === 'plot') return 'plots';
+    return lower;
+  };
+
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
@@ -94,7 +104,9 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   // ── ADVANCED SEARCH FILTER STATES (Matching Image 1 & Image 3) ──
-  const [purpose, setPurpose] = useState(queryPurpose || queryListingType || initialFilter || 'all');
+  const [purpose, setPurpose] = useState(() =>
+    parsePurpose(queryPurpose || queryListingType || (initialFilter !== 'all' ? initialFilter : ''))
+  );
   const [city, setCity] = useState(queryCity || 'all');
   const [area, setArea] = useState(queryArea || '');
   const [subAreas, setSubAreas] = useState([]); // multiselect
@@ -102,6 +114,46 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
   const [priceRange, setPriceRange] = useState('all');
   const [sortBy, setSortBy] = useState('default');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+
+  // Dynamic synchronization with URL search parameters & route initialFilter
+  useEffect(() => {
+    const qp = searchParams.get('purpose') || searchParams.get('listingType');
+    if (qp) {
+      setPurpose(parsePurpose(qp));
+    } else if (initialFilter && initialFilter !== 'all') {
+      setPurpose(parsePurpose(initialFilter));
+    } else if (!qp && initialFilter === 'all') {
+      setPurpose('all');
+    }
+
+    const qc = searchParams.get('city');
+    if (qc) setCity(qc);
+
+    const qa = searchParams.get('area') || searchParams.get('locality');
+    if (qa) setArea(qa);
+
+    const qpt = searchParams.get('propertyType');
+    if (qpt) setPropertyType(qpt);
+
+    const minP = searchParams.get('minPrice');
+    const maxP = searchParams.get('maxPrice');
+    if (minP || maxP) {
+      setPriceRange(`${minP || ''}-${maxP || ''}`);
+    }
+  }, [location.pathname, location.search, searchParams, initialFilter]);
+
+  // Smooth scroll into view when hash specifies live-properties
+  useEffect(() => {
+    if (location.hash === '#live-properties' || location.hash === '#properties-showcase') {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('live-properties') || document.getElementById('properties-showcase');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash, location.pathname, location.search]);
 
   // Dropdown Open & Search States
   const [areaDropdownOpen, setAreaDropdownOpen] = useState(false);
@@ -418,8 +470,8 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
     (priceRange !== 'all' ? 1 : 0);
 
   return (
-    <section id="properties-showcase" className="py-10 bg-[#f8fafc] border-t border-[#e2e8f0]">
-      <div className="max-w-[1360px] mx-auto px-4 sm:px-6">
+    <section id="live-properties" data-section="properties-showcase" className="py-10 bg-[#f8fafc] border-t border-[#e2e8f0]">
+      <div id="properties-showcase" className="max-w-[1360px] mx-auto px-4 sm:px-6">
         {/* Breadcrumbs & Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
