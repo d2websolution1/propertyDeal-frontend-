@@ -125,15 +125,24 @@ const ManageUsers = () => {
 
   const openPlanModal = (user) => {
     setPlanModalUser(user);
-    // User Requirement: Always default to FREE plan across all users
-    const defaultPreset = PLAN_PRESETS[0];
-    setSelectedPlanPreset(defaultPreset.id);
+    const curPlan = (user.activePlan || "").toLowerCase();
+    const matchedPreset = PLAN_PRESETS.find(
+      (p) =>
+        p.name.toLowerCase() === curPlan ||
+        (curPlan.includes("499") && p.id === "owner-gold") ||
+        (curPlan.includes("1499") && p.id === "owner-annual") ||
+        (curPlan.includes("999") && p.id === "agent-std") ||
+        (curPlan.includes("1999") && p.id === "agent-pro") ||
+        (curPlan.includes("4999") && p.id === "agent-annual")
+    ) || PLAN_PRESETS[0];
+
+    setSelectedPlanPreset(matchedPreset.id);
     setCustomPlanForm({
-      planName: defaultPreset.name,
-      listingLimit: defaultPreset.limit,
-      validityDays: defaultPreset.days,
-      featuredLimit: defaultPreset.featured,
-      price: defaultPreset.price,
+      planName: matchedPreset.name,
+      listingLimit: matchedPreset.limit,
+      validityDays: matchedPreset.days,
+      featuredLimit: matchedPreset.featured,
+      price: matchedPreset.price,
     });
     setPlanSuccessMsg("");
   };
@@ -201,9 +210,19 @@ const ManageUsers = () => {
       setPlanSuccessMsg(
         `Plan "${formToSend.planName}" activated successfully! Quota updated to ${formToSend.listingLimit} listings.`
       );
+      setPlanModalUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              activePlan: formToSend.planName,
+              listingLimit: formToSend.listingLimit,
+            }
+          : null
+      );
       setTimeout(() => {
         setPlanSuccessMsg("");
         setPlanModalUser(null);
+        fetchUsers();
       }, 1000);
     } catch (err) {
       const msg =
