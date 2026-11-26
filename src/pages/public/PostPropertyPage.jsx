@@ -4,6 +4,13 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 import ClientAuthModal from '../../components/common/ClientAuthModal';
+import {
+  STANDARDIZED_PLANS,
+  OWNER_PLANS,
+  AGENT_PLANS,
+  isUserPlanActive,
+  getActivePlanPreset,
+} from '../../utils/plans';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "https://propertydeal-backend-w3yk.onrender.com/api";
 
@@ -122,17 +129,6 @@ const compressPhoto = (file, maxWidth = 1000, maxHeight = 1000, quality = 0.8) =
   });
 };
 
-const OWNER_PLANS = [
-  { id: 'owner-starter', name: 'Free Starter (30 Days)', price: '₹0', originalPrice: '₹999', days: 30, limit: 2, featured: 0, tag: 'FREE' },
-  { id: 'owner-gold', name: 'Gold Owner Plan (60 Days)', price: '₹499', originalPrice: '₹1499', days: 60, limit: 5, featured: 1, tag: 'POPULAR' },
-  { id: 'owner-annual', name: 'Annual Owner Plan (365 Days)', price: '₹1499', originalPrice: '₹3999', days: 365, limit: 20, featured: 5, tag: 'BEST VALUE' },
-];
-
-const AGENT_PLANS = [
-  { id: 'agent-std', name: 'Standard Agent Plan (45 Days)', price: '₹999', originalPrice: '₹1999', days: 45, limit: 20, featured: 2, tag: 'STARTER' },
-  { id: 'agent-pro', name: 'Pro Agent Plan (90 Days)', price: '₹1999', originalPrice: '₹3999', days: 90, limit: 50, featured: 5, tag: 'MOST POPULAR' },
-  { id: 'agent-annual', name: 'Annual Agent Plan (365 Days)', price: '₹4999', originalPrice: '₹9999', days: 365, limit: 200, featured: 20, tag: 'UNLIMITED LEADS' },
-];
 
 const CITY_STATE_MAP = {
   'jaipur': 'Rajasthan',
@@ -180,15 +176,15 @@ export default function PostPropertyPage() {
   // Auto-generated Property ID (display preview)
   const [autoPropertyId, setAutoPropertyId] = useState(() => 'PA-' + Math.floor(100000 + Math.random() * 900000));
 
-  // Plan Selection States (User Requirement: Select plan with property submission)
-  const isAgentRole = user?.userType === 'Dealer / Agent' || user?.role === 'agent' || selectedRole === 'Dealer / Agent';
-  const availablePlans = isAgentRole ? AGENT_PLANS : OWNER_PLANS;
-  const [selectedPlan, setSelectedPlan] = useState(OWNER_PLANS[0]);
+  // Plan Selection States (User Requirement: Consistent plans with user's active plan)
+  const [selectedPlan, setSelectedPlan] = useState(() => getActivePlanPreset(user?.activePlan));
   const [updatingPlan, setUpdatingPlan] = useState(false);
 
   useEffect(() => {
-    setSelectedPlan(isAgentRole ? AGENT_PLANS[0] : OWNER_PLANS[0]);
-  }, [isAgentRole]);
+    if (user?.activePlan) {
+      setSelectedPlan(getActivePlanPreset(user.activePlan));
+    }
+  }, [user?.activePlan]);
 
   // Update Plan after property post on success view
   const handleSelectSuccessPlan = async (plan, code, propId) => {
@@ -369,7 +365,8 @@ export default function PostPropertyPage() {
       .get(`${API_BASE_URL}/properties/${editId}`)
       .then((res) => {
         if (!isMounted) return;
-        const p = res.data?.property;
+        const rawP = res.data?.property;
+        const p = rawP ? { ...rawP, ...(rawP.hasPendingEdit && rawP.pendingEdit ? rawP.pendingEdit : {}) } : null;
         if (p) {
           if (p.uniqueCode) setAutoPropertyId(p.uniqueCode);
           setTitle(p.title || '');
@@ -2019,8 +2016,10 @@ export default function PostPropertyPage() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {availablePlans.map((plan) => {
+              {STANDARDIZED_PLANS.map((plan) => {
                 const isSelected = (selectedPlan?.id || selectedPlan?.name) === (plan.id || plan.name);
+                const isActiveOnAccount = isUserPlanActive(user?.activePlan, plan);
+
                 return (
                   <div
                     key={plan.id}
@@ -2028,17 +2027,28 @@ export default function PostPropertyPage() {
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all relative ${
                       isSelected
                         ? 'border-[#2563eb] bg-blue-50/70 shadow-sm ring-2 ring-blue-500/20'
+                        : isActiveOnAccount
+                        ? 'border-emerald-400 bg-emerald-50/30 shadow-2xs'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    {plan.tag && (
-                      <span className={`absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.2 rounded uppercase ${
-                        plan.tag === 'FREE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {plan.tag}
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase">
+                        {plan.categoryLabel}
                       </span>
-                    )}
-                    <p className="text-xs font-black text-[#142D4E] pr-12">{plan.name}</p>
+                      {isActiveOnAccount ? (
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-600 text-white uppercase">
+                          ✓ Active Plan
+                        </span>
+                      ) : plan.tag ? (
+                        <span className={`text-[9px] font-black px-1.5 py-0.2 rounded uppercase ${
+                          plan.tag === 'FREE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {plan.tag}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-xs font-black text-[#142D4E] pr-2">{plan.name}</p>
                     <div className="flex items-baseline gap-1.5 mt-2">
                       <span className="text-base font-black text-[#D62839]">{plan.price}</span>
                       {plan.originalPrice && (
@@ -2130,49 +2140,53 @@ export default function PostPropertyPage() {
 
             {/* Plans Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
-              {rolePlans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`p-5 rounded-2xl border-2 flex flex-col justify-between transition-all ${
-                    user?.activePlan === plan.name
-                      ? 'border-emerald-500 bg-emerald-50/40 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-slate-50'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-black uppercase bg-[#2563eb] text-white px-2 py-0.5 rounded">
-                        {plan.tag}
-                      </span>
-                      {user?.activePlan === plan.name && (
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                          Current Plan
-                        </span>
-                      )}
-                    </div>
-                    <h4 className="text-base font-bold text-slate-900 mt-1">{plan.name}</h4>
-                    <p className="text-xs text-slate-600 mt-1">
-                      {plan.limit} Listings • {plan.days} Days Validity • Direct inquiries
-                    </p>
-                    <div className="flex items-baseline gap-2 mt-3">
-                      <p className="text-2xl font-black text-[#D62839]">{plan.price}</p>
-                      <span className="text-xs text-slate-400 line-through">{plan.originalPrice}</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={submitting || user?.activePlan === plan.name}
-                    onClick={() => handleUpgradePlan(plan)}
-                    className={`mt-4 w-full py-2.5 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition-all ${
-                      user?.activePlan === plan.name
-                        ? 'bg-emerald-600 text-white cursor-default'
-                        : 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white'
+              {STANDARDIZED_PLANS.map((plan) => {
+                const isActive = isUserPlanActive(user?.activePlan, plan);
+
+                return (
+                  <div
+                    key={plan.id}
+                    className={`p-5 rounded-2xl border-2 flex flex-col justify-between transition-all ${
+                      isActive
+                        ? 'border-emerald-500 bg-emerald-50/40 shadow-xs'
+                        : 'border-slate-200 hover:border-slate-300 bg-slate-50'
                     }`}
                   >
-                    {user?.activePlan === plan.name ? '✓ Active' : 'Contact Property Adda →'}
-                  </button>
-                </div>
-              ))}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black uppercase bg-[#2563eb] text-white px-2 py-0.5 rounded">
+                          {plan.tag}
+                        </span>
+                        {isActive && (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                            ✓ Current Plan
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900 mt-1">{plan.name}</h4>
+                      <p className="text-xs text-slate-600 mt-1">
+                        {plan.limit} Listings • {plan.days} Days Validity • Direct inquiries
+                      </p>
+                      <div className="flex items-baseline gap-2 mt-3">
+                        <p className="text-2xl font-black text-[#D62839]">{plan.price}</p>
+                        <span className="text-xs text-slate-400 line-through">{plan.originalPrice}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={submitting || isActive}
+                      onClick={() => handleUpgradePlan(plan)}
+                      className={`mt-4 w-full py-2.5 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition-all ${
+                        isActive
+                          ? 'bg-emerald-600 text-white cursor-default'
+                          : 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white'
+                      }`}
+                    >
+                      {isActive ? '✓ Active Plan' : 'Contact Property Adda →'}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="text-center text-xs text-slate-400">

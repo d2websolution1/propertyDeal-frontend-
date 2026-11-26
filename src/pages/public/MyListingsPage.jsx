@@ -3,6 +3,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
+import {
+  STANDARDIZED_PLANS,
+  OWNER_PLANS as STANDARDIZED_OWNER_PLANS,
+  AGENT_PLANS as STANDARDIZED_AGENT_PLANS,
+  isUserPlanActive,
+} from '../../utils/plans';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://propertydeal-backend-w3yk.onrender.com/api';
 
@@ -20,84 +26,6 @@ const formatIndianPrice = (price, listingType) => {
   }
   return `₹ ${num.toLocaleString('en-IN')}`;
 };
-
-const STANDARDIZED_OWNER_PLANS = [
-  {
-    id: 'owner-starter',
-    name: 'Free Starter (30 Days)',
-    price: '₹0',
-    priceNum: 0,
-    originalPrice: '₹999',
-    days: 30,
-    limit: 2,
-    featured: 0,
-    tag: 'FREE',
-    desc: 'Post 2 properties completely free with 30 days validity.',
-  },
-  {
-    id: 'owner-gold',
-    name: 'Gold Owner Plan (60 Days)',
-    price: '₹499',
-    priceNum: 499,
-    originalPrice: '₹1499',
-    days: 60,
-    limit: 5,
-    featured: 1,
-    tag: 'POPULAR',
-    desc: '5 active listings for 60 days validity + 1 featured boost slot.',
-  },
-  {
-    id: 'owner-annual',
-    name: 'Annual Owner Plan (365 Days)',
-    price: '₹1499',
-    priceNum: 1499,
-    originalPrice: '₹3999',
-    days: 365,
-    limit: 20,
-    featured: 5,
-    tag: 'BEST VALUE',
-    desc: '20 active listings for 365 days (1 full year) + 5 featured boosts.',
-  },
-];
-
-const STANDARDIZED_AGENT_PLANS = [
-  {
-    id: 'agent-std',
-    name: 'Standard Agent Plan (45 Days)',
-    price: '₹999',
-    priceNum: 999,
-    originalPrice: '₹1999',
-    days: 45,
-    limit: 20,
-    featured: 2,
-    tag: 'STARTER',
-    desc: '20 listings for 45 days + 2 featured boosts & direct buyer leads.',
-  },
-  {
-    id: 'agent-pro',
-    name: 'Pro Agent Plan (90 Days)',
-    price: '₹1999',
-    priceNum: 1999,
-    originalPrice: '₹3999',
-    days: 90,
-    limit: 50,
-    featured: 5,
-    tag: 'MOST POPULAR',
-    desc: '50 listings for 90 days + 5 featured boosts & verified badge.',
-  },
-  {
-    id: 'agent-annual',
-    name: 'Annual Agent Plan (365 Days)',
-    price: '₹4999',
-    priceNum: 4999,
-    originalPrice: '₹9999',
-    days: 365,
-    limit: 200,
-    featured: 20,
-    tag: 'UNLIMITED LEADS',
-    desc: '200 listings for 365 days + 20 featured slots & top search ranking.',
-  },
-];
 
 export default function MyListingsPage() {
   const { user, refreshUser } = useAuth();
@@ -711,111 +639,114 @@ export default function MyListingsPage() {
         )}
 
         {/* ── TAB 3: SUBSCRIPTION PLANS ── */}
-        {navTab === 'subscription' && (
-          <div className="bg-white rounded-3xl border border-[#e2e8f0] p-6 sm:p-8 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-              <div>
-                <h3 className="text-xl font-black text-slate-900">
-                  Subscription Plans & Listing Limits
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Select your plan below to connect directly with Admin on WhatsApp for instant payment & listing approval.
-                </p>
+        {navTab === 'subscription' && (() => {
+          const displayedPlans = STANDARDIZED_PLANS;
+
+          return (
+            <div className="bg-white rounded-3xl border border-[#e2e8f0] p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">
+                    Subscription Plans & Listing Limits
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Select your plan below to connect directly with Admin on WhatsApp for instant payment & listing approval.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-[#eff6ff] rounded-2xl border border-[#bfdbfe] text-xs">
+                  <span className="text-[#64748b]">Current Active Plan: </span>
+                  <strong className="text-[#2563eb] font-extrabold">{user?.activePlan || 'Free Starter (30 Days)'}</strong>
+                  <span className="mx-2 text-slate-300">|</span>
+                  <span className="text-[#64748b]">Quota: </span>
+                  <strong className="text-emerald-700 font-extrabold">{user?.listingLimit !== undefined ? user.listingLimit : 2} listings</strong>
+                </div>
               </div>
 
-              <div className="p-3 bg-[#eff6ff] rounded-2xl border border-[#bfdbfe] text-xs">
-                <span className="text-[#64748b]">Current Active Plan: </span>
-                <strong className="text-[#2563eb] font-extrabold">{user?.activePlan || 'Free Starter'}</strong>
-                <span className="mx-2 text-slate-300">|</span>
-                <span className="text-[#64748b]">Quota: </span>
-                <strong className="text-emerald-700 font-extrabold">{user?.listingLimit !== undefined ? user.listingLimit : 2} listings</strong>
-              </div>
-            </div>
+              {subSuccessMsg && (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+                  <span>🎉</span>
+                  <span>{subSuccessMsg}</span>
+                </div>
+              )}
 
-            {subSuccessMsg && (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-                <span>🎉</span>
-                <span>{subSuccessMsg}</span>
-              </div>
-            )}
+              {/* Standardized Plans Grid (Consistent Across Admin & User Dashboard) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {displayedPlans.map((plan) => {
+                  const isPlanActive = isUserPlanActive(user?.activePlan, plan);
 
-            {/* Standardized Plans Grid (Consistent Across All Pages) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {(isAgent ? STANDARDIZED_AGENT_PLANS : STANDARDIZED_OWNER_PLANS).map((plan) => {
-                const userPlanStr = (user?.activePlan || 'Free Starter').toLowerCase();
-                const isPlanActive =
-                  (plan.priceNum === 0 && (userPlanStr.includes('free') || !user?.activePlan)) ||
-                  userPlanStr.includes(plan.name.toLowerCase()) ||
-                  plan.name.toLowerCase().includes(userPlanStr);
+                  return (
+                    <div
+                      key={plan.id}
+                      className={`p-6 rounded-3xl border-2 flex flex-col justify-between transition-all relative ${
+                        isPlanActive
+                          ? 'border-emerald-500 bg-emerald-50/50 shadow-md ring-2 ring-emerald-500/20'
+                          : plan.tag === 'POPULAR'
+                          ? 'border-blue-500 bg-blue-50/30 shadow-sm'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          {plan.categoryLabel}
+                        </span>
+                        <span
+                          className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
+                            isPlanActive
+                              ? 'bg-emerald-600 text-white'
+                              : plan.tag === 'FREE'
+                              ? 'bg-slate-200 text-slate-800'
+                              : plan.tag === 'POPULAR'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-amber-500 text-white'
+                          }`}
+                        >
+                          {isPlanActive ? '✓ ACTIVE NOW' : plan.tag}
+                        </span>
+                      </div>
 
-                return (
-                  <div
-                    key={plan.id}
-                    className={`p-6 rounded-3xl border-2 flex flex-col justify-between transition-all relative ${
-                      isPlanActive
-                        ? 'border-emerald-500 bg-emerald-50/40 shadow-sm'
-                        : plan.tag === 'POPULAR'
-                        ? 'border-blue-500 bg-blue-50/30 shadow-sm'
-                        : 'border-slate-200 bg-white'
-                    }`}
-                  >
-                    {plan.tag && (
-                      <span
-                        className={`absolute top-4 right-4 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase ${
-                          isPlanActive
-                            ? 'bg-emerald-600 text-white'
-                            : plan.tag === 'FREE'
-                            ? 'bg-slate-200 text-slate-800'
-                            : plan.tag === 'POPULAR'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-amber-500 text-white'
-                        }`}
-                      >
-                        {isPlanActive ? 'ACTIVE NOW' : plan.tag}
-                      </span>
-                    )}
+                      <div>
+                        <h4 className="text-base font-extrabold text-slate-900 pr-4">{plan.name}</h4>
+                        <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{plan.desc}</p>
+                        <div className="flex items-baseline gap-2 mt-4">
+                          <span className="text-3xl font-black text-[#142D4E]">{plan.price}</span>
+                          {plan.originalPrice && (
+                            <span className="text-sm line-through text-slate-400 font-semibold">{plan.originalPrice}</span>
+                          )}
+                        </div>
+                        <div className="mt-2 text-xs font-semibold text-slate-600">
+                          Validity: <strong>{plan.days} Days</strong> • Max {plan.limit} Listings
+                        </div>
+                      </div>
 
-                    <div>
-                      <h4 className="text-base font-extrabold text-slate-900 pr-16">{plan.name}</h4>
-                      <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">{plan.desc}</p>
-                      <div className="flex items-baseline gap-2 mt-4">
-                        <span className="text-3xl font-black text-[#142D4E]">{plan.price}</span>
-                        {plan.originalPrice && (
-                          <span className="text-sm line-through text-slate-400 font-semibold">{plan.originalPrice}</span>
+                      <div className="mt-6">
+                        {isPlanActive ? (
+                          <button
+                            type="button"
+                            disabled
+                            className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-black text-xs shadow-sm cursor-default flex items-center justify-center gap-1.5"
+                          >
+                            <span>✓</span>
+                            <span>Active Plan</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleSubscribe(plan)}
+                            className="w-full py-3 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102 flex items-center justify-center gap-1.5"
+                          >
+                            <span>Contact Property Adda</span>
+                            <span>→</span>
+                          </button>
                         )}
                       </div>
-                      <div className="mt-2 text-xs font-semibold text-slate-600">
-                        Validity: <strong>{plan.days} Days</strong> • Max {plan.limit} Listings
-                      </div>
                     </div>
-
-                    <div className="mt-6">
-                      {isPlanActive ? (
-                        <button
-                          type="button"
-                          disabled
-                          className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-extrabold text-xs shadow-sm cursor-default flex items-center justify-center gap-1.5"
-                        >
-                          <span>✓</span>
-                          <span>Active</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleSubscribe(plan)}
-                          className="w-full py-3 rounded-2xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-xs shadow-md cursor-pointer transition-all hover:scale-102 flex items-center justify-center gap-1.5"
-                        >
-                          <span>Contact Property Adda</span>
-                          <span>→</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ── TAB 4: REGISTER AS AGENT / PROJECT OWNER (FOR OWNERS) ── */}
         {navTab === 'agent-upgrade' && !isAgent && (
