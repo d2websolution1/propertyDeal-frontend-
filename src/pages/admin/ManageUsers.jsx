@@ -112,21 +112,21 @@ const ManageUsers = () => {
 
   // Activate Plan Modal State
   const [planModalUser, setPlanModalUser] = useState(null);
-  const [selectedPlanPreset, setSelectedPlanPreset] = useState("owner-gold");
+  const [selectedPlanPreset, setSelectedPlanPreset] = useState("owner-starter");
   const [customPlanForm, setCustomPlanForm] = useState({
-    planName: "Gold Owner Plan (60 Days)",
-    listingLimit: 5,
-    validityDays: 60,
-    featuredLimit: 1,
-    price: 499,
+    planName: "Free Starter (30 Days)",
+    listingLimit: 2,
+    validityDays: 30,
+    featuredLimit: 0,
+    price: 0,
   });
   const [activatingPlan, setActivatingPlan] = useState(false);
   const [planSuccessMsg, setPlanSuccessMsg] = useState("");
 
   const openPlanModal = (user) => {
     setPlanModalUser(user);
-    const isAg = user.userType === "Dealer / Agent" || user.role === "vendor";
-    const defaultPreset = isAg ? PLAN_PRESETS[3] : PLAN_PRESETS[1];
+    // User Requirement: Always default to FREE plan across all users
+    const defaultPreset = PLAN_PRESETS[0];
     setSelectedPlanPreset(defaultPreset.id);
     setCustomPlanForm({
       planName: defaultPreset.name,

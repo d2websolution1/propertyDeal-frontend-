@@ -594,20 +594,41 @@ const ManageProperties = () => {
 
                       {/* Selected Listing Plan Box (User Requirement: Admin can see selected plan and confirm payment) */}
                       {(() => {
-                        const hasOwnerPlan = owner.activePlan && owner.activePlan !== "Free Starter (30 Days)";
-                        const planTitle = hasOwnerPlan
-                          ? owner.activePlan
+                        const ownerPlan = (owner.activePlan || property.selectedPlan?.name || "").trim();
+                        const isOwnerPlanFree =
+                          !ownerPlan ||
+                          ownerPlan.toLowerCase().includes("free") ||
+                          ownerPlan.toLowerCase().includes("starter");
+
+                        const planTitle = !isOwnerPlanFree
+                          ? ownerPlan
                           : property.selectedPlan?.name || owner.activePlan || "Free Starter (30 Days)";
-                        const planPrice = hasOwnerPlan
-                          ? owner.activePlan.includes("499")
+
+                        const planPrice = !isOwnerPlanFree
+                          ? ownerPlan.includes("499")
                             ? "₹499"
-                            : owner.activePlan.includes("1499")
+                            : ownerPlan.includes("1499")
                             ? "₹1499"
-                            : owner.activePlan.includes("999")
+                            : ownerPlan.includes("999")
                             ? "₹999"
-                            : "₹0"
-                          : property.selectedPlan?.price || (planTitle.includes("499") ? "₹499" : planTitle.includes("1499") ? "₹1499" : "₹0");
-                        const validityDays = property.selectedPlan?.days || (planTitle.includes("60") ? 60 : planTitle.includes("365") ? 365 : 30);
+                            : ownerPlan.includes("1999")
+                            ? "₹1999"
+                            : ownerPlan.includes("4999")
+                            ? "₹4999"
+                            : property.selectedPlan?.price || "₹499"
+                          : property.selectedPlan?.price || "₹0";
+
+                        const validityDays = !isOwnerPlanFree
+                          ? ownerPlan.includes("60")
+                            ? 60
+                            : ownerPlan.includes("365")
+                            ? 365
+                            : ownerPlan.includes("90")
+                            ? 90
+                            : ownerPlan.includes("45")
+                            ? 45
+                            : property.selectedPlan?.days || 60
+                          : property.selectedPlan?.days || 30;
 
                         return (
                           <div className="mt-2 p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs">
