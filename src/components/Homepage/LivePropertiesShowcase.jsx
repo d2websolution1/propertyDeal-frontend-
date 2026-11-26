@@ -192,34 +192,37 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  // Compute available areas for selected city
+  const isCitySelected = Boolean(city && city !== 'all');
+
+  // Compute available areas for selected city (Only enabled when city is selected)
   const availableAreas = useMemo(() => {
-    if (!city || city === 'all') {
-      const allAreas = new Set(DEFAULT_JAIPUR_AREAS);
-      locationsData.forEach((l) => {
-        if (Array.isArray(l.areas)) {
-          l.areas.forEach((a) => allAreas.add(a));
-        }
-      });
-      properties.forEach((p) => {
-        if (p.locality) allAreas.add(p.locality);
-        if (Array.isArray(p.areas)) p.areas.forEach((a) => allAreas.add(a));
-      });
-      return Array.from(allAreas);
-    }
+    if (!isCitySelected) return [];
+
     const matched = locationsData.find(
       (l) => l.city.toLowerCase().trim() === city.toLowerCase().trim()
     );
-    if (matched && Array.isArray(matched.areas) && matched.areas.length > 0) {
-      return matched.areas;
+    const setOfAreas = new Set();
+    if (matched && Array.isArray(matched.areas)) {
+      matched.areas.forEach((a) => setOfAreas.add(a));
+    }
+    // Also include from properties in this specific city
+    properties.forEach((p) => {
+      if (p.city && p.city.toLowerCase().trim() === city.toLowerCase().trim()) {
+        if (p.locality) setOfAreas.add(p.locality);
+        if (Array.isArray(p.areas)) p.areas.forEach((a) => setOfAreas.add(a));
+      }
+    });
+
+    if (setOfAreas.size > 0) {
+      return Array.from(setOfAreas);
     }
     if (city.toLowerCase() === 'jaipur') {
       return DEFAULT_JAIPUR_AREAS;
     }
     return ['Central Area', 'Main Market', 'Civil Lines', 'Model Town', 'Industrial Area', 'Green Park'];
-  }, [locationsData, city, properties]);
+  }, [locationsData, city, properties, isCitySelected]);
 
-  // Filtered areas inside dropdown search box (like Image 1)
+  // Filtered areas inside dropdown search box
   const filteredAreasList = useMemo(() => {
     if (!areaSearchTerm.trim()) return availableAreas;
     return availableAreas.filter((a) =>
@@ -227,17 +230,35 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
     );
   }, [availableAreas, areaSearchTerm]);
 
-  // Compute available subareas / townships
+  // Compute available subareas / townships for selected city
   const availableSubAreas = useMemo(() => {
-    const extracted = new Set(DEFAULT_SUB_AREAS);
+    if (!isCitySelected) return [];
+
+    const matched = locationsData.find(
+      (l) => l.city.toLowerCase().trim() === city.toLowerCase().trim()
+    );
+    const extracted = new Set();
+    if (matched && Array.isArray(matched.townships)) {
+      matched.townships.forEach((t) => extracted.add(t));
+    }
+    if (matched && Array.isArray(matched.subAreas)) {
+      matched.subAreas.forEach((sa) => extracted.add(sa));
+    }
+    // Also include from properties in this specific city
     properties.forEach((p) => {
-      if (Array.isArray(p.subAreas)) {
-        p.subAreas.forEach((sa) => extracted.add(sa));
+      if (p.city && p.city.toLowerCase().trim() === city.toLowerCase().trim()) {
+        if (Array.isArray(p.subAreas)) {
+          p.subAreas.forEach((sa) => extracted.add(sa));
+        }
+        if (p.projectName) extracted.add(p.projectName);
       }
-      if (p.projectName) extracted.add(p.projectName);
     });
-    return Array.from(extracted);
-  }, [properties]);
+
+    if (extracted.size > 0) {
+      return Array.from(extracted);
+    }
+    return DEFAULT_SUB_AREAS;
+  }, [locationsData, city, properties, isCitySelected]);
 
   const filteredSubAreasList = useMemo(() => {
     if (!subAreaSearchTerm.trim()) return availableSubAreas;
@@ -565,9 +586,12 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                 <select
                   value={city}
                   onChange={(e) => {
-                    setCity(e.target.value);
+                    const newCity = e.target.value;
+                    setCity(newCity);
                     setArea(''); // reset area when city changes
                     setSubAreas([]);
+                    setAreaDropdownOpen(false);
+                    setSubAreaDropdownOpen(false);
                   }}
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-[#142D4E] font-medium outline-none focus:border-[#D62839] focus:bg-white appearance-none cursor-pointer"
                 >
@@ -604,10 +628,19 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
               {/* Toggle Box */}
               <button
                 type="button"
-                onClick={() => setAreaDropdownOpen(!areaDropdownOpen)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-left font-medium text-[#142D4E] flex items-center justify-between cursor-pointer focus:outline-none focus:border-[#D62839] focus:bg-white"
+                disabled={!isCitySelected}
+                onClick={() => {
+                  if (isCitySelected) setAreaDropdownOpen(!areaDropdownOpen);
+                }}
+                className={`w-full px-3 py-2.5 rounded-xl border text-xs text-left font-medium flex items-center justify-between transition-all ${
+                  !isCitySelected
+                    ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'border-slate-200 bg-slate-50/70 text-[#142D4E] cursor-pointer focus:outline-none focus:border-[#D62839] focus:bg-white'
+                }`}
               >
-                <span className="truncate">{area || 'Select Area / Locality'}</span>
+                <span className="truncate">
+                  {!isCitySelected ? 'Select a city first' : area || `Select Area in ${city}`}
+                </span>
                 <span className="text-[10px] text-slate-400">
                   {areaDropdownOpen ? '▲' : '▼'}
                 </span>
@@ -699,12 +732,21 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
               {/* Multiselect Toggle */}
               <button
                 type="button"
-                onClick={() => setSubAreaDropdownOpen(!subAreaDropdownOpen)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-left font-medium text-[#142D4E] flex items-center justify-between cursor-pointer focus:outline-none focus:border-[#D62839] focus:bg-white"
+                disabled={!isCitySelected}
+                onClick={() => {
+                  if (isCitySelected) setSubAreaDropdownOpen(!subAreaDropdownOpen);
+                }}
+                className={`w-full px-3 py-2.5 rounded-xl border text-xs text-left font-medium flex items-center justify-between transition-all ${
+                  !isCitySelected
+                    ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'border-slate-200 bg-slate-50/70 text-[#142D4E] cursor-pointer focus:outline-none focus:border-[#D62839] focus:bg-white'
+                }`}
               >
                 <span className="truncate">
-                  {subAreas.length === 0
-                    ? 'Select Sub Areas / Townships...'
+                  {!isCitySelected
+                    ? 'Select a city first'
+                    : subAreas.length === 0
+                    ? `Select Sub Areas in ${city}...`
                     : `${subAreas.length} Sub Area${subAreas.length > 1 ? 's' : ''} Selected`}
                 </span>
                 <span className="text-[10px] text-slate-400">

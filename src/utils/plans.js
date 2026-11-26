@@ -2,140 +2,75 @@
 
 export const STANDARDIZED_PLANS = [
   {
-    id: "owner-starter",
-    category: "owner",
-    categoryLabel: "Owner",
+    id: "free-starter",
+    category: "all",
+    categoryLabel: "Free Plan",
     name: "Free Starter (30 Days)",
     price: "₹0",
     priceNum: 0,
-    originalPrice: "₹999",
+    originalPrice: "₹499",
     limit: 2,
     days: 30,
     featured: 0,
     tag: "FREE",
     badge: "FREE",
-    desc: "Post 2 properties completely free with 30 days validity.",
+    desc: "2 free listings for 1 month (Active by default).",
     features: [
       "2 Free Property Listings",
-      "30 Days Listing Validity",
-      "Direct Buyer Phone & WhatsApp Inquiries",
+      "1 Month (30 Days) Listing Validity",
+      "Active by Default for All Accounts",
+      "Direct Buyer Phone & Inquiries",
       "Standard Search Placement",
     ],
   },
   {
-    id: "owner-gold",
-    category: "owner",
-    categoryLabel: "Owner",
-    name: "Gold Owner Plan (60 Days)",
+    id: "gold-499",
+    category: "all",
+    categoryLabel: "Gold Pack",
+    name: "Gold Plan (90 Days)",
     price: "₹499",
     priceNum: 499,
     originalPrice: "₹1499",
-    limit: 5,
-    days: 60,
-    featured: 1,
+    limit: 10,
+    days: 90,
+    featured: 2,
     tag: "POPULAR",
     badge: "POPULAR",
-    desc: "5 active listings for 60 days validity + 1 featured boost slot.",
+    desc: "10 listings quota for 3 months (90 days).",
     features: [
-      "5 Property Listings Quota",
-      "60 Days Extended Validity",
-      "1 Featured Boost Slot",
-      "Direct WhatsApp Leads & Calls",
-      "Verified Owner Badge",
+      "10 Property Listings Quota",
+      "3 Months (90 Days) Extended Validity",
+      "2 Featured Boost Slots",
+      "Verified Badge on Listings",
+      "Direct WhatsApp & Phone Leads",
     ],
   },
   {
-    id: "owner-annual",
-    category: "owner",
-    categoryLabel: "Owner",
-    name: "Annual Owner Plan (365 Days)",
-    price: "₹1499",
-    priceNum: 1499,
-    originalPrice: "₹3999",
-    limit: 20,
-    days: 365,
+    id: "pro-999",
+    category: "all",
+    categoryLabel: "Pro Pack",
+    name: "Pro Plan (270 Days)",
+    price: "₹999",
+    priceNum: 999,
+    originalPrice: "₹2999",
+    limit: 30,
+    days: 270,
     featured: 5,
     tag: "BEST VALUE",
     badge: "BEST VALUE",
-    desc: "20 active listings for 365 days (1 full year) + 5 featured boosts.",
+    desc: "30 listings quota for 9 months (270 days).",
     features: [
-      "20 Property Listings Quota",
-      "365 Days (1 Full Year) Validity",
+      "30 Property Listings Quota",
+      "9 Months (270 Days) Full Validity",
       "5 Featured Boost Slots",
-      "Priority Buyer Inquiries",
-      "Gold Verified Owner Badge",
-    ],
-  },
-  {
-    id: "agent-std",
-    category: "agent",
-    categoryLabel: "Dealer / Agent",
-    name: "Standard Agent Plan (45 Days)",
-    price: "₹999",
-    priceNum: 999,
-    originalPrice: "₹1999",
-    limit: 20,
-    days: 45,
-    featured: 2,
-    tag: "AGENT PACK",
-    badge: "AGENT PACK",
-    desc: "20 listings for 45 days + 2 featured boosts & direct buyer leads.",
-    features: [
-      "20 Active Listings Quota",
-      "45 Days Validity",
-      "2 Featured Boost Slots",
-      "Verified Agent Badge",
-      "Direct Client Inquiries",
-    ],
-  },
-  {
-    id: "agent-pro",
-    category: "agent",
-    categoryLabel: "Dealer / Agent",
-    name: "Pro Agent Plan (90 Days)",
-    price: "₹1999",
-    priceNum: 1999,
-    originalPrice: "₹3999",
-    limit: 50,
-    days: 90,
-    featured: 5,
-    tag: "MOST POPULAR",
-    badge: "MOST POPULAR",
-    desc: "50 listings for 90 days + 5 featured boosts & verified badge.",
-    features: [
-      "50 Active Listings Quota",
-      "90 Days Validity",
-      "5 Featured Boost Slots",
-      "High Search Priority",
-      "Dedicated Agent Showcase",
-    ],
-  },
-  {
-    id: "agent-annual",
-    category: "agent",
-    categoryLabel: "Dealer / Agent",
-    name: "Annual Agent Plan (365 Days)",
-    price: "₹4999",
-    priceNum: 4999,
-    originalPrice: "₹9999",
-    limit: 200,
-    days: 365,
-    featured: 20,
-    tag: "UNLIMITED",
-    badge: "UNLIMITED",
-    desc: "200 active listings for 365 days (1 full year) + 20 featured slots.",
-    features: [
-      "200 Active Listings Quota",
-      "365 Days (1 Full Year) Validity",
-      "20 Featured Slots",
-      "Top Homepage Placement",
-      "VIP Dedicated Support",
+      "Gold Verified Top Ranking",
+      "Priority Direct Client Leads",
     ],
   },
 ];
 
-export const OWNER_PLANS = STANDARDIZED_PLANS.filter((p) => p.category === "owner");
-export const AGENT_PLANS = STANDARDIZED_PLANS.filter((p) => p.category === "agent");
+export const OWNER_PLANS = STANDARDIZED_PLANS;
+export const AGENT_PLANS = STANDARDIZED_PLANS;
 
 /**
  * Checks whether a given plan preset matches the user's activePlan.
@@ -151,22 +86,38 @@ export function isUserPlanActive(userActivePlan, plan) {
 
   if (lUser === lPlan) return true;
 
-  if ((lUser.includes("standard agent") || lUser.includes("45 day") || lUser.includes("999")) && plan.id === "agent-std") {
+  // 999 Pro plan (9 months / 270 days / Standard Agent legacy)
+  if (
+    (lUser.includes("999") ||
+      lUser.includes("pro") ||
+      lUser.includes("270") ||
+      lUser.includes("9 month") ||
+      lUser.includes("standard agent")) &&
+    plan.priceNum === 999
+  ) {
     return true;
   }
-  if ((lUser.includes("gold") || lUser.includes("60 day") || lUser.includes("499")) && plan.id === "owner-gold") {
+
+  // 499 Gold plan (3 months / 90 days / Gold Owner legacy)
+  if (
+    (lUser.includes("499") ||
+      lUser.includes("gold") ||
+      lUser.includes("90") ||
+      lUser.includes("3 month") ||
+      lUser.includes("owner plan (60")) &&
+    plan.priceNum === 499
+  ) {
     return true;
   }
-  if ((lUser.includes("annual agent") || lUser.includes("4999")) && plan.id === "agent-annual") {
-    return true;
-  }
-  if ((lUser.includes("annual owner") || (lUser.includes("annual") && !lUser.includes("agent")) || lUser.includes("1499")) && plan.id === "owner-annual") {
-    return true;
-  }
-  if ((lUser.includes("pro agent") || lUser.includes("90 day") || lUser.includes("1999")) && plan.id === "agent-pro") {
-    return true;
-  }
-  if ((lUser.includes("free") || lUser.includes("starter") || lUser.includes("फ्री")) && plan.priceNum === 0) {
+
+  // Free starter plan
+  if (
+    (lUser.includes("free") ||
+      lUser.includes("starter") ||
+      lUser.includes("फ्री") ||
+      lUser.includes("0")) &&
+    plan.priceNum === 0
+  ) {
     return true;
   }
 

@@ -493,8 +493,8 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
     let targetPath = '/';
     if (purpose === 'rent') targetPath = '/rent';
-    else if (propertyCategory === 'Commercial') targetPath = '/commercial';
-    else if (propertyType === 'Plot') targetPath = '/plots';
+    else if (purpose === 'commercial' || propertyCategory === 'Commercial') targetPath = '/commercial';
+    else if (purpose === 'plots' || propertyType === 'Plot') targetPath = '/plots';
     else if (propertyType === 'Pg/hostel') targetPath = '/pg-co-living';
 
     const searchStr = params.toString();
@@ -671,7 +671,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
           {/* Search Inputs: ONLY Drop-down selection */}
           <form onSubmit={handleSearch} className="pt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5 items-end">
-            {/* 1. Purpose Dropdown */}
+            {/* 1. Purpose Dropdown (Matching Sidebar EXACTLY) */}
             <div className="w-full">
               <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
                 Purpose
@@ -681,9 +681,11 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                 onChange={(e) => setPurpose(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
               >
-                <option value="all">All (Buy / Rent)</option>
-                <option value="sale">Buy / Sale</option>
-                <option value="rent">Rent / Lease</option>
+                <option value="all">All Purpose (Buy & Rent)</option>
+                <option value="sale">For Sale (Buy)</option>
+                <option value="rent">For Rent / Lease</option>
+                <option value="commercial">Commercial</option>
+                <option value="plots">Plots & Land</option>
               </select>
             </div>
 

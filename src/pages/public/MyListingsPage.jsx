@@ -333,12 +333,6 @@ export default function MyListingsPage() {
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
             <Link
-              to="/profile"
-              className="px-4 py-2.5 rounded-xl border border-[#cbd5e1] text-xs font-bold text-[#334155] hover:bg-[#f8fafc] transition-colors"
-            >
-              ✏️ Edit Profile
-            </Link>
-            <Link
               to="/post-property"
               className="px-5 py-2.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
             >
