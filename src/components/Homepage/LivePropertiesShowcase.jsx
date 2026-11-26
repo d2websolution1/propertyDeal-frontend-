@@ -987,8 +987,8 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                           ID: {prop.uniqueCode || ('PA-' + String(prop._id || prop.id).slice(-6).toUpperCase())}
                         </div>
 
-                        {/* Rate Tag over Image (Matching Image 3: '17000/ gaj' / per sq.ft) */}
-                        {priceRate && (
+                        {/* Rate Tag over Image (Matching Image 3: '17000/ gaj' / per sq.ft - for Sale only) */}
+                        {priceRate && prop.listingType !== 'rent' && (
                           <div className="absolute bottom-3 left-3 z-10 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-xs font-black">
                             ₹{priceRate.toLocaleString('en-IN')}/ {prop.sizeUnit || 'sqft'}
                           </div>

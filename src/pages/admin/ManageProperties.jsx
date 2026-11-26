@@ -481,7 +481,7 @@ const ManageProperties = () => {
                           <span className="text-[#D62839] font-black text-base block">
                             {formatIndianPrice(property.price, property.listingType)}
                           </span>
-                          {(property.pricePerSqft || (property.price && (property.areaSqft || property.size))) && (
+                          {property.listingType !== 'rent' && (property.pricePerSqft || (property.price && (property.areaSqft || property.size))) && (
                             <span className="text-[10.5px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
                               ₹{(property.pricePerSqft || Math.round(Number(property.price) / Number(property.areaSqft || property.size))).toLocaleString('en-IN')}/sq.ft
                             </span>

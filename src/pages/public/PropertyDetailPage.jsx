@@ -292,14 +292,14 @@ export default function PropertyDetailPage() {
                 {formatIndianPrice(property.price, property.listingType)}
               </div>
 
-              {/* RATE PER SQUARE FOOT DISPLAY (USER REQUIREMENT) */}
-              {calculatedRatePerSqft && (
+              {/* RATE PER SQUARE FOOT DISPLAY (USER REQUIREMENT: Sale only) */}
+              {calculatedRatePerSqft && property.listingType !== 'rent' && (
                 <div className="mt-1.5 inline-flex items-center gap-1 bg-white border border-[#D62839]/30 text-[#D62839] px-2.5 py-1 rounded-lg text-xs font-bold">
                   <span>₹{calculatedRatePerSqft.toLocaleString('en-IN')} / sq.ft</span>
                 </div>
               )}
 
-              {sizeVal > 0 && (
+              {sizeVal > 0 && property.listingType !== 'rent' && (
                 <p className="text-[11px] text-slate-500 mt-1">
                   Calculated on {sizeVal.toLocaleString('en-IN')} sq.ft area
                 </p>
@@ -649,7 +649,7 @@ export default function PropertyDetailPage() {
                           <strong className="text-base font-extrabold text-[#D62839]">
                             {formatIndianPrice(sim.price, sim.listingType)}
                           </strong>
-                          {simRate && (
+                          {simRate && sim.listingType !== 'rent' && (
                             <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
                               ₹{simRate.toLocaleString('en-IN')}/sq.ft
                             </span>

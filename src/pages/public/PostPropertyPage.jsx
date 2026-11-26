@@ -335,6 +335,51 @@ export default function PostPropertyPage() {
     return matched?.areas || ['Sector 62', 'Indirapuram', 'Vaishali', 'Gomti Nagar', 'Mansarovar', 'Malviya Nagar'];
   }, [locationsData, city]);
 
+  const currentCityTownships = useMemo(() => {
+    if (!city) return [];
+    const matched = locationsData.find(
+      (l) => l.city.toLowerCase() === city.trim().toLowerCase()
+    );
+    if (Array.isArray(matched?.townships) && matched.townships.length > 0) {
+      return matched.townships;
+    }
+    return CITY_TOWNSHIPS[city] || CITY_TOWNSHIPS['Jaipur'] || [
+      'Mahima Panorama',
+      'Mahima Florenza',
+      'Vatika Infotech City',
+      'Ashiana Town',
+      'Omaxe City',
+      'Manglam Grand City',
+      'UDB Greens',
+      'Unique Sapphire',
+      'Green Meadows',
+      'Siddhi Homes',
+      'Trimurty Ariana',
+    ];
+  }, [locationsData, city]);
+
+  const currentCitySubAreas = useMemo(() => {
+    if (!city) return [];
+    const matched = locationsData.find(
+      (l) => l.city.toLowerCase() === city.trim().toLowerCase()
+    );
+    if (Array.isArray(matched?.subAreas) && matched.subAreas.length > 0) {
+      return matched.subAreas;
+    }
+    return [
+      'Block A',
+      'Block B',
+      'Block C',
+      'Phase 1',
+      'Phase 2',
+      'Extension',
+      'Main Road Facing',
+      'Near Metro Station',
+      'Sector 62',
+      'Sector 18 Pocket 2',
+    ];
+  }, [locationsData, city]);
+
   // 7. Photos
   const [selectedCategory, setSelectedCategory] = useState('Exterior view');
   const [photos, setPhotos] = useState([]); // array of { url: string, category: string, isFeatured: boolean }
@@ -821,7 +866,7 @@ export default function PostPropertyPage() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              {availablePlans.map((plan) => {
+              {STANDARDIZED_PLANS.map((plan) => {
                 const isSelected = (currentPlan?.id || currentPlan?.name) === (plan.id || plan.name);
                 return (
                   <button
@@ -1753,7 +1798,7 @@ export default function PostPropertyPage() {
                   Township / Apartment / Project Name
                 </label>
                 <select
-                  value={(CITY_TOWNSHIPS[city] || CITY_TOWNSHIPS['Jaipur'] || []).includes(projectName) ? projectName : (projectName ? 'Other' : '')}
+                  value={currentCityTownships.includes(projectName) ? projectName : (projectName ? 'Other' : '')}
                   onChange={(e) => {
                     if (e.target.value === 'Other') {
                       setProjectName('');
@@ -1764,7 +1809,7 @@ export default function PostPropertyPage() {
                   className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
                 >
                   <option value="">-- Choose Township / Project ({city || 'City'}) --</option>
-                  {(CITY_TOWNSHIPS[city] || CITY_TOWNSHIPS['Jaipur'] || []).map((tName) => (
+                  {currentCityTownships.map((tName) => (
                     <option key={tName} value={tName}>
                       {tName}
                     </option>
@@ -1822,16 +1867,11 @@ export default function PostPropertyPage() {
                   className="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-semibold text-[#142D4E] mb-1.5 cursor-pointer outline-none focus:border-[#2563eb]"
                 >
                   <option value="">-- Choose Sub Area / Block from Dropdown --</option>
-                  <option value="Block A">Block A</option>
-                  <option value="Block B">Block B</option>
-                  <option value="Block C">Block C</option>
-                  <option value="Phase 1">Phase 1</option>
-                  <option value="Phase 2">Phase 2</option>
-                  <option value="Extension">Extension</option>
-                  <option value="Main Road Facing">Main Road Facing</option>
-                  <option value="Near Metro Station">Near Metro Station</option>
-                  <option value="Sector 62">Sector 62</option>
-                  <option value="Sector 18 Pocket 2">Sector 18 Pocket 2</option>
+                  {currentCitySubAreas.map((sName) => (
+                    <option key={sName} value={sName}>
+                      {sName}
+                    </option>
+                  ))}
                 </select>
                 <input
                   type="text"
@@ -1997,82 +2037,49 @@ export default function PostPropertyPage() {
             )}
           </div>
 
-          {/* ── 7. SELECT LISTING PLAN (User Requirement: Send selected plan with property to admin) ── */}
+          {/* ── 7. ACTIVE LISTING PLAN (Only Active Plan Shown) ── */}
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9] flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
                 <span className="w-7 h-7 rounded-full bg-[#2563eb] text-white text-xs font-black flex items-center justify-center">
                   7
                 </span>
-                <h2 className="text-base font-bold text-[#0f172a]">Select Listing Plan</h2>
+                <h2 className="text-base font-bold text-[#0f172a]">Active Listing Plan</h2>
               </div>
-              <span className="text-xs font-bold text-[#2563eb] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                Selected: {selectedPlan?.name} ({selectedPlan?.price})
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                ✓ Active: {selectedPlan?.name} ({selectedPlan?.price})
               </span>
             </div>
 
             <p className="text-xs text-slate-500">
-              Apni listing ke liye plan select karein. Ye details property post hone ke sath Admin panel me automatically submit ho jayegi:
+              Aapke account par ye plan active hai. Ye plan details property post hone ke sath Admin panel me automatically submit ho jayengi:
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {STANDARDIZED_PLANS.map((plan) => {
-                const isSelected = (selectedPlan?.id || selectedPlan?.name) === (plan.id || plan.name);
-                const isActiveOnAccount = isUserPlanActive(user?.activePlan, plan);
-
-                return (
-                  <div
-                    key={plan.id}
-                    onClick={() => setSelectedPlan(plan)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all relative ${
-                      isSelected
-                        ? 'border-[#2563eb] bg-blue-50/70 shadow-sm ring-2 ring-blue-500/20'
-                        : isActiveOnAccount
-                        ? 'border-emerald-400 bg-emerald-50/30 shadow-2xs'
-                        : 'border-slate-200 hover:border-slate-300 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase">
-                        {plan.categoryLabel}
-                      </span>
-                      {isActiveOnAccount ? (
-                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-600 text-white uppercase">
-                          ✓ Active Plan
-                        </span>
-                      ) : plan.tag ? (
-                        <span className={`text-[9px] font-black px-1.5 py-0.2 rounded uppercase ${
-                          plan.tag === 'FREE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                        }`}>
-                          {plan.tag}
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="text-xs font-black text-[#142D4E] pr-2">{plan.name}</p>
-                    <div className="flex items-baseline gap-1.5 mt-2">
-                      <span className="text-base font-black text-[#D62839]">{plan.price}</span>
-                      {plan.originalPrice && (
-                        <span className="text-[11px] line-through text-slate-400">{plan.originalPrice}</span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Validity: <strong>{plan.days} Days</strong> • Max {plan.limit} Listings
-                    </p>
-                    <div className="mt-2.5 flex items-center gap-1.5 text-xs font-bold">
-                      <input
-                        type="radio"
-                        name="selectedPlanRadio"
-                        checked={isSelected}
-                        onChange={() => setSelectedPlan(plan)}
-                        className="w-4 h-4 text-[#2563eb]"
-                      />
-                      <span className={isSelected ? 'text-[#2563eb]' : 'text-slate-600'}>
-                        {isSelected ? '✓ Selected' : 'Choose Plan'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="max-w-md">
+              <div className="p-5 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 shadow-sm relative">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">
+                    {selectedPlan?.categoryLabel || 'SUBSCRIPTION PLAN'}
+                  </span>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase">
+                    ✓ ACTIVE PLAN
+                  </span>
+                </div>
+                <h4 className="text-sm font-extrabold text-[#142D4E]">{selectedPlan?.name}</h4>
+                <div className="flex items-baseline gap-1.5 mt-2">
+                  <span className="text-xl font-black text-[#D62839]">{selectedPlan?.price}</span>
+                  {selectedPlan?.originalPrice && (
+                    <span className="text-xs line-through text-slate-400">{selectedPlan?.originalPrice}</span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-600 mt-2">
+                  Validity: <strong>{selectedPlan?.days} Days</strong> • Quota: <strong>{selectedPlan?.limit} Listings</strong>
+                </p>
+                <div className="mt-3 pt-2.5 border-t border-emerald-200 flex items-center gap-2 text-xs font-bold text-emerald-800">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>✓ Automatically Applied to this Listing</span>
+                </div>
+              </div>
             </div>
           </div>
 
