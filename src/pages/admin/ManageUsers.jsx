@@ -152,17 +152,46 @@ const ManageUsers = () => {
   const handleActivatePlanSubmit = async (e, overridePlanForm) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!planModalUser) return;
-    const uid = planModalUser.id || planModalUser._id || planModalUser.email;
+    const uid = planModalUser._id || planModalUser.id || planModalUser.email;
     const formToSend = overridePlanForm || customPlanForm;
+    const payload = {
+      ...formToSend,
+      userId: planModalUser._id || planModalUser.id,
+      id: planModalUser._id || planModalUser.id,
+      email: planModalUser.email,
+      userEmail: planModalUser.email,
+    };
+
     setActivatingPlan(true);
     try {
-      const res = await api.put(`/admin/users/${uid}/activate-plan`, formToSend);
-      const updatedUser = res.data.user || {};
+      let res;
+      try {
+        res = await api.put("/admin/users/activate-plan", payload);
+      } catch (err1) {
+        if (err1.response?.status === 404 || err1.response?.status === 405) {
+          try {
+            res = await api.put(`/admin/users/${encodeURIComponent(uid)}/activate-plan`, payload);
+          } catch (err2) {
+            try {
+              res = await api.post("/admin/users/activate-plan", payload);
+            } catch (err3) {
+              res = await api.put(`/users/admin/${encodeURIComponent(uid)}/agent-status`, {
+                activePlan: formToSend.planName,
+                listingLimit: formToSend.listingLimit,
+              });
+            }
+          }
+        } else {
+          throw err1;
+        }
+      }
+
+      const updatedUser = res?.data?.user || {};
 
       setUsers((prev) =>
         prev.map((u) =>
           (u.id || u._id) === uid || (updatedUser.email && u.email === updatedUser.email)
-            ? { ...u, ...updatedUser }
+            ? { ...u, ...updatedUser, activePlan: formToSend.planName, listingLimit: formToSend.listingLimit }
             : u
         )
       );

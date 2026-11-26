@@ -668,6 +668,12 @@ export default function MyListingsPage() {
                             <p className="text-base font-extrabold text-[#2563eb]">
                               {formatIndianPrice(prop.price, prop.listingType || prop.purpose)}
                             </p>
+                            <div className="pt-1">
+                              <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                <span>📦</span>
+                                <span>{prop.selectedPlan?.name || user?.activePlan || "Free Starter (30 Days)"}</span>
+                              </span>
+                            </div>
                           </div>
                         </div>
 
