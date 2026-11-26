@@ -166,23 +166,26 @@ const ManageUsers = () => {
     try {
       let res;
       try {
-        res = await api.put("/admin/users/activate-plan", payload);
-      } catch (err1) {
-        if (err1.response?.status === 404 || err1.response?.status === 405) {
+        res = await api.put(`/admin/users/${encodeURIComponent(uid)}/activate-plan`, payload);
+      } catch (e1) {
+        try {
+          res = await api.put("/admin/users/activate-plan", payload);
+        } catch (e2) {
           try {
-            res = await api.put(`/admin/users/${encodeURIComponent(uid)}/activate-plan`, payload);
-          } catch (err2) {
+            res = await api.post("/admin/users/activate-plan", payload);
+          } catch (e3) {
             try {
-              res = await api.post("/admin/users/activate-plan", payload);
-            } catch (err3) {
+              res = await api.put(`/admin/users/${encodeURIComponent(uid)}`, {
+                activePlan: formToSend.planName,
+                listingLimit: Number(formToSend.listingLimit),
+              });
+            } catch (e4) {
               res = await api.put(`/users/admin/${encodeURIComponent(uid)}/agent-status`, {
                 activePlan: formToSend.planName,
-                listingLimit: formToSend.listingLimit,
+                listingLimit: Number(formToSend.listingLimit),
               });
             }
           }
-        } else {
-          throw err1;
         }
       }
 
