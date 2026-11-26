@@ -594,41 +594,42 @@ const ManageProperties = () => {
 
                       {/* Selected Listing Plan Box (User Requirement: Admin can see selected plan and confirm payment) */}
                       {(() => {
-                        const ownerPlan = (owner.activePlan || property.selectedPlan?.name || "").trim();
-                        const isOwnerPlanFree =
-                          !ownerPlan ||
-                          ownerPlan.toLowerCase().includes("free") ||
-                          ownerPlan.toLowerCase().includes("starter");
+                        const rawPlan = (owner.activePlan || property.selectedPlan?.name || "").trim();
+                        const lower = rawPlan.toLowerCase();
+                        const isFree = !rawPlan || lower.includes("free") || lower.includes("starter") || lower.includes("फ्री");
 
-                        const planTitle = !isOwnerPlanFree
-                          ? ownerPlan
-                          : property.selectedPlan?.name || owner.activePlan || "Free Starter (30 Days)";
+                        let planTitle = rawPlan || "Free Starter (30 Days)";
+                        let planPrice = property.selectedPlan?.price || "₹0";
+                        let validityDays = property.selectedPlan?.days || 30;
 
-                        const planPrice = !isOwnerPlanFree
-                          ? ownerPlan.includes("499")
-                            ? "₹499"
-                            : ownerPlan.includes("1499")
-                            ? "₹1499"
-                            : ownerPlan.includes("999")
-                            ? "₹999"
-                            : ownerPlan.includes("1999")
-                            ? "₹1999"
-                            : ownerPlan.includes("4999")
-                            ? "₹4999"
-                            : property.selectedPlan?.price || "₹499"
-                          : property.selectedPlan?.price || "₹0";
-
-                        const validityDays = !isOwnerPlanFree
-                          ? ownerPlan.includes("60")
-                            ? 60
-                            : ownerPlan.includes("365")
-                            ? 365
-                            : ownerPlan.includes("90")
-                            ? 90
-                            : ownerPlan.includes("45")
-                            ? 45
-                            : property.selectedPlan?.days || 60
-                          : property.selectedPlan?.days || 30;
+                        if (isFree) {
+                          planTitle = property.selectedPlan?.name || owner.activePlan || "Free Starter (30 Days)";
+                          planPrice = "₹0";
+                          validityDays = 30;
+                        } else if (lower.includes("standard agent") || lower.includes("agent plan (45") || lower.includes("45 day") || lower.includes("999")) {
+                          planTitle = "Standard Agent Plan (45 Days)";
+                          planPrice = "₹999";
+                          validityDays = 45;
+                        } else if (lower.includes("gold") || lower.includes("owner plan (60") || lower.includes("60 day") || lower.includes("499")) {
+                          planTitle = "Gold Owner Plan (60 Days)";
+                          planPrice = "₹499";
+                          validityDays = 60;
+                        } else if (lower.includes("annual agent") || lower.includes("4999")) {
+                          planTitle = "Annual Agent Plan (365 Days)";
+                          planPrice = "₹4999";
+                          validityDays = 365;
+                        } else if (lower.includes("annual") || lower.includes("1499")) {
+                          planTitle = "Annual Owner Plan (365 Days)";
+                          planPrice = "₹1499";
+                          validityDays = 365;
+                        } else if (lower.includes("pro agent") || lower.includes("90 day") || lower.includes("1999")) {
+                          planTitle = "Pro Agent Plan (90 Days)";
+                          planPrice = "₹1999";
+                          validityDays = 90;
+                        } else {
+                          planPrice = property.selectedPlan?.price || "₹499";
+                          validityDays = property.selectedPlan?.days || 30;
+                        }
 
                         return (
                           <div className="mt-2 p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs">
