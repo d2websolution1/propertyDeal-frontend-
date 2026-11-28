@@ -1061,13 +1061,13 @@ export default function PostPropertyPage() {
   const isPlanExpired = Boolean(user?.planExpiresAt && new Date(user.planExpiresAt) < new Date());
   const hasActivePlan = Boolean(user?.activePlan && !isPlanExpired);
 
-  const purchasedDateStr = user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const purchasedDateStr = user?.planStartedAt
+    ? new Date(user.planStartedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : 'Starts from 1st listing';
 
   const expiryDateStr = user?.planExpiresAt
     ? new Date(user.planExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : 'Valid for 30 Days';
+    : `${selectedPlan?.days || 30} Days from 1st listing`;
 
   const rolePlans = user?.userType === 'Dealer / Agent' ? AGENT_PLANS : OWNER_PLANS;
 

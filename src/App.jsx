@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import ScrollToTop from './components/common/ScrollToTop';
 import HomePage from './pages/public/HomePage';
 import RentPage from './pages/public/RentPage';
 import CommercialPage from './pages/public/CommercialPage';
@@ -92,6 +93,7 @@ function AppContent() {
 
   return (
     <>
+      <ScrollToTop />
       {!hideCommonChrome && <Header />}
       <Routes>
         {/* Public Routes */}

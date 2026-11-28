@@ -554,7 +554,7 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
               )}
             </div>
 
-            {/* 1. Buy / Rent Dropdown */}
+            {/* 1. Buy / Rent Dropdown (For Sale and For Rent only) */}
             <div>
               <label className="block text-[11px] font-bold text-[#142D4E] uppercase tracking-wider mb-1">
                 Buy / Rent
@@ -565,11 +565,8 @@ const LivePropertiesShowcase = ({ initialFilter = 'all', title = 'Popular Proper
                   onChange={(e) => setPurpose(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-[#142D4E] font-medium outline-none focus:border-[#D62839] focus:bg-white appearance-none cursor-pointer"
                 >
-                  <option value="all">All Purpose (Buy & Rent)</option>
                   <option value="sale">For Sale (Buy)</option>
                   <option value="rent">For Rent / Lease</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="plots">Plots & Land</option>
                 </select>
                 <span className="absolute right-3 top-3 text-[10px] text-slate-400 pointer-events-none">
                   ▼

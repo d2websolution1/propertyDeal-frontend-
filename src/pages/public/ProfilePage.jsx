@@ -240,9 +240,6 @@ export default function ProfilePage() {
       await updateProfile({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        phone: cleanMobile,
-        age: age ? Number(age) : null,
-        gender,
         userType,
         avatar: safeAvatar,
         companyLogo: safeLogo,
@@ -388,62 +385,28 @@ export default function ProfilePage() {
             </div>
 
             {/* 3. Mobile number * */}
+            {/* 3. Mobile number (Read-only / cannot be changed by user) */}
             <div>
-              <label className="block text-xs font-semibold text-[#0f172a] mb-1.5">
-                Mobile number <span className="text-[#dc2626]">*</span>
+              <label className="block text-xs font-semibold text-[#0f172a] mb-1.5 flex items-center justify-between">
+                <span>Mobile number</span>
+                <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium">🔒 Phone number cannot be changed</span>
               </label>
-              <div className="flex rounded-xl border border-[#cbd5e1] overflow-hidden focus-within:border-[#005744] focus-within:ring-1 focus-within:ring-[#005744] transition-all">
-                <span className="bg-[#f8fafc] text-[#475569] text-xs sm:text-sm font-semibold px-3.5 py-2.5 border-r border-[#cbd5e1] flex items-center">
+              <div className="flex rounded-xl border border-[#cbd5e1] overflow-hidden bg-slate-100/80 cursor-not-allowed">
+                <span className="bg-[#f1f5f9] text-[#64748b] text-xs sm:text-sm font-semibold px-3.5 py-2.5 border-r border-[#cbd5e1] flex items-center">
                   +91
                 </span>
                 <input
                   type="tel"
-                  required
-                  maxLength={10}
+                  readOnly
+                  disabled
                   value={mobile}
-                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
                   placeholder="10-digit mobile number"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm text-[#0f172a] outline-none placeholder:text-[#94a3b8]"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm text-[#475569] bg-transparent outline-none cursor-not-allowed font-medium"
                 />
               </div>
               <p className="text-[11px] text-[#64748b] mt-1.5">
                 Shown to logged-in buyers on your listings, and shared with sellers when you contact them.
               </p>
-            </div>
-
-            {/* 4. Age & Gender */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-[#0f172a] mb-1.5">
-                  Age
-                </label>
-                <input
-                  type="number"
-                  min="16"
-                  max="120"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="e.g. 25"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs sm:text-sm text-[#0f172a] focus:border-[#005744] focus:ring-1 focus:ring-[#005744] outline-none transition-all placeholder:text-[#94a3b8]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#0f172a] mb-1.5">
-                  Gender
-                </label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#cbd5e1] text-xs sm:text-sm text-[#0f172a] focus:border-[#005744] focus:ring-1 focus:ring-[#005744] outline-none transition-all bg-white"
-                >
-                  <option value="">Select</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                </select>
-              </div>
             </div>
 
             {/* 5. "I am a *" selection (Owner / Dealer / Agent / Builder) */}

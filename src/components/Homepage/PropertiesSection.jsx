@@ -634,10 +634,10 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
           </div>
         </div>
 
-        {/* ── 2. Floating Navbar & Search Widget (Identical on ALL pages!) ── */}
-        <div className="relative -mt-6 sm:-mt-8 z-30 max-w-[1080px] mx-auto bg-white rounded-2xl shadow-xl border border-[#e2e8f0] p-3 sm:p-4">
+        {/* ── 2. Floating Navbar & Search Widget (Enlarged & Prominently Centered) ── */}
+        <div className="relative -mt-10 sm:-mt-14 z-30 max-w-[1180px] mx-auto bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 p-4 sm:p-6 transition-all">
           {/* Category Tabs linking to each page */}
-          <div className="flex items-center gap-1 sm:gap-2 pb-3 border-b border-[#f1f5f9] overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 sm:gap-3 pb-4 border-b border-slate-100 overflow-x-auto no-scrollbar">
             {SEARCH_TABS.map((tab) => {
               const isActive =
                 (tab.path === '/' && location.pathname === '/') ||
@@ -647,10 +647,10 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
                 <Link
                   key={tab.id}
                   to={tab.path}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 ${
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold whitespace-nowrap transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#D62839] text-white shadow-sm'
-                      : 'text-[#64748B] hover:text-[#142D4E] hover:bg-[#F3F5F8]'
+                      ? 'bg-[#D62839] text-white shadow-md shadow-red-500/20 scale-[1.02]'
+                      : 'text-[#64748B] hover:text-[#142D4E] hover:bg-slate-100'
                   }`}
                 >
                   {tab.label}
@@ -660,32 +660,29 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             <Link
               to="/post-property"
-              className="ml-auto hidden sm:inline-flex items-center gap-1 text-xs font-bold text-[#D62839] hover:text-[#b81d2c] px-3 py-1.5 rounded-lg bg-[#fff1f2]"
+              className="ml-auto hidden sm:inline-flex items-center gap-1.5 text-xs font-black text-[#D62839] hover:text-[#b81d2c] px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 transition-all border border-red-200"
             >
               <span>Post Property</span>
-              <span className="text-[9.5px] bg-[#D62839] text-white px-1.5 py-0.2 rounded font-black">
+              <span className="text-[10px] bg-[#D62839] text-white px-1.5 py-0.5 rounded font-black">
                 FREE
               </span>
             </Link>
           </div>
 
           {/* Search Inputs: ONLY Drop-down selection */}
-          <form onSubmit={handleSearch} className="pt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5 items-end">
-            {/* 1. Purpose Dropdown (Matching Sidebar EXACTLY) */}
+          <form onSubmit={handleSearch} className="pt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-3.5 items-end">
+            {/* 1. Purpose Dropdown (For Sale and For Rent only) */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-black text-[#475569] uppercase tracking-wider mb-1.5">
                 Purpose
               </label>
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-300 bg-slate-50 text-xs sm:text-sm font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white focus:ring-2 focus:ring-red-100 transition-all cursor-pointer"
               >
-                <option value="all">All Purpose (Buy & Rent)</option>
                 <option value="sale">For Sale (Buy)</option>
                 <option value="rent">For Rent / Lease</option>
-                <option value="commercial">Commercial</option>
-                <option value="plots">Plots & Land</option>
               </select>
             </div>
 
@@ -732,13 +729,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             {/* 4. City Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-black text-[#475569] uppercase tracking-wider mb-1.5">
                 City
               </label>
               <select
                 value={searchCity}
                 onChange={(e) => setSearchCity(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-300 bg-slate-50 text-xs sm:text-sm font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white focus:ring-2 focus:ring-red-100 transition-all cursor-pointer"
               >
                 <option value="">All Cities</option>
                 {availableCities.map((c) => (
@@ -749,13 +746,13 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
 
             {/* 5. Budget Dropdown */}
             <div className="w-full">
-              <label className="block text-[10.5px] font-extrabold text-[#64748B] uppercase tracking-wider mb-1">
+              <label className="block text-[11px] font-black text-[#475569] uppercase tracking-wider mb-1.5">
                 Budget
               </label>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-[#cbd5e1] bg-[#F3F5F8] text-xs font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white transition-colors cursor-pointer"
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-300 bg-slate-50 text-xs sm:text-sm font-bold text-[#142D4E] outline-none focus:border-[#D62839] focus:bg-white focus:ring-2 focus:ring-red-100 transition-all cursor-pointer"
               >
                 <option value="">Any Budget</option>
                 {purpose === 'rent' ? (
@@ -782,7 +779,7 @@ const PropertiesSection = ({ category = 'buy', city = 'Mumbai' }) => {
             <div className="w-full col-span-2 sm:col-span-1">
               <button
                 type="submit"
-                className="w-full py-2.5 px-3 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-black text-xs sm:text-sm shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white font-black text-xs sm:text-sm shadow-lg shadow-red-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Search</span>
                 <span>→</span>

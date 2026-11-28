@@ -158,13 +158,13 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} Property Adda. All rights reserved.</p>
+          <p>© 2020 Property Adda. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <Link to="/about-us" className="hover:text-white transition-colors">About Us</Link>
-            <Link to="/contact-us" className="hover:text-white transition-colors">Contact</Link>
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms-and-conditions" className="hover:text-white transition-colors">Terms of Use</Link>
-            <Link to="/admin/login" className="hover:text-white transition-colors text-slate-400 hover:text-slate-200">Admin Portal</Link>
+            <Link to="/about-us" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">About Us</Link>
+            <Link to="/contact-us" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Contact</Link>
+            <Link to="/privacy-policy" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms-and-conditions" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Terms of Use</Link>
+            <Link to="/admin/login" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors text-slate-400 hover:text-slate-200">Admin Portal</Link>
           </div>
         </div>
       </div>
