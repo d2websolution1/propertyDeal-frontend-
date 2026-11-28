@@ -7,15 +7,22 @@ import { PropertyDealLogo } from './Header';
 
 const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/my-listings' }) => {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login, sendOtp, verifyOtp } = useAuth();
 
   const [mode, setMode] = useState(initialMode); // 'login' | 'signup'
+  const [step, setStep] = useState('form'); // 'form' | 'otp' (only used in signup)
+
+  // Form fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [userType, setUserType] = useState('Owner');
   const [selectedPlan, setSelectedPlan] = useState({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+
+  // Timer for OTP resend
+  const [timer, setTimer] = useState(60);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,6 +31,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
   useEffect(() => {
     if (!isOpen) return;
     setMode(initialMode);
+    setStep('form');
+    setOtp('');
     setError('');
     setSuccessMsg('');
 
@@ -51,6 +60,19 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
       setSelectedPlan({ name: 'Free Starter (30 Days)', days: 30, price: '₹0' });
     }
   }, [userType]);
+
+  // OTP Countdown timer
+  useEffect(() => {
+    let interval = null;
+    if (step === 'otp' && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [step, timer]);
 
   if (!isOpen) return null;
 
@@ -83,8 +105,8 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
     }
   };
 
-  // Direct Account Creation (Name + Mobile + Gmail + Password - No OTP)
-  const handleSignupSubmit = async (e) => {
+  // Step 1: Initiate Signup -> Validate details & Send OTP to Gmail
+  const handleInitiateSignup = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
@@ -115,9 +137,48 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
 
     try {
       setLoading(true);
-      await register({
+      const res = await sendOtp({
         name: name.trim(),
         email: cleanEmail,
+        phone: cleanPhone,
+        password: password.trim(),
+        userType: userType || 'Owner',
+        type: 'signup',
+      });
+
+      setStep('otp');
+      setOtp('');
+      setTimer(60);
+      setSuccessMsg(res?.message || `A 6-digit verification code has been sent to ${cleanEmail}.`);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send OTP verification email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Verify OTP and create user account
+  const handleVerifyOtpSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+
+    const cleanOtp = otp.trim().replace(/\D/g, '');
+    if (cleanOtp.length !== 6) {
+      setError('Please enter the complete 6-digit OTP code sent to your Gmail.');
+      return;
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const rawDigits = phone.replace(/\D/g, '');
+    const cleanPhone = rawDigits.length === 10 ? `+91${rawDigits}` : `+${rawDigits}`;
+
+    try {
+      setLoading(true);
+      await verifyOtp({
+        name: name.trim(),
+        email: cleanEmail,
+        otp: cleanOtp,
         password: password.trim(),
         phone: cleanPhone,
         userType: userType || 'Owner',
@@ -125,13 +186,42 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
         validityDays: selectedPlan.days,
       });
 
-      setSuccessMsg(`Welcome ${name}! Your account has been created successfully.`);
+      setSuccessMsg(`Welcome ${name}! Your account has been verified and created successfully.`);
       setTimeout(() => {
         onClose();
         navigate(nextUrl);
       }, 500);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. An account with this email may already exist.');
+      setError(err.response?.data?.message || 'Invalid or expired OTP. Please check your email or resend.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Resend OTP to Gmail
+  const handleResendOtp = async () => {
+    if (timer > 0 || loading) return;
+    setError('');
+    setSuccessMsg('');
+
+    const cleanEmail = email.trim().toLowerCase();
+    const rawDigits = phone.replace(/\D/g, '');
+    const cleanPhone = rawDigits.length === 10 ? `+91${rawDigits}` : `+${rawDigits}`;
+
+    try {
+      setLoading(true);
+      const res = await sendOtp({
+        name: name.trim(),
+        email: cleanEmail,
+        phone: cleanPhone,
+        password: password.trim(),
+        userType: userType || 'Owner',
+        type: 'signup',
+      });
+      setTimer(60);
+      setSuccessMsg(res?.message || `New 6-digit OTP sent to ${cleanEmail}.`);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to resend verification code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -166,6 +256,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
               type="button"
               onClick={() => {
                 setMode('login');
+                setStep('form');
                 setError('');
                 setSuccessMsg('');
               }}
@@ -180,6 +271,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
               type="button"
               onClick={() => {
                 setMode('signup');
+                setStep('form');
                 setError('');
                 setSuccessMsg('');
               }}
@@ -195,12 +287,18 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
           {/* Title Header */}
           <div className="text-center">
             <h3 className="text-xl font-black text-[#142D4E]">
-              {mode === 'signup' ? 'Create Your Account' : 'Sign In with Gmail & Password'}
+              {mode === 'login'
+                ? 'Sign In with Gmail & Password'
+                : step === 'otp'
+                  ? 'Verify Your Gmail'
+                  : 'Create Your Account'}
             </h3>
             <p className="text-xs text-[#64748B] mt-1">
-              {mode === 'signup'
-                ? 'Enter your name, mobile number, Gmail & password to start posting'
-                : 'Enter your registered Gmail & password to access your dashboard'}
+              {mode === 'login'
+                ? 'Enter your registered Gmail & password to access your dashboard'
+                : step === 'otp'
+                  ? `Enter the 6-digit OTP code sent to ${email}`
+                  : 'Fill in your details to receive an OTP on your Gmail'}
             </p>
           </div>
 
@@ -264,6 +362,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                   type="button"
                   onClick={() => {
                     setMode('signup');
+                    setStep('form');
                     setError('');
                   }}
                   className="text-xs font-bold text-[#D62839] hover:underline cursor-pointer"
@@ -272,9 +371,77 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                 </button>
               </div>
             </form>
+          ) : step === 'otp' ? (
+            /* ── STEP 2: OTP VERIFICATION FORM ── */
+            <form onSubmit={handleVerifyOtpSubmit} className="space-y-4">
+              <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 text-center">
+                <div className="text-2xl mb-1">✉️</div>
+                <div className="text-xs font-bold text-[#142D4E]">OTP sent to your Gmail</div>
+                <div className="text-[11px] text-slate-600 mt-0.5 font-medium break-all">{email}</div>
+                <div className="text-[10px] text-slate-500 mt-1 italic">
+                  (Check your Inbox as well as Spam / Junk folder)
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#142D4E] mb-1.5 text-center">
+                  Enter 6-Digit Verification Code <span className="text-[#D62839]">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  placeholder="• • • • • •"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full px-4 py-3 rounded-2xl border-2 border-slate-300 text-center text-2xl font-black text-[#142D4E] tracking-[0.4em] outline-none focus:border-[#D62839] focus:ring-2 focus:ring-[#D62839]/20 bg-[#F3F5F8]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || otp.trim().length !== 6}
+                className="w-full py-3 px-4 rounded-xl bg-[#005744] hover:bg-[#004737] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 active:scale-98"
+              >
+                {loading ? 'Verifying OTP & Creating Account...' : 'Verify OTP & Create Account ✓'}
+              </button>
+
+              {/* Resend and Edit options */}
+              <div className="flex items-center justify-between text-xs pt-1 px-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('form');
+                    setError('');
+                    setSuccessMsg('');
+                  }}
+                  className="text-slate-500 hover:text-[#142D4E] font-medium flex items-center gap-1 cursor-pointer"
+                >
+                  ← Edit Details
+                </button>
+
+                {timer > 0 ? (
+                  <span className="text-slate-400 font-medium text-[11px]">
+                    Resend code in <strong className="text-slate-600">{timer}s</strong>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={loading}
+                    className="text-[#D62839] hover:underline font-bold cursor-pointer"
+                  >
+                    Resend OTP
+                  </button>
+                )}
+              </div>
+            </form>
           ) : (
-            /* ── SIGN UP FORM: NAME + MOBILE + GMAIL + PASSWORD (NO OTP) ── */
-            <form onSubmit={handleSignupSubmit} className="space-y-3">
+            /* ── STEP 1: SIGN UP DETAILS FORM (SEND OTP TO GMAIL) ── */
+            <form onSubmit={handleInitiateSignup} className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-[#142D4E] mb-1">
                   Full Name <span className="text-[#D62839]">*</span>
@@ -377,7 +544,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                 disabled={loading}
                 className="w-full py-3 px-4 rounded-xl bg-[#D62839] hover:bg-[#b81d2c] text-white text-xs font-extrabold shadow-md transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 active:scale-98"
               >
-                {loading ? 'Creating Account...' : 'Create Account & Sign In →'}
+                {loading ? 'Sending OTP to Gmail...' : 'Get OTP on Gmail →'}
               </button>
 
               <div className="text-center pt-1">
@@ -386,6 +553,7 @@ const ClientAuthModal = ({ isOpen, onClose, initialMode = 'login', nextUrl = '/m
                   type="button"
                   onClick={() => {
                     setMode('login');
+                    setStep('form');
                     setError('');
                   }}
                   className="text-xs font-bold text-[#2563eb] hover:underline cursor-pointer"
